@@ -1,0 +1,2335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TypeChron Viz - Multi-Keyboard Support</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+            color: #f0f0f0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        body.test-active .header {
+            opacity: 0.4;
+            filter: brightness(0.5);
+        }
+
+        h1 {
+            color: #ff7e5f;
+            margin-bottom: 10px;
+            font-size: 2.8em;
+            font-weight: 700;
+            text-shadow: 0 0 15px rgba(255, 126, 95, 0.4);
+        }
+
+        .subtitle {
+            color: #ddd;
+            font-size: 18px;
+            margin-top: 5px;
+        }
+
+        /* Keyboard Section - Minimalist */
+        .keyboard-section {
+            margin: 40px auto;
+            transition: all 0.3s ease;
+        }
+
+        body.test-active .keyboard-section {
+            opacity: 0.4;
+            filter: brightness(0.5);
+        }
+
+        .keyboard-info {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .keyboard-selector {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .keyboard-selector label {
+            color: #ddd;
+            font-size: 16px;
+        }
+
+        .keyboard-selector select {
+            background: rgba(80, 80, 80, 0.3);
+            color: #fff;
+            border: 1px solid #5a5a5a;
+            border-radius: 20px;
+            padding: 8px 15px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .keyboard-selector select:hover {
+            background: rgba(100, 100, 100, 0.4);
+            border-color: #ff7e5f;
+        }
+
+        .keyboard-selector select:focus {
+            box-shadow: 0 0 0 2px rgba(255, 126, 95, 0.5);
+        }
+
+        .keyboard-background {
+            width: 1200px;
+            height: 450px;
+            background: #3a3a3a;
+            border-radius: 10px;
+            margin: 0 auto;
+            transform: scale(1.1);
+            transform-origin: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .keyboard-wrapper {
+            position: relative;
+            width: 1052.05px;
+            height: 373.199px;
+            background: transparent;
+            border-radius: 0;
+            margin: 0;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .keycap-wrapper {
+            position: absolute;
+            z-index: 1;
+        }
+
+        .keycap-key {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .keycap {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(145deg, #5a5a5a, #4a4a4a);
+            background-size: cover;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 500;
+            text-align: center;
+            line-height: 1.2;
+            transition: all 0.1s ease;
+            cursor: pointer;
+            border: 1px solid #3a3a3a;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .keycap.escape-key {
+            background: linear-gradient(145deg, #ff7e5f, #e56a4a);
+            border-color: #cc573a;
+        }
+
+        .keycap.enter-key {
+            background: linear-gradient(145deg, #ff7e5f, #e56a4a);
+            border-color: #cc573a;
+        }
+
+        .keycap.rotate {
+            background: linear-gradient(145deg, #ff7e5f, #e56a4a);
+            border-color: #cc573a;
+            border-radius: 50%;
+        }
+
+        .keycap.active {
+            background: #ff7e5f;
+            border-color: #ff7e5f;
+            transform: scale(0.95);
+            box-shadow: 0 0 15px rgba(255, 126, 95, 0.6);
+        }
+
+        .active-cover {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 126, 95, 0.3);
+            border-radius: 6px;
+            z-index: 2;
+            opacity: 0;
+            transition: opacity 0.1s;
+        }
+
+        .active-cover.visible {
+            opacity: 1;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .mode-label {
+            color: #ddd;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            width: 60px;
+            height: 30px;
+            background: #5a5a5a;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid #5a5a5a;
+        }
+
+        .toggle-switch.active {
+            background: #ff7e5f;
+            border-color: #ff7e5f;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 22px;
+            height: 22px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .toggle-switch.active .toggle-slider {
+            transform: translateX(30px);
+        }
+
+        /* Keyboard Analytics Panel - NEW */
+        .keyboard-analytics {
+            display: none;
+            background: rgba(40, 40, 40, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px auto;
+            max-width: 1200px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        body.keyboard-only .keyboard-analytics {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .analytics-title {
+            color: #ff7e5f;
+            font-size: 1.8em;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 30px;
+            text-shadow: 0 0 10px rgba(255, 126, 95, 0.3);
+        }
+
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto auto;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .analytics-card {
+            background: rgba(60, 60, 60, 0.4);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(255, 126, 95, 0.2);
+        }
+
+        .card-title {
+            color: #fff;
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ff7e5f;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .live-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .live-stat {
+            text-align: center;
+        }
+
+        .live-stat-value {
+            font-size: 2em;
+            font-weight: 700;
+            color: #ff7e5f;
+            margin-bottom: 5px;
+        }
+
+        .live-stat-label {
+            color: #aaa;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .chart-container {
+            height: 150px;
+            position: relative;
+            background: rgba(80, 80, 80, 0.2);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .chart-canvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        .top-keys-list {
+            max-height: 120px;
+            overflow-y: auto;
+        }
+
+        .top-key-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            margin: 4px 0;
+            background: rgba(80, 80, 80, 0.3);
+            border-radius: 6px;
+            border-left: 3px solid #ff7e5f;
+        }
+
+        .key-name {
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .key-count {
+            color: #ff7e5f;
+            font-weight: 700;
+        }
+
+        .progress-bar {
+            width: 60px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #ff7e5f;
+            transition: width 0.3s ease;
+        }
+
+        .hand-balance {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .hand-indicator {
+            flex: 1;
+            text-align: center;
+        }
+
+        .hand-percentage {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #ff7e5f;
+        }
+
+        .hand-label {
+            color: #aaa;
+            font-size: 0.9em;
+        }
+
+        .balance-bar {
+            flex: 2;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .balance-fill-left {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #66BB6A);
+            transition: width 0.5s ease;
+        }
+
+        .balance-fill-right {
+            position: absolute;
+            right: 0;
+            top: 0;
+            height: 100%;
+            background: linear-gradient(90deg, #FF9800, #FFB74D);
+            transition: width 0.5s ease;
+        }
+
+        /* Heatmap styles */
+        .heatmap-container {
+            margin-top: 10px;
+        }
+
+        .heatmap-row {
+            display: flex;
+            gap: 2px;
+            margin: 2px 0;
+            justify-content: center;
+        }
+
+        .heatmap-key {
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+
+        .heatmap-key.heat-1 { background: rgba(255, 126, 95, 0.3); }
+        .heatmap-key.heat-2 { background: rgba(255, 126, 95, 0.5); }
+        .heatmap-key.heat-3 { background: rgba(255, 126, 95, 0.7); }
+        .heatmap-key.heat-4 { background: rgba(255, 126, 95, 0.9); }
+        .heatmap-key.heat-5 { background: rgba(255, 126, 95, 1); }
+
+        /* Test Results Summary */
+        .results-summary {
+            background: rgba(40, 40, 40, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px auto;
+            max-width: 1200px;
+            transition: all 0.3s;
+        }
+
+        .results-container {
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+        }
+
+        .results-left {
+            flex: 0 0 250px;
+        }
+
+        .results-right {
+            flex: 1;
+        }
+
+        .big-stats {
+            margin-bottom: 25px;
+        }
+
+        .big-wpm {
+            font-size: 5em;
+            font-weight: 800;
+            color: #ff7e5f;
+            line-height: 0.9;
+            margin-bottom: 5px;
+        }
+
+        .big-wpm-label {
+            color: #aaa;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .big-acc {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+
+        .big-acc-label {
+            color: #aaa;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .test-info {
+            color: #bbb;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .test-info span {
+            color: #ff7e5f;
+            font-weight: 600;
+        }
+
+        .graph-container {
+            background: rgba(60, 60, 60, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            height: 200px;
+            position: relative;
+        }
+
+        .graph-title {
+            color: #ddd;
+            font-size: 14px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .wpm-graph {
+            width: 100%;
+            height: 140px;
+            position: relative;
+        }
+
+        .detail-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .detail-stat {
+            text-align: center;
+        }
+
+        .detail-stat-label {
+            color: #aaa;
+            font-size: 12px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .detail-stat-value {
+            color: #ff7e5f;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .characters-breakdown {
+            font-size: 18px;
+            color: #fff;
+        }
+
+        .char-correct { color: #4CAF50; }
+        .char-incorrect { color: #f44336; }
+        .char-extra { color: #ff9800; }
+        .char-missed { color: #9e9e9e; }
+
+        body.test-active .results-summary {
+            opacity: 0.4;
+            filter: brightness(0.5);
+        }
+
+        body.keyboard-only .results-summary {
+            display: none;
+        }
+
+        .summary-title {
+            color: #fff;
+            font-size: 1.2em;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .test-result {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 15px;
+            margin: 5px 0;
+            background: rgba(60, 60, 60, 0.5);
+            border-radius: 8px;
+            font-size: 0.9em;
+            border: 2px solid #ff7e5f;
+            background: rgba(255, 126, 95, 0.1);
+        }
+
+        .result-stats {
+            display: flex;
+            gap: 20px;
+        }
+
+        .result-stat {
+            color: #ddd;
+        }
+
+        .result-stat strong {
+            color: #ff7e5f;
+        }
+        body.keyboard-only #wordsDisplay,
+        body.keyboard-only .stats-container {
+            display: none;
+        }
+
+        body.keyboard-only .header {
+            margin-bottom: 20px;
+        }
+
+        .capture-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #2ecc71;
+            color: white;
+            padding: 12px 18px;
+            border-radius: 30px;
+            font-size: 14px;
+            display: none;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Typing Test - Minimalist and Wide */
+        #wordsDisplay {
+            font-size: 1.5em;
+            line-height: 1.6;
+            text-align: center;
+            color: #e0e0e0;
+            margin: 40px auto 20px;
+            min-height: 120px;
+            font-weight: 400;
+            padding: 20px;
+            max-width: 1400px;
+            transition: all 0.3s;
+        }
+
+        .word {
+            display: inline-block;
+            margin: 0 6px;
+            padding: 6px 8px;
+            border-radius: 8px;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .word.future {
+            opacity: 0.7;
+            color: #b0b0b0;
+        }
+
+        .word.active {
+            background: rgba(80, 80, 80, 0.3);
+            color: #ffffff;
+            opacity: 1;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .word.completed {
+            color: #a0a0a0;
+            opacity: 0.9;
+        }
+
+        .char {
+            display: inline-block;
+            position: relative;
+            transition: color 0.2s;
+            color: #e0e0e0;
+        }
+
+        .char.correct {
+            color: #ffffff;
+        }
+
+        .char.incorrect {
+            color: #ff6b6b;
+        }
+
+        .char.current {
+            position: relative;
+            color: #ffffff;
+        }
+
+        .char.current::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: #ff7e5f;
+            animation: blink 1.4s infinite;
+            border-radius: 2px;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        /* Stats Container */
+        .stats-container {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin: 20px auto 40px;
+            max-width: 800px;
+        }
+
+        .stat-box {
+            background: rgba(80, 80, 80, 0.4);
+            padding: 20px 35px;
+            border-radius: 12px;
+            text-align: center;
+            min-width: 160px;
+            transition: transform 0.3s;
+        }
+
+        .stat-box:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-value {
+            font-size: 3em;
+            font-weight: 800;
+            color: #ff7e5f;
+            margin-top: 10px;
+            text-shadow: 0 0 10px rgba(255, 126, 95, 0.4);
+        }
+
+        .stat-label {
+            color: #ddd;
+            font-size: 1em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .test-controls {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .test-btn {
+            background: #5a5a5a;
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .test-btn:hover {
+            background: #6a6a6a;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+        
+        .test-btn:active {
+            transform: translateY(1px);
+        }
+        
+        .instructions {
+            text-align: center;
+            color: #ddd;
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(80, 80, 80, 0.3);
+            border-radius: 12px;
+            max-width: 800px;
+            margin: 30px auto;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        body.test-active .instructions {
+            opacity: 0.4;
+            filter: brightness(0.5);
+        }
+
+        /* Make words brighter during test */
+        body.test-active #wordsDisplay {
+            opacity: 1;
+            filter: brightness(1.2);
+        }
+
+        /* Focus overlay */
+        .focus-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.2);
+            z-index: 999;
+            display: none;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="capture-indicator" id="captureIndicator">KEYBOARD ONLY MODE - Toggle to return to typing test</div>
+    <div class="focus-overlay" id="focusOverlay"></div>
+    
+    <div class="container">
+        <div class="header">
+            <h1>TypeChron Viz</h1>
+            <p class="subtitle">Visualize typing on multiple keyboard layouts</p>
+        </div>
+        
+        <!-- Keyboard Section - Minimalist -->
+        <div class="keyboard-section">
+            <div class="keyboard-info">
+                <div class="keyboard-selector">
+                    <!-- <label for="keyboardSelect">Keyboard Layout:</label> -->
+                    <select id="keyboardSelect">
+                        <option value="keychron">Keychron K15 Max ANSI</option>
+                        <option value="marvo">MARVO KG 980B TKL (ANSI 87-key)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="keyboard-background">
+                <div class="keyboard-wrapper" id="keyboardLayout">
+                    <!-- Keyboard layout will be generated here -->
+                </div>
+            </div>
+            <div class="controls">
+                <span class="mode-label">Typing Test</span>
+                <div class="toggle-switch" id="modeToggle">
+                    <div class="toggle-slider"></div>
+                </div>
+                <span class="mode-label">Keyboard Only</span>
+            </div>
+        </div>
+
+        <!-- NEW: Keyboard Analytics Panel -->
+        <div class="keyboard-analytics" id="keyboardAnalytics">
+            <h2 class="analytics-title">Analytics</h2>
+            
+            <div class="analytics-grid">
+                <!-- Live Stats Card -->
+                <div class="analytics-card">
+                    <div class="card-title">
+                        <div class="card-icon">⚡</div>
+                        Live Statistics
+                    </div>
+                    <div class="live-stats">
+                        <div class="live-stat">
+                            <div class="live-stat-value" id="totalKeystrokes">0</div>
+                            <div class="live-stat-label">Keystrokes</div>
+                        </div>
+                        <div class="live-stat">
+                            <div class="live-stat-value" id="averageDwell">0ms</div>
+                            <div class="live-stat-label">Avg Dwell</div>
+                        </div>
+                        <div class="live-stat">
+                            <div class="live-stat-value" id="keystrokeRate">0</div>
+                            <div class="live-stat-label">KPS</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Keystroke Rhythm Chart -->
+                <div class="analytics-card">
+                    <div class="card-title">
+                        <div class="card-icon">📊</div>
+                        Keystroke Rhythm
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="rhythmChart" class="chart-canvas"></canvas>
+                    </div>
+                </div>
+
+                <!-- Top Keys -->
+                <div class="analytics-card">
+                    <div class="card-title">
+                        <div class="card-icon">🔥</div>
+                        Most Used Keys
+                    </div>
+                    <div class="top-keys-list" id="topKeysList">
+                        <!-- Top keys will be populated here -->
+                    </div>
+                </div>
+
+                <!-- Hand Balance & Heatmap -->
+                <div class="analytics-card">
+                    <div class="card-title">
+                        <div class="card-icon">⚖️</div>
+                        Hand Balance & Usage
+                    </div>
+                    <div class="hand-balance">
+                        <div class="hand-indicator">
+                            <div class="hand-percentage" id="leftHandPercent">50%</div>
+                            <div class="hand-label">Left</div>
+                        </div>
+                        <div class="balance-bar">
+                            <div class="balance-fill-left" id="balanceFillLeft"></div>
+                            <div class="balance-fill-right" id="balanceFillRight"></div>
+                        </div>
+                        <div class="hand-indicator">
+                            <div class="hand-percentage" id="rightHandPercent">50%</div>
+                            <div class="hand-label">Right</div>
+                        </div>
+                    </div>
+                    <div class="heatmap-container" id="heatmapContainer">
+                        <!-- Heatmap will be generated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Stats Container -->
+        <div class="stats-container">
+            <div class="stat-box">
+                <div class="stat-label">Words/Min</div>
+                <div class="stat-value" id="wpm">0</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Accuracy</div>
+                <div class="stat-value" id="accuracy">100%</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Time</div>
+                <div class="stat-value" id="timer">60s</div>
+            </div>
+        </div>
+        
+        <!-- Words Display -->
+        <div id="wordsDisplay"></div>
+        
+        <!-- Test Results Summary -->
+        <div class="results-summary" id="resultsSummary">
+            <div class="results-container">
+                <div class="results-left">
+                    <div class="big-stats">
+                        <div class="big-wpm" id="bigWpm">0</div>
+                        <div class="big-wpm-label">wpm</div>
+                        <div class="big-acc" id="bigAcc">100%</div>
+                        <div class="big-acc-label">acc</div>
+                    </div>
+                    <div class="test-info">
+                        <div>test type</div>
+                        <div><span>time 30</span></div>
+                        <div><span>english</span></div>
+                    </div>
+                </div>
+                <div class="results-right">
+                    <div class="graph-container">
+                        <div class="graph-title">Words per Minute</div>
+                        <canvas id="wpmGraph" class="wpm-graph" width="800" height="140"></canvas>
+                    </div>
+                    <div class="detail-stats">
+                        <div class="detail-stat">
+                            <div class="detail-stat-label">raw</div>
+                            <div class="detail-stat-value" id="rawWpm">0</div>
+                        </div>
+                        <div class="detail-stat">
+                            <div class="detail-stat-label">characters</div>
+                            <div class="detail-stat-value characters-breakdown" id="charBreakdown">0/0/0/0</div>
+                        </div>
+                        <div class="detail-stat">
+                            <div class="detail-stat-label">consistency</div>
+                            <div class="detail-stat-value" id="consistency">0%</div>
+                        </div>
+                        <div class="detail-stat">
+                            <div class="detail-stat-label">time</div>
+                            <div class="detail-stat-value" id="testTime">30s</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Instructions -->
+        <div class="instructions">
+            <p>Type on your keyboard to see the visualization. Toggle between keyboard layouts using the dropdown.</p>
+            <p>Switch to "Keyboard Only" mode to focus solely on the keyboard visualization.</p>
+        </div>
+    </div>
+
+    <script>
+        // ================== Typing Test Functionality ==================
+        let words = [];
+        let currentWordIndex = 0;
+        let currentCharIndex = 0;
+        let correctChars = 0;
+        let totalCharsAttempted = 0;
+        let startTime = null;
+        let timer = 30; // 30 seconds timer
+        let canStartTest = true;
+        let testJustEnded = false;
+        let timerInterval = null;
+        let testActive = false;
+        let lastTestResult = null;
+        let wpmHistory = [];
+        let keystrokeTimestamps = [];
+        let lastKeystrokeTime = 0;
+        let rawWpm = 0;
+        let correctCharsTyped = 0;
+        let incorrectCharsTyped = 0;
+        let extraCharsTyped = 0;
+        let missedCharsTyped = 0;
+
+        const wordsDisplay = document.getElementById('wordsDisplay');
+        const wpmDisplay = document.getElementById('wpm');
+        const accuracyDisplay = document.getElementById('accuracy');
+        const timerDisplay = document.getElementById('timer');
+        const focusOverlay = document.getElementById('focusOverlay');
+        const testResultsList = document.getElementById('testResultsList');
+
+        // Global set to track words used across ALL tests - no repeats ever
+        let globalUsedWords = new Set();
+
+        // Massive Monkeytype-style word list - NO FAKER
+        const allWords = [
+            // 2-letter words (high frequency for flow)
+            "of", "to", "in", "it", "is", "be", "as", "at", "so", "we", "he", "by", "or", "on", "do", "if", "me", "my", "up", "an", "go", "no", "us", "am", "ox", "ah", "oh", "hi", "ex",
+            
+            // 3-letter words 
+            "the", "and", "for", "are", "but", "not", "you", "all", "can", "had", "her", "was", "one", "our", "out", "day", "get", "has", "him", "his", "how", "man", "new", "now", "old", "see", "two", "way", "who", "boy", "did", "its", "let", "put", "say", "she", "too", "use", "may", "try", "own", "run", "why", "big", "end", "far", "few", "got", "lot", "off", "cut", "dog", "eat", "job", "sit", "yes", "yet", "ask", "car", "eye", "bad", "top", "war", "buy", "law", "son", "add", "age", "ago", "air", "art", "box", "cry", "die", "due", "ear", "fly", "fun", "gun", "hit", "hot", "joy", "key", "lie", "low", "mix", "pay", "per", "sea", "set", "six", "ten", "win", "act", "arm", "bag", "bat", "bed", "bet", "bit", "bus", "cap", "cat", "cup", "egg", "fat", "fit", "fix", "gap", "gas", "hat", "ice", "kid", "lay", "leg", "map", "net", "oil", "pan", "pen", "pop", "pot", "row", "sad", "sky", "sun", "tax", "tea", "tip", "toy", "van", "web", "wet", "zip", "red", "tan", "mud",
+            
+            // 4-letter words
+            "that", "with", "have", "this", "will", "your", "from", "they", "know", "want", "been", "good", "much", "some", "time", "very", "when", "come", "here", "just", "like", "long", "make", "many", "over", "such", "take", "than", "them", "well", "were", "what", "year", "work", "back", "call", "came", "each", "even", "find", "give", "hand", "high", "keep", "last", "left", "life", "live", "look", "made", "most", "move", "must", "name", "need", "next", "only", "open", "part", "play", "said", "same", "seem", "show", "side", "tell", "turn", "used", "ways", "week", "went", "word", "also", "away", "best", "both", "case", "down", "does", "fact", "feel", "free", "full", "game", "help", "home", "kind", "line", "mind", "more", "near", "real", "room", "talk", "walk", "want", "ways", "well", "went", "will", "with", "work", "year", "able", "book", "came", "done", "face", "form", "hard", "head", "idea", "late", "love", "once", "took", "turn", "city", "data", "file", "code", "soon", "door", "eyes", "food", "hear", "hold", "hope", "hour", "keep", "kind", "land", "learn", "love", "mean", "meet", "move", "note", "pass", "plan", "push", "read", "rest", "room", "save", "seem", "send", "show", "stay", "stop", "sure", "talk", "team", "tell", "test", "town", "tree", "true", "turn", "type", "used", "user", "view", "wait", "walk", "want", "warm", "wash", "wave", "wear", "week", "wide", "wild", "wind", "wine", "wise", "wood", "word", "yard", "zone", "blue", "pink", "gold", "gray", "dark", "cool", "soft", "hard", "fast", "slow", "easy", "nice", "safe", "fair", "rich", "poor", "deep", "high", "low", "long", "short", "big", "small", "old", "new", "hot", "cold", "dry", "wet", "open", "shut", "full", "half", "dead", "live", "lost", "born", "grow", "fall", "rise", "push", "pull", "give", "take", "send", "come", "go", "run", "walk", "jump", "stop", "start", "end", "begin", "try", "fail", "win", "lose", "buy", "sell", "pay", "cost", "save", "spend", "earn", "work", "play", "rest", "sleep", "wake", "eat", "cook", "wash", "wear", "clean", "dirty", "sick", "well", "hurt", "heal", "help", "care", "love", "hate", "like", "want", "need", "hope", "fear", "know", "learn", "teach", "tell", "ask", "hear", "see", "look", "watch", "read", "write", "draw", "sing", "dance", "laugh", "cry", "smile", "frown",
+            
+            // 5-letter words
+            "about", "could", "first", "great", "these", "would", "other", "thing", "think", "where", "right", "three", "years", "place", "after", "house", "never", "water", "while", "every", "found", "going", "under", "again", "being", "large", "often", "those", "which", "until", "since", "world", "today", "small", "state", "child", "group", "money", "music", "night", "party", "still", "story", "study", "table", "there", "times", "trade", "union", "value", "voice", "white", "write", "young", "above", "alone", "apple", "black", "brown", "chair", "clean", "clear", "close", "dance", "dream", "early", "earth", "field", "final", "floor", "force", "fresh", "front", "glass", "grass", "green", "happy", "heart", "heavy", "human", "light", "local", "march", "match", "metal", "model", "month", "north", "paper", "peace", "phone", "piece", "plant", "point", "power", "press", "quick", "quiet", "radio", "reach", "river", "round", "score", "sense", "share", "sheet", "short", "sleep", "smile", "sound", "south", "space", "speak", "spend", "stage", "stand", "start", "steel", "stone", "sweet", "thick", "throw", "touch", "track", "train", "treat", "trust", "truth", "uncle", "under", "visit", "watch", "wheel", "whole", "woman", "women", "worth", "write", "wrong", "youth", "angry", "basic", "beach", "bread", "break", "bring", "build", "catch", "chain", "cheap", "check", "class", "climb", "clock", "cloth", "cloud", "coach", "coast", "count", "court", "cover", "craft", "crash", "crazy", "cream", "crime", "cross", "crowd", "death", "depth", "diary", "doubt", "dozen", "draft", "drama", "dress", "drink", "drive", "drive", "drugs", "empty", "enemy", "enjoy", "equal", "event", "exact", "exist", "extra", "faith", "false", "frame", "fruit", "funny", "ghost", "giant", "given", "grace", "grand", "grant", "grave", "great", "grief", "gross", "guard", "guess", "guest", "guide", "habit", "horse", "hotel", "hurry", "ideal", "image", "index", "inner", "input", "issue", "joint", "judge", "knife", "knock", "label", "labor", "laugh", "layer", "leave", "legal", "level", "limit", "liver", "logic", "loose", "lucky", "lunch", "magic", "major", "maker", "maple", "marry", "maybe", "mayor", "medal", "media", "merit", "minor", "mixed", "modal", "money", "moral", "motor", "mount", "mouse", "mouth", "movie", "nasty", "naval", "noise", "north", "novel", "nurse", "ocean", "offer", "order", "organ", "other", "owner", "panel", "patch", "pause", "phase", "phone", "photo", "piano", "pilot", "pitch", "plain", "plane", "plaza", "plate", "point", "pound", "power", "press", "price", "pride", "prime", "print", "prior", "prize", "proof", "prove", "proud", "queen", "query", "quest", "quick", "quiet", "quite", "quote", "raise", "range", "rapid", "ratio", "reach", "react", "ready", "rebel", "refer", "relax", "reply", "rider", "right", "rival", "river", "robot", "roger", "roman", "rough", "round", "route", "royal", "ruler", "rural", "scale", "scene", "scope", "score", "sense", "serve", "setup", "seven", "shade", "shake", "shall", "shame", "shape", "share", "sharp", "sheep", "sheet", "shelf", "shell", "shift", "shine", "shirt", "shock", "shoot", "short", "shown", "sight", "silly", "since", "sixth", "skill", "sleep", "slide", "small", "smart", "smile", "smoke", "snake", "solid", "solve", "sorry", "sound", "south", "space", "spare", "speak", "speed", "spend", "split", "spoke", "sport", "staff", "stage", "stake", "stamp", "stand", "start", "state", "steam", "steel", "stick", "still", "stock", "stone", "stood", "store", "storm", "story", "strip", "stuck", "study", "stuff", "style", "sugar", "suite", "super", "sweet", "swift", "swing", "table", "taken", "taste", "teach", "thank", "theft", "their", "theme", "there", "these", "thick", "thing", "think", "third", "those", "three", "threw", "throw", "thumb", "tight", "timer", "tired", "title", "today", "token", "total", "touch", "tough", "tower", "track", "trade", "trail", "train", "trash", "treat", "trend", "trial", "tribe", "trick", "tried", "truck", "truly", "trunk", "trust", "truth", "twice", "twist", "ultra", "uncle", "under", "undue", "union", "unity", "until", "upper", "urban", "usage", "usual", "valid", "value", "video", "virus", "visit", "vital", "voice", "waste", "watch", "water", "wheat", "wheel", "where", "which", "while", "white", "whole", "whose", "widow", "width", "woman", "women", "world", "worry", "worse", "worst", "worth", "would", "write", "wrong", "wrote", "youth"
+        ];
+
+        function generateWords() {
+            words = [];
+            const usedWords = new Set();
+            
+            for (let i = 0; i < 30; i++) {  // Generate 30 words (3 rows x 10 words)
+                let word;
+                let attempts = 0;
+                
+                do {
+                    attempts++;
+                    
+                    // Pick random word from our massive list
+                    word = allWords[Math.floor(Math.random() * allWords.length)];
+                    
+                    // Fallback if we can't find unused words
+                    if (attempts > 200) {
+                        // Reset global used words if we've exhausted the pool
+                        globalUsedWords.clear();
+                        word = allWords[Math.floor(Math.random() * allWords.length)];
+                        break;
+                    }
+                    
+                } while (usedWords.has(word) || globalUsedWords.has(word) || word === '');
+                
+                usedWords.add(word);
+                globalUsedWords.add(word);
+                words.push(word);
+            }
+            
+            renderWords();
+        }
+
+        function renderWords() {
+            wordsDisplay.innerHTML = '';
+            
+            // Create 3 rows of exactly 6 words each
+            for (let row = 0; row < 3; row++) {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'word-row';
+                rowDiv.style.display = 'block';
+                // rowDiv.style.marginBottom = '10px';
+                
+                
+                for (let col = 0; col < 10; col++) {  // 10 words per row
+                    const wordIndex = row * 10 + col;  // 10 words per row
+                    if (wordIndex >= words.length) break;
+                    
+                    const word = words[wordIndex];
+                    const wordSpan = document.createElement('span');
+                    wordSpan.className = 'word';
+                    wordSpan.id = `word-${wordIndex}`;
+                    
+                    // Apply classes based on word status
+                    if (wordIndex < currentWordIndex) {
+                        wordSpan.classList.add('completed');
+                    } else if (wordIndex === currentWordIndex) {
+                        wordSpan.classList.add('active');
+                    } else {
+                        wordSpan.classList.add('future');
+                    }
+                    
+                    for (let charIndex = 0; charIndex < word.length; charIndex++) {
+                        const charSpan = document.createElement('span');
+                        charSpan.className = 'char';
+                        charSpan.id = `char-${wordIndex}-${charIndex}`;
+                        charSpan.textContent = word[charIndex];
+                        
+                        // Apply styling for past characters in the current word
+                        if (wordIndex === currentWordIndex && charIndex < currentCharIndex) {
+                            const charElem = document.getElementById(`char-${wordIndex}-${charIndex}`);
+                            if (charElem) {
+                                const isCorrect = charElem.textContent === word[charIndex];
+                                charSpan.classList.add(isCorrect ? 'correct' : 'incorrect');
+                            }
+                        }
+                        
+                        wordSpan.appendChild(charSpan);
+                    }
+                    
+                    rowDiv.appendChild(wordSpan);
+                }
+                
+                wordsDisplay.appendChild(rowDiv);
+            }
+            
+            // Highlight the current character
+            const currentCharElem = document.getElementById(`char-${currentWordIndex}-${currentCharIndex}`);
+            if (currentCharElem) {
+                currentCharElem.classList.add('current');
+            }
+        }
+
+        function startTest() {
+            testActive = true;
+            startTime = new Date();
+            lastKeystrokeTime = startTime.getTime();
+            
+            // Reset advanced stats
+            wpmHistory = [];
+            keystrokeTimestamps = [];
+            rawWpm = 0;
+            correctCharsTyped = 0;
+            incorrectCharsTyped = 0;
+            extraCharsTyped = 0;
+            missedCharsTyped = 0;
+            
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(updateTimer, 1000);
+            
+            // Add test-active class to body for focus mode
+            document.body.classList.add('test-active');
+            focusOverlay.style.display = 'block';
+        }
+
+        function updateTimer() {
+            timer--;
+            timerDisplay.textContent = `${timer}s`;
+            
+            // Auto-stop when timer reaches 0, regardless of position
+            if (timer <= 0) {
+                endTest();
+            }
+        }
+
+        function endTest() {
+            testActive = false;
+            testJustEnded = true;
+            canStartTest = false;
+            clearInterval(timerInterval);
+            
+            // Calculate final WPM and accuracy
+            const elapsedTime = (new Date() - startTime) / 1000 / 60;
+            const wpm = Math.round((correctChars / 5) / elapsedTime);
+            const accuracy = totalCharsAttempted > 0 ? Math.round((correctChars / totalCharsAttempted) * 100) : 100;
+            
+            wpmDisplay.textContent = wpm;
+            accuracyDisplay.textContent = `${accuracy}%`;
+            
+            // Save the test result
+            saveTestResult(wpm, accuracy);
+            
+            // Remove focus mode
+            document.body.classList.remove('test-active');
+            focusOverlay.style.display = 'none';
+            
+            // Wait 2 seconds before allowing new test
+            setTimeout(() => {
+                canStartTest = true;
+                testJustEnded = false;
+                
+                // Generate new words and reset - start from 1st word of 1st row
+                generateWords();
+                currentWordIndex = 0;
+                currentCharIndex = 0;
+                correctChars = 0;
+                totalCharsAttempted = 0;
+                timer = 30;
+                wpmDisplay.textContent = '0';
+                accuracyDisplay.textContent = '100%';
+                timerDisplay.textContent = `${timer}s`;
+            }, 2000);
+        }
+
+        function handleTyping(e) {
+            // Prevent starting test if in wait period
+            if (!canStartTest && !testActive) {
+                return;
+            }
+
+            // Start test if not active and user types a character
+            if (!testActive && e.key.length === 1 && canStartTest) {
+                startTest();
+            }
+            
+            if (!testActive) return;
+            
+            const currentWord = words[currentWordIndex];
+            
+            // Handle space to move to next word
+            if (e.key === ' ' && currentCharIndex >= currentWord.length) {
+                e.preventDefault();
+                
+                // Check if the entire word was typed correctly
+                let wordCorrect = true;
+                for (let i = 0; i < currentWord.length; i++) {
+                    const charElem = document.getElementById(`char-${currentWordIndex}-${i}`);
+                    if (!charElem || !charElem.classList.contains('correct')) {
+                        wordCorrect = false;
+                        break;
+                    }
+                }
+                
+                // Only count space as correct if the entire word was correct
+                totalCharsAttempted++;
+                if (wordCorrect) {
+                    correctChars++;
+                }
+                
+                moveToNextWord();
+                updateStats();
+                return;
+            }
+            
+            // Handle character keys
+            if (e.key.length === 1) {
+                const currentCharElem = document.getElementById(`char-${currentWordIndex}-${currentCharIndex}`);
+                totalCharsAttempted++;
+                
+                // Record keystroke timing
+                const currentTime = new Date().getTime();
+                keystrokeTimestamps.push(currentTime);
+
+                if (e.key === currentWord[currentCharIndex]) {
+                    // Correct character
+                    currentCharElem.classList.remove('current');
+                    currentCharElem.classList.add('correct');
+                    correctChars++;
+                    correctCharsTyped++;
+                } else {
+                    // Incorrect character
+                    currentCharElem.classList.remove('current');
+                    currentCharElem.classList.add('incorrect');
+                    incorrectCharsTyped++;
+                }
+
+                // Update real-time WPM tracking
+                updateRealTimeStats();
+                
+                // Move to next character
+                currentCharIndex++;
+                
+                // Update stats
+                updateStats();
+                
+                // Check if we've reached the end of the word
+                if (currentCharIndex >= currentWord.length) {
+                    if (currentCharElem) currentCharElem.classList.remove('current');
+                } else {
+                    // Highlight next character
+                    const nextCharElem = document.getElementById(`char-${currentWordIndex}-${currentCharIndex}`);
+                    if (nextCharElem) nextCharElem.classList.add('current');
+                }
+            }
+            // Handle backspace
+            else if (e.key === 'Backspace') {
+                if (currentCharIndex > 0) {
+                    // Remove current class from current char
+                    const currentCharElem = document.getElementById(`char-${currentWordIndex}-${currentCharIndex}`);
+                    if (currentCharElem) currentCharElem.classList.remove('current');
+                    
+                    // Move back one character
+                    currentCharIndex--;
+                    
+                    // Reset the character we're going back to
+                    const prevCharElem = document.getElementById(`char-${currentWordIndex}-${currentCharIndex}`);
+                    if (prevCharElem) {
+                        const wasCorrect = prevCharElem.classList.contains('correct');
+                        prevCharElem.classList.remove('correct', 'incorrect');
+                        prevCharElem.classList.add('current');
+                        
+                        // Adjust stats if we're removing a correct character
+                        if (wasCorrect) {
+                            correctChars--;
+                        }
+                        totalCharsAttempted--;
+                    }
+                    
+                    updateStats();
+                }
+            }
+        }
+
+        function updateStats() {
+            // Calculate WPM (Words Per Minute) - Standard formula: (correct chars / 5) / time in minutes
+            const elapsedTime = (new Date() - startTime) / 1000 / 60;
+            const wpm = elapsedTime > 0 ? Math.round((correctChars / 5) / elapsedTime) : 0;
+            wpmDisplay.textContent = wpm;
+            
+            // Calculate Accuracy - Standard formula: (correct chars / total chars attempted) * 100
+            const accuracy = totalCharsAttempted > 0 ? Math.round((correctChars / totalCharsAttempted) * 100) : 100;
+            accuracyDisplay.textContent = `${accuracy}%`;
+        }
+
+        function updateRealTimeStats() {
+            const currentTime = new Date().getTime();
+            const elapsedSeconds = (currentTime - startTime.getTime()) / 1000;
+            
+            if (elapsedSeconds >= 1) {
+                const currentWpm = Math.round((correctChars / 5) / (elapsedSeconds / 60));
+                const currentRawWpm = Math.round((totalCharsAttempted / 5) / (elapsedSeconds / 60));
+                
+                wpmHistory.push({
+                    time: Math.floor(elapsedSeconds),
+                    wpm: currentWpm,
+                    rawWpm: currentRawWpm
+                });
+                
+                rawWpm = currentRawWpm;
+            }
+        }
+
+        function calculateConsistency() {
+            if (wpmHistory.length < 3) return 100;
+            
+            const wpmValues = wpmHistory.map(entry => entry.wpm);
+            const mean = wpmValues.reduce((a, b) => a + b) / wpmValues.length;
+            const variance = wpmValues.reduce((sum, wpm) => sum + Math.pow(wpm - mean, 2), 0) / wpmValues.length;
+            const standardDeviation = Math.sqrt(variance);
+            
+            const consistencyPercentage = Math.max(0, Math.round(100 - (standardDeviation / mean * 100)));
+            return consistencyPercentage;
+        }
+
+        function drawWpmGraph() {
+            const canvas = document.getElementById('wpmGraph');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width;
+            const height = canvas.height;
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, width, height);
+            
+            if (wpmHistory.length < 2) return;
+            
+            // Calculate scales
+            const maxWpm = Math.max(...wpmHistory.map(h => Math.max(h.wpm, h.rawWpm))) + 10;
+            const minWpm = Math.max(0, Math.min(...wpmHistory.map(h => Math.min(h.wpm, h.rawWpm))) - 10);
+            const maxTime = 30;
+            
+            // Draw grid lines
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.lineWidth = 1;
+            
+            // Vertical grid lines (time)
+            for (let i = 0; i <= maxTime; i += 5) {
+                const x = (i / maxTime) * width;
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, height);
+                ctx.stroke();
+            }
+            
+            // Horizontal grid lines (WPM)
+            for (let wpm = minWpm; wpm <= maxWpm; wpm += 20) {
+                const y = height - ((wpm - minWpm) / (maxWpm - minWpm)) * height;
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(width, y);
+                ctx.stroke();
+            }
+            
+            // Draw WPM line (yellow)
+            if (wpmHistory.length > 1) {
+                ctx.strokeStyle = '#ffcc4d';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                
+                wpmHistory.forEach((point, index) => {
+                    const x = (point.time / maxTime) * width;
+                    const y = height - ((point.wpm - minWpm) / (maxWpm - minWpm)) * height;
+                    
+                    if (index === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                });
+                
+                ctx.stroke();
+            }
+            
+            // Draw Raw WPM line (gray)
+            if (wpmHistory.length > 1) {
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                
+                wpmHistory.forEach((point, index) => {
+                    const x = (point.time / maxTime) * width;
+                    const y = height - ((point.rawWpm - minWpm) / (maxWpm - minWpm)) * height;
+                    
+                    if (index === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                });
+                
+                ctx.stroke();
+            }
+        }
+
+        function saveTestResult(wpm, accuracy) {
+            const consistency = calculateConsistency();
+            
+            const result = {
+                wpm: wpm,
+                rawWpm: rawWpm,
+                accuracy: accuracy,
+                consistency: consistency,
+                correctChars: correctCharsTyped,
+                incorrectChars: incorrectCharsTyped,
+                extraChars: extraCharsTyped,
+                missedChars: missedCharsTyped,
+                date: new Date().toLocaleTimeString(),
+                timestamp: Date.now(),
+                wpmHistory: [...wpmHistory]
+            };
+            
+            lastTestResult = result;
+            updateResultsDisplay();
+        }
+
+        function updateResultsDisplay() {
+            if (!lastTestResult) {
+                document.getElementById('bigWpm').textContent = '0';
+                document.getElementById('bigAcc').textContent = '100%';
+                document.getElementById('rawWpm').textContent = '0';
+                document.getElementById('charBreakdown').innerHTML = '0/0/0/0';
+                document.getElementById('consistency').textContent = '100%';
+                document.getElementById('testTime').textContent = '30s';
+                return;
+            }
+            
+            // Update big stats
+            document.getElementById('bigWpm').textContent = lastTestResult.wpm;
+            document.getElementById('bigAcc').textContent = `${lastTestResult.accuracy}%`;
+            
+            // Update detail stats
+            document.getElementById('rawWpm').textContent = lastTestResult.rawWpm;
+            document.getElementById('consistency').textContent = `${lastTestResult.consistency}%`;
+            document.getElementById('testTime').textContent = '30s';
+            
+            // Update character breakdown with colors
+            const charBreakdown = document.getElementById('charBreakdown');
+            charBreakdown.innerHTML = `
+                <span class="char-correct">${lastTestResult.correctChars}</span>/
+                <span class="char-incorrect">${lastTestResult.incorrectChars}</span>/
+                <span class="char-extra">${lastTestResult.extraChars}</span>/
+                <span class="char-missed">${lastTestResult.missedChars}</span>
+            `;
+            
+            // Draw the WPM graph
+            setTimeout(() => {
+                wpmHistory = lastTestResult.wpmHistory || [];
+                drawWpmGraph();
+            }, 100);
+        }
+
+        function moveToNextWord() {
+            // Remove current highlight from current character
+            const currentCharElem = document.getElementById(`char-${currentWordIndex}-${currentCharIndex}`);
+            if (currentCharElem) currentCharElem.classList.remove('current');
+            
+            // Move to next word
+            document.getElementById(`word-${currentWordIndex}`).classList.remove('active');
+            document.getElementById(`word-${currentWordIndex}`).classList.add('completed');
+            
+            currentWordIndex++;
+            currentCharIndex = 0;
+            
+            // Sliding rows: when finishing LAST word of 2nd row, slide everything up
+            if (currentWordIndex === 20) {  // Trigger slide after 2nd row (20 words)
+                // Remove entire 1st row (first 6 words: 0-5)
+                words.splice(0, 10);  // Remove 10 words (first row)
+                
+                // Reset position to 1st word of what is now the 2nd row
+                currentWordIndex = 10;  // Reset to first word of new first row
+                
+                // Add 6 new words to create new 3rd row
+                const usedWords = new Set(words);
+                
+                for (let i = 0; i < 10; i++) {  // Add 10 new words
+                    let word;
+                    let attempts = 0;
+                    
+                    do {
+                        attempts++;
+                        
+                        // Pick random word from our massive list
+                        word = allWords[Math.floor(Math.random() * allWords.length)];
+                        
+                        if (attempts > 200) {
+                            // Reset global used words if we've exhausted the pool
+                            globalUsedWords.clear();
+                            word = allWords[Math.floor(Math.random() * allWords.length)];
+                            break;
+                        }
+                        
+                    } while (usedWords.has(word) || globalUsedWords.has(word) || word === '');
+                    
+                    usedWords.add(word);
+                    globalUsedWords.add(word);
+                    words.push(word);
+                }
+                
+                renderWords();
+            }
+            
+            // Check if we've reached the end of the test
+            if (currentWordIndex >= words.length) {
+                endTest();
+                return;
+            }
+            
+            // Highlight next word
+            document.getElementById(`word-${currentWordIndex}`).classList.remove('future');
+            document.getElementById(`word-${currentWordIndex}`).classList.add('active');
+            
+            // Highlight first character of next word
+            const nextCharElem = document.getElementById(`char-${currentWordIndex}-${currentCharIndex}`);
+            if (nextCharElem) nextCharElem.classList.add('current');
+        }
+
+        // Initialize the typing test
+        generateWords();
+        // Set initial state - start at 1st word of 1st row
+        currentWordIndex = 0;
+        currentCharIndex = 0;
+        correctChars = 0;
+        totalCharsAttempted = 0;
+        timer = 30; // FIXED: Set to 30 seconds
+        wpmDisplay.textContent = '0';
+        accuracyDisplay.textContent = '100%';
+        timerDisplay.textContent = `${timer}s`;
+
+        // Initialize results display
+        updateResultsDisplay();
+
+        // ================== NEW: Keyboard Analytics System ==================
+        
+        // Keyboard analytics data
+        let keyboardAnalytics = {
+            sessionStartTime: Date.now(),
+            totalKeystrokes: 0,
+            keyFrequency: new Map(),
+            dwellTimes: [],
+            keystrokeTimings: [],
+            keyDownTimes: new Map(),
+            rhythmData: [],
+            handBalance: { left: 0, right: 0 }
+        };
+
+        // Left hand keys (QWERTY layout mapping)
+        const leftHandKeys = new Set([
+            'KeyQ', 'KeyW', 'KeyE', 'KeyR', 'KeyT',
+            'KeyA', 'KeyS', 'KeyD', 'KeyF', 'KeyG',
+            'KeyZ', 'KeyX', 'KeyC', 'KeyV', 'KeyB',
+            'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5',
+            'Tab', 'CapsLock', 'ShiftLeft', 'ControlLeft', 'AltLeft', 'MetaLeft',
+            'Backquote', 'Escape'
+        ]);
+
+        // Chart instances
+        let rhythmChart = null;
+
+        // Initialize keyboard analytics
+        function initKeyboardAnalytics() {
+            setupCharts();
+            startAnalyticsUpdate();
+        }
+
+        function setupCharts() {
+            const rhythmCanvas = document.getElementById('rhythmChart');
+            if (rhythmCanvas) {
+                const ctx = rhythmCanvas.getContext('2d');
+                rhythmChart = {
+                    canvas: rhythmCanvas,
+                    ctx: ctx,
+                    data: []
+                };
+            }
+        }
+
+        function startAnalyticsUpdate() {
+            // Update analytics every 100ms for smooth real-time feel
+            setInterval(updateAnalyticsDisplay, 100);
+            // Update charts every 500ms to reduce performance impact
+            setInterval(updateAnalyticsCharts, 500);
+        }
+
+        function recordKeyPress(code, timestamp) {
+            if (!keyboardOnlyMode) return;
+            
+            keyboardAnalytics.totalKeystrokes++;
+            
+            // Record key frequency
+            const currentCount = keyboardAnalytics.keyFrequency.get(code) || 0;
+            keyboardAnalytics.keyFrequency.set(code, currentCount + 1);
+            
+            // Record keystroke timing for rhythm analysis
+            if (keyboardAnalytics.keystrokeTimings.length > 0) {
+                const lastTime = keyboardAnalytics.keystrokeTimings[keyboardAnalytics.keystrokeTimings.length - 1];
+                const interval = timestamp - lastTime;
+                keyboardAnalytics.rhythmData.push(interval);
+                
+                // Keep only last 50 intervals for performance
+                if (keyboardAnalytics.rhythmData.length > 50) {
+                    keyboardAnalytics.rhythmData.shift();
+                }
+            }
+            
+            keyboardAnalytics.keystrokeTimings.push(timestamp);
+            keyboardAnalytics.keyDownTimes.set(code, timestamp);
+            
+            // Track hand balance
+            if (leftHandKeys.has(code)) {
+                keyboardAnalytics.handBalance.left++;
+            } else {
+                keyboardAnalytics.handBalance.right++;
+            }
+            
+            // Keep timing arrays manageable
+            if (keyboardAnalytics.keystrokeTimings.length > 1000) {
+                keyboardAnalytics.keystrokeTimings = keyboardAnalytics.keystrokeTimings.slice(-500);
+            }
+        }
+
+        function recordKeyRelease(code, timestamp) {
+            if (!keyboardOnlyMode) return;
+            
+            const downTime = keyboardAnalytics.keyDownTimes.get(code);
+            if (downTime) {
+                const dwellTime = timestamp - downTime;
+                keyboardAnalytics.dwellTimes.push(dwellTime);
+                keyboardAnalytics.keyDownTimes.delete(code);
+                
+                // Keep only last 100 dwell times
+                if (keyboardAnalytics.dwellTimes.length > 100) {
+                    keyboardAnalytics.dwellTimes.shift();
+                }
+            }
+        }
+
+        function updateAnalyticsDisplay() {
+            if (!keyboardOnlyMode) return;
+            
+            // Update live statistics
+            document.getElementById('totalKeystrokes').textContent = keyboardAnalytics.totalKeystrokes;
+            
+            // Calculate average dwell time
+            const avgDwell = keyboardAnalytics.dwellTimes.length > 0 
+                ? Math.round(keyboardAnalytics.dwellTimes.reduce((a, b) => a + b, 0) / keyboardAnalytics.dwellTimes.length)
+                : 0;
+            document.getElementById('averageDwell').textContent = `${avgDwell}ms`;
+            
+            // Calculate keystrokes per second
+            const sessionDuration = (Date.now() - keyboardAnalytics.sessionStartTime) / 1000;
+            const kps = sessionDuration > 0 ? (keyboardAnalytics.totalKeystrokes / sessionDuration).toFixed(1) : '0.0';
+            document.getElementById('keystrokeRate').textContent = kps;
+            
+            // Update top keys list
+            updateTopKeysList();
+            
+            // Update hand balance
+            updateHandBalance();
+            
+            // Update heatmap
+            updateKeyboardHeatmap();
+        }
+
+        function updateTopKeysList() {
+            const topKeysList = document.getElementById('topKeysList');
+            if (!topKeysList) return;
+            
+            // Get top 5 most pressed keys
+            const sortedKeys = Array.from(keyboardAnalytics.keyFrequency.entries())
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5);
+            
+            const maxCount = sortedKeys.length > 0 ? sortedKeys[0][1] : 1;
+            
+            topKeysList.innerHTML = sortedKeys.map(([code, count]) => {
+                const keyName = getKeyDisplayName(code);
+                const percentage = Math.round((count / maxCount) * 100);
+                
+                return `
+                    <div class="top-key-item">
+                        <span class="key-name">${keyName}</span>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${percentage}%"></div>
+                        </div>
+                        <span class="key-count">${count}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateHandBalance() {
+            const total = keyboardAnalytics.handBalance.left + keyboardAnalytics.handBalance.right;
+            if (total === 0) return;
+            
+            const leftPercent = Math.round((keyboardAnalytics.handBalance.left / total) * 100);
+            const rightPercent = Math.round((keyboardAnalytics.handBalance.right / total) * 100);
+            
+            document.getElementById('leftHandPercent').textContent = `${leftPercent}%`;
+            document.getElementById('rightHandPercent').textContent = `${rightPercent}%`;
+            
+            // Update balance bar
+            document.getElementById('balanceFillLeft').style.width = `${leftPercent}%`;
+            document.getElementById('balanceFillRight').style.width = `${rightPercent}%`;
+        }
+
+        function updateKeyboardHeatmap() {
+            const heatmapContainer = document.getElementById('heatmapContainer');
+            if (!heatmapContainer || keyboardAnalytics.keyFrequency.size === 0) return;
+            
+            // Create simplified heatmap for QWERTY layout
+            const qwertyRows = [
+                ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
+                ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
+                ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
+                ['Z', 'X', 'C', 'V', 'B', 'N', 'M']
+            ];
+            
+            const maxCount = Math.max(...Array.from(keyboardAnalytics.keyFrequency.values()));
+            
+            heatmapContainer.innerHTML = qwertyRows.map(row => {
+                return `<div class="heatmap-row">` +
+                    row.map(key => {
+                        const code = getCodeFromKey(key);
+                        const count = keyboardAnalytics.keyFrequency.get(code) || 0;
+                        const heatLevel = maxCount > 0 ? Math.ceil((count / maxCount) * 5) : 0;
+                        
+                        return `<div class="heatmap-key ${heatLevel > 0 ? `heat-${heatLevel}` : ''}">${key}</div>`;
+                    }).join('') +
+                `</div>`;
+            }).join('');
+        }
+
+        function updateAnalyticsCharts() {
+            if (!keyboardOnlyMode || !rhythmChart) return;
+            
+            drawRhythmChart();
+        }
+
+        function drawRhythmChart() {
+            const { canvas, ctx } = rhythmChart;
+            if (!canvas || !ctx) return;
+            
+            const width = canvas.width = canvas.offsetWidth;
+            const height = canvas.height = canvas.offsetHeight;
+            
+            ctx.clearRect(0, 0, width, height);
+            
+            if (keyboardAnalytics.rhythmData.length < 2) {
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+                ctx.font = '14px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('Start typing to see rhythm...', width / 2, height / 2);
+                return;
+            }
+            
+            const data = keyboardAnalytics.rhythmData.slice(-30); // Last 30 intervals
+            const maxInterval = Math.max(...data, 500); // Cap at 500ms
+            const minInterval = Math.min(...data, 0);
+            
+            // Draw grid
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= 5; i++) {
+                const y = (i / 5) * height;
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(width, y);
+                ctx.stroke();
+            }
+            
+            // Draw rhythm line
+            ctx.strokeStyle = '#ff7e5f';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            
+            data.forEach((interval, index) => {
+                const x = (index / (data.length - 1)) * width;
+                const normalizedInterval = Math.min(interval, 500); // Cap display at 500ms
+                const y = height - ((normalizedInterval - minInterval) / (maxInterval - minInterval)) * height;
+                
+                if (index === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            });
+            
+            ctx.stroke();
+            
+            // Add dots for data points
+            ctx.fillStyle = '#ff7e5f';
+            data.forEach((interval, index) => {
+                const x = (index / (data.length - 1)) * width;
+                const normalizedInterval = Math.min(interval, 500);
+                const y = height - ((normalizedInterval - minInterval) / (maxInterval - minInterval)) * height;
+                
+                ctx.beginPath();
+                ctx.arc(x, y, 3, 0, 2 * Math.PI);
+                ctx.fill();
+            });
+        }
+
+        // Helper functions for analytics
+        function getKeyDisplayName(code) {
+            const keyMap = {
+                'Space': 'Space',
+                'Enter': 'Enter',
+                'Backspace': 'Backsp',
+                'ShiftLeft': 'LShift',
+                'ShiftRight': 'RShift',
+                'ControlLeft': 'LCtrl',
+                'ControlRight': 'RCtrl',
+                'AltLeft': 'LAlt',
+                'AltRight': 'RAlt',
+                'MetaLeft': 'LCmd',
+                'MetaRight': 'RCmd',
+                'Tab': 'Tab',
+                'CapsLock': 'Caps',
+                'Escape': 'Esc'
+            };
+            
+            if (keyMap[code]) return keyMap[code];
+            if (code.startsWith('Key')) return code.slice(3);
+            if (code.startsWith('Digit')) return code.slice(5);
+            if (code.startsWith('Arrow')) return code.slice(5);
+            
+            return code;
+        }
+
+        function getCodeFromKey(key) {
+            const keyCodeMap = {
+                '1': 'Digit1', '2': 'Digit2', '3': 'Digit3', '4': 'Digit4', '5': 'Digit5',
+                '6': 'Digit6', '7': 'Digit7', '8': 'Digit8', '9': 'Digit9', '0': 'Digit0',
+                'Q': 'KeyQ', 'W': 'KeyW', 'E': 'KeyE', 'R': 'KeyR', 'T': 'KeyT',
+                'Y': 'KeyY', 'U': 'KeyU', 'I': 'KeyI', 'O': 'KeyO', 'P': 'KeyP',
+                'A': 'KeyA', 'S': 'KeyS', 'D': 'KeyD', 'F': 'KeyF', 'G': 'KeyG',
+                'H': 'KeyH', 'J': 'KeyJ', 'K': 'KeyK', 'L': 'KeyL',
+                'Z': 'KeyZ', 'X': 'KeyX', 'C': 'KeyC', 'V': 'KeyV', 'B': 'KeyB',
+                'N': 'KeyN', 'M': 'KeyM'
+            };
+            
+            return keyCodeMap[key] || key;
+        }
+
+        function resetAnalytics() {
+            keyboardAnalytics = {
+                sessionStartTime: Date.now(),
+                totalKeystrokes: 0,
+                keyFrequency: new Map(),
+                dwellTimes: [],
+                keystrokeTimings: [],
+                keyDownTimes: new Map(),
+                rhythmData: [],
+                handBalance: { left: 0, right: 0 }
+            };
+        }
+
+        // ================== Keyboard Visualizer ==================
+        let pressedKeys = new Set();
+        let keyboardOnlyMode = false;
+
+        // Keyboard layouts
+        const keyLayouts = {
+            keychron: [
+                // Row 0 (Knob and function keys)
+                {row: 0, col: 0, x: 26.5, y: 2.89852, width: 52, height: 54, isKnob: true, label: 'OSL(1)', code: 'KC_ACL0', key: 'OSL(1)'},
+                {row: 0, col: 1, x: 106, y: 2.89852, width: 52, height: 54, label: 'Esc', code: 'Escape', key: 'Escape', isSpecial: true},
+                {row: 0, col: 2, x: 172.25, y: 2.89852, width: 52, height: 54, label: 'Scr -', code: 'F1', key: 'F1'},
+                {row: 0, col: 3, x: 225.25, y: 2.89852, width: 52, height: 54, label: 'Scr +', code: 'F2', key: 'F2'},
+                {row: 0, col: 4, x: 284.829, y: 5.30011, width: 52, height: 54, rotation: 0.10472, label: 'MCtl', code: 'F3', key: 'F3'},
+                {row: 0, col: 5, x: 337.539, y: 10.8401, width: 52, height: 54, rotation: 0.10472, label: 'LPad', code: 'F4', key: 'F4'},
+                {row: 0, col: 6, x: 403.426, y: 17.7651, width: 52, height: 54, rotation: 0.10472, label: 'BL -', code: 'F5', key: 'F5'},
+                {row: 0, col: 7, x: 456.136, y: 23.3051, width: 52, height: 54, rotation: 0.10472, label: 'BL +', code: 'F6', key: 'F6'},
+                {row: 0, col: 8, x: 540.748, y: 23.6689, width: 52, height: 54, rotation: -0.10472, label: 'Prvs', code: 'F7', key: 'F7'},
+                {row: 0, col: 9, x: 593.458, y: 18.1289, width: 52, height: 54, rotation: -0.10472, label: 'Play', code: 'F8', key: 'F8'},
+                {row: 0, col: 10, x: 659.345, y: 11.2039, width: 52, height: 54, rotation: -0.10472, label: 'Next', code: 'F9', key: 'F9'},
+                {row: 0, col: 11, x: 712.054, y: 5.66387, width: 52, height: 54, rotation: -0.10472, label: 'Mute', code: 'F10', key: 'F10'},
+                {row: 0, col: 12, x: 773.8, y: 2.89852, width: 52, height: 54, label: 'Vol -', code: 'F11', key: 'F11'},
+                {row: 0, col: 13, x: 826.8, y: 2.89852, width: 52, height: 54, label: 'Vol +', code: 'F12', key: 'F12'},
+                {row: 0, col: 14, x: 893.05, y: 2.89852, width: 52, height: 54, label: 'Ins', code: 'Insert', key: 'Insert'},
+                {row: 0, col: 15, x: 959.3, y: 2.89852, width: 52, height: 54, label: 'Del', code: 'Delete', key: 'Delete'},
+
+                // Row 1 (Number row)
+                {row: 1, col: 0, x: 39.75, y: 71.6485, width: 52, height: 54, label: 'M1', code: 'N/A', key: 'M1'},
+                {row: 1, col: 1, x: 119.25, y: 71.6485, width: 52, height: 54, label: '~\n`', code: 'Backquote', key: '`'},
+                {row: 1, col: 2, x: 172.25, y: 71.6485, width: 52, height: 54, label: '!\n1', code: 'Digit1', key: '1'},
+                {row: 1, col: 3, x: 225.25, y: 71.6485, width: 52, height: 54, label: '@\n2', code: 'Digit2', key: '2'},
+                {row: 1, col: 4, x: 285.55, y: 74.5045, width: 52, height: 54, rotation: 0.10472, label: '#\n3', code: 'Digit3', key: '3'},
+                {row: 1, col: 5, x: 338.259, y: 80.0445, width: 52, height: 54, rotation: 0.10472, label: '$\n4', code: 'Digit4', key: '4'},
+                {row: 1, col: 6, x: 390.969, y: 85.5845, width: 52, height: 54, rotation: 0.10472, label: '%\n5', code: 'Digit5', key: '5'},
+                {row: 1, col: 7, x: 443.679, y: 91.1245, width: 52, height: 54, rotation: 0.10472, label: '^\n6', code: 'Digit6', key: '6'},
+                {row: 1, col: 8, x: 513.673, y: 95.6433, width: 52, height: 54, rotation: -0.10472, label: '&\n7', code: 'Digit7', key: '7'},
+                {row: 1, col: 9, x: 566.383, y: 90.1033, width: 52, height: 54, rotation: -0.10472, label: '*\n8', code: 'Digit8', key: '8'},
+                {row: 1, col: 10, x: 619.092, y: 84.5633, width: 52, height: 54, rotation: -0.10472, label: '(\n9', code: 'Digit9', key: '9'},
+                {row: 1, col: 11, x: 671.802, y: 79.0233, width: 52, height: 54, rotation: -0.10472, label: ')\n0', code: 'Digit0', key: '0'},
+                {row: 1, col: 12, x: 736.7, y: 71.6485, width: 52, height: 54, label: '_\n-', code: 'Minus', key: '-'},
+                {row: 1, col: 13, x: 789.7, y: 71.6485, width: 52, height: 54, label: '+\n=', code: 'Equal', key: '='},
+                {row: 1, col: 14, x: 842.7, y: 71.6485, width: 105, height: 54, label: 'Backspace', mark: '18', code: 'Backspace', key: 'Backspace'},
+                {row: 1, col: 15, x: 980.5, y: 71.6485, width: 52, height: 54, label: 'PgUp', code: 'PageUp', key: 'PageUp'},
+
+                // Row 2 (QWERTY row)
+                {row: 2, col: 0, x: 26.5, y: 126.649, width: 52, height: 54, label: 'M2', code: 'N/A', key: 'M2'},
+                {row: 2, col: 1, x: 106, y: 126.649, width: 78.5, height: 54, label: 'Tab', code: 'Tab', key: 'Tab'},
+                {row: 2, col: 2, x: 185.5, y: 126.649, width: 52, height: 54, label: 'Q', mark: '26', code: 'KeyQ', key: 'q'},
+                {row: 2, col: 3, x: 245.539, y: 125.602, width: 52, height: 54, rotation: 0.10472, label: 'W', mark: '33', code: 'KeyW', key: 'w'},
+                {row: 2, col: 4, x: 298.249, y: 131.142, width: 52, height: 54, rotation: 0.10472, label: 'E', mark: '32', code: 'KeyE', key: 'e'},
+                {row: 2, col: 5, x: 350.959, y: 136.682, width: 52, height: 54, rotation: 0.10472, label: 'R', mark: '2', code: 'KeyR', key: 'r'},
+                {row: 2, col: 6, x: 403.668, y: 142.222, width: 52, height: 54, rotation: 0.10472, label: 'T', mark: '9', code: 'KeyT', key: 't'},
+                {row: 2, col: 7, x: 493.067, y: 153.112, width: 52, height: 54, rotation: -0.10472, label: 'Y', code: 'KeyY', key: 'y'},
+                {row: 2, col: 8, x: 545.777, y: 147.572, width: 52, height: 54, rotation: -0.10472, label: 'U', mark: '1', code: 'KeyU', key: 'u'},
+                {row: 2, col: 9, x: 598.487, y: 142.032, width: 52, height: 54, rotation: -0.10472, label: 'I', mark: '10', code: 'KeyI', key: 'i'},
+                {row: 2, col: 10, x: 651.196, y: 136.492, width: 52, height: 54, rotation: -0.10472, label: 'O', mark: '6', code: 'KeyO', key: 'o'},
+                {row: 2, col: 11, x: 703.906, y: 130.952, width: 52, height: 54, rotation: -0.10472, label: 'P', mark: '1', code: 'KeyP', key: 'p'},
+                {row: 2, col: 12, x: 763.2, y: 126.649, width: 52, height: 54, label: '{\n[', code: 'BracketLeft', key: '['},
+                {row: 2, col: 13, x: 816.2, y: 126.649, width: 52, height: 54, label: '}\n]', mark: '3', code: 'BracketRight', key: ']'},
+                {row: 2, col: 14, x: 869.2, y: 126.649, width: 91.75, height: 54, label: '|\n\\', mark: '4', code: 'Backslash', key: '\\'},
+                {row: 2, col: 15, x: 988.45, y: 126.649, width: 52, height: 54, label: 'PgDn', code: 'PageDown', key: 'PageDown'},
+
+                // Row 3 (ASDF row)
+                {row: 3, col: 0, x: 13.25, y: 181.649, width: 52, height: 54, label: 'M3', code: 'N/A', key: 'M3'},
+                {row: 3, col: 1, x: 92.75, y: 181.649, width: 91.75, height: 54, label: 'Caps Lock', code: 'CapsLock', key: 'CapsLock'},
+                {row: 3, col: 2, x: 185.5, y: 181.649, width: 52, height: 54, label: 'A', mark: '16', code: 'KeyA', key: 'a'},
+                {row: 3, col: 3, x: 245.061, y: 180.855, width: 52, height: 54, rotation: 0.10472, label: 'S', mark: '17', code: 'KeyS', key: 's'},
+                {row: 3, col: 4, x: 297.771, y: 186.395, width: 52, height: 54, rotation: 0.10472, label: 'D', mark: '21', code: 'KeyD', key: 'd'},
+                {row: 3, col: 5, x: 350.48, y: 191.935, width: 52, height: 54, rotation: 0.10472, label: 'F', mark: '6', code: 'KeyF', key: 'f'},
+                {row: 3, col: 6, x: 403.19, y: 197.475, width: 52, height: 54, rotation: 0.10472, label: 'G', mark: '6', code: 'KeyG', key: 'g'},
+                {row: 3, col: 7, x: 525.171, y: 205.041, width: 52, height: 54, rotation: -0.10472, label: 'H', mark: '6', code: 'KeyH', key: 'h'},
+                {row: 3, col: 8, x: 577.881, y: 199.501, width: 52, height: 54, rotation: -0.10472, label: 'J', mark: '3', code: 'KeyJ', key: 'j'},
+                {row: 3, col: 9, x: 630.591, y: 193.961, width: 52, height: 54, rotation: -0.10472, label: 'K', code: 'KeyK', key: 'k'},
+                {row: 3, col: 10, x: 683.3, y: 188.421, width: 52, height: 54, rotation: -0.10472, label: 'L', mark: '4', code: 'KeyL', key: 'l'},
+                {row: 3, col: 11, x: 747.3, y: 181.649, width: 52, height: 54, label: ':\n;', mark: '1', code: 'Semicolon', key: ';'},
+                {row: 3, col: 12, x: 800.3, y: 181.649, width: 52, height: 54, label: '"\n\'', code: 'Quote', key: "'"},
+                {row: 3, col: 14, x: 853.3, y: 181.649, width: 118.25, height: 54, label: 'Enter', mark: '2', code: 'Enter', key: 'Enter', isSpecial: true},
+                {row: 3, col: 15, x: 999.05, y: 181.649, width: 52, height: 54, label: 'Sleep', code: 'Home', key: 'Home'},
+
+                // Row 4 (ZXCV row)
+                {row: 4, col: 0, x: 0, y: 236.649, width: 52, height: 54, label: 'M4', code: 'N/A', key: 'M4'},
+                {row: 4, col: 1, x: 79.5, y: 236.649, width: 118.25, height: 54, label: 'Shift', mark: '1', code: 'ShiftLeft', key: 'Shift'},
+                {row: 4, col: 2, x: 198.75, y: 236.649, width: 52, height: 54, label: 'Z', code: 'KeyZ', key: 'z'},
+                {row: 4, col: 3, x: 257.76, y: 237.493, width: 52, height: 54, rotation: 0.10472, label: 'X', code: 'KeyX', key: 'x'},
+                {row: 4, col: 4, x: 310.47, y: 243.033, width: 52, height: 54, rotation: 0.10472, label: 'C', code: 'KeyC', key: 'c'},
+                {row: 4, col: 5, x: 363.18, y: 248.573, width: 52, height: 54, rotation: 0.10472, label: 'V', mark: '2', code: 'KeyV', key: 'v'},
+                {row: 4, col: 6, x: 415.889, y: 254.113, width: 52, height: 54, rotation: 0.10472, label: 'B', mark: '1', code: 'KeyB', key: 'b'},
+                {row: 4, col: 7, x: 501.93, y: 262.786, width: 52, height: 54, rotation: -0.10472, label: 'B', mark: '1', code: 'KeyB', key: 'b'},
+                {row: 4, col: 8, x: 554.64, y: 257.246, width: 52, height: 54, rotation: -0.10472, label: 'N', mark: '2', code: 'KeyN', key: 'n'},
+                {row: 4, col: 9, x: 607.349, y: 251.706, width: 52, height: 54, rotation: -0.10472, label: 'M', mark: '1', code: 'KeyM', key: 'm'},
+                {row: 4, col: 10, x: 660.059, y: 246.166, width: 52, height: 54, rotation: -0.10472, label: '<\n,', code: 'Comma', key: ','},
+                {row: 4, col: 11, x: 712.769, y: 240.626, width: 52, height: 54, rotation: -0.10472, label: '>\n.', code: 'Period', key: '.'},
+                {row: 4, col: 12, x: 779.1, y: 236.649, width: 52, height: 54, label: '?\n/', code: 'Slash', key: '/'},
+                {row: 4, col: 13, x: 832.1, y: 236.649, width: 91.75, height: 54, label: 'Shift', mark: '2', code: 'ShiftRight', key: 'Shift'},
+                {row: 4, col: 14, x: 938.1, y: 250.399, width: 52, height: 54, label: '↑', mark: '4', code: 'ArrowUp', key: 'ArrowUp'},
+
+                // Row 5 (Bottom row)
+                {row: 5, col: 0, x: 0, y: 291.649, width: 52, height: 54, label: 'M5', code: 'N/A', key: 'M5'},
+                {row: 5, col: 1, x: 79.5, y: 291.649, width: 65.25, height: 54, label: 'Ctrl', code: 'ControlLeft', key: 'Control'},
+                {row: 5, col: 2, x: 145.75, y: 291.649, width: 65.25, height: 54, label: 'LOpt', code: 'AltLeft', key: 'Alt'},
+                {row: 5, col: 3, x: 251.975, y: 292.884, width: 65.25, height: 54, rotation: 0.10472, label: 'LCmd', mark: '3', code: 'MetaLeft', key: 'Meta'},
+                {row: 5, col: 5, x: 317.717, y: 302.579, width: 118.25, height: 54, rotation: 0.10472, label: 'Space', code: 'Space', key: ' ', spaceSide: 'left'},
+                {row: 5, col: 6, x: 436.495, y: 311.581, width: 52, height: 54, rotation: 0.10472, label: 'MO(1)', code: 'N/A', key: 'MO(1)'},
+                {row: 5, col: 7, x: 507.454, y: 313.192, width: 134.15, height: 54, rotation: -0.10472, label: 'Space', mark: '12', code: 'Space', key: ' ', spaceSide: 'right'},
+                {row: 5, col: 9, x: 642.089, y: 303.358, width: 52, height: 54, rotation: -0.10472, label: 'RCmd', code: 'MetaRight', key: 'Meta'},
+                {row: 5, col: 10, x: 694.798, y: 297.818, width: 52, height: 54, rotation: -0.10472, label: 'Ctrl', code: 'ControlRight', key: 'Control'},
+                {row: 5, col: 12, x: 885.1, y: 305.399, width: 52, height: 54, label: '←', mark: '6', code: 'ArrowLeft', key: 'ArrowLeft'},
+                {row: 5, col: 13, x: 938.1, y: 305.399, width: 52, height: 54, label: '↓', mark: '2', code: 'ArrowDown', key: 'ArrowDown'},
+                {row: 5, col: 14, x: 991.1, y: 305.399, width: 52, height: 54, label: '→', mark: '4', code: 'ArrowRight', key: 'ArrowRight'}
+            ],
+            
+            marvo: [
+                // Function row
+                {row: 0, col: 0, x: 10, y: 10, width: 52, height: 54, label: 'Esc', code: 'Escape', key: 'Escape', isSpecial: true},
+                
+                {row: 0, col: 1, x: 100, y: 10, width: 52, height: 54, label: 'F1', code: 'F1', key: 'F1'},
+                {row: 0, col: 2, x: 160, y: 10, width: 52, height: 54, label: 'F2', code: 'F2', key: 'F2'},
+                {row: 0, col: 3, x: 220, y: 10, width: 52, height: 54, label: 'F3', code: 'F3', key: 'F3'},
+                {row: 0, col: 4, x: 280, y: 10, width: 52, height: 54, label: 'F4', code: 'F4', key: 'F4'},
+                {row: 0, col: 5, x: 384, y: 10, width: 52, height: 54, label: 'F5', code: 'F5', key: 'F5'},
+                {row: 0, col: 6, x: 444, y: 10, width: 52, height: 54, label: 'F6', code: 'F6', key: 'F6'},
+                {row: 0, col: 7, x: 504, y: 10, width: 52, height: 54, label: 'F7', code: 'F7', key: 'F7'},
+                {row: 0, col: 8, x: 564, y: 10, width: 52, height: 54, label: 'F8', code: 'F8', key: 'F8'},
+                {row: 0, col: 9, x: 668, y: 10, width: 52, height: 54, label: 'F9', code: 'F9', key: 'F9'},
+                {row: 0, col: 10, x: 728, y: 10, width: 52, height: 54, label: 'F10', code: 'F10', key: 'F10'},
+                {row: 0, col: 11, x: 788, y: 10, width: 52, height: 54, label: 'F11', code: 'F11', key: 'F11'},
+                {row: 0, col: 12, x: 848, y: 10, width: 52, height: 54, label: 'F12', code: 'F12', key: 'F12'},              
+                {row: 0, col: 13, x: 910, y: 10, width: 52, height: 54, label: 'PrtSc', code: 'PrintScreen', key: 'PrintScreen'},
+                {row: 0, col: 14, x: 970, y: 10, width: 52, height: 54, label: 'ScrLk', code: 'ScrollLock', key: 'ScrollLock'},
+                {row: 0, col: 15, x: 1030, y: 10, width: 52, height: 54, label: 'Pause', code: 'Pause', key: 'Pause'},
+
+                // Number row
+                {row: 1, col: 0, x: 10, y: 70, width: 52, height: 54, label: '~\n`', code: 'Backquote', key: '`'},
+                {row: 1, col: 1, x: 70, y: 70, width: 52, height: 54, label: '!\n1', code: 'Digit1', key: '1'},
+                {row: 1, col: 2, x: 130, y: 70, width: 52, height: 54, label: '@\n2', code: 'Digit2', key: '2'},
+                {row: 1, col: 3, x: 190, y: 70, width: 52, height: 54, label: '#\n3', code: 'Digit3', key: '3'},
+                {row: 1, col: 4, x: 250, y: 70, width: 52, height: 54, label: '$\n4', code: 'Digit4', key: '4'},
+                {row: 1, col: 5, x: 310, y: 70, width: 52, height: 54, label: '%\n5', code: 'Digit5', key: '5'},
+                {row: 1, col: 6, x: 370, y: 70, width: 52, height: 54, label: '^\n6', code: 'Digit6', key: '6'},
+                {row: 1, col: 7, x: 430, y: 70, width: 52, height: 54, label: '&\n7', code: 'Digit7', key: '7'},
+                {row: 1, col: 8, x: 490, y: 70, width: 52, height: 54, label: '*\n8', code: 'Digit8', key: '8'},
+                {row: 1, col: 9, x: 550, y: 70, width: 52, height: 54, label: '(\n9', code: 'Digit9', key: '9'},
+                {row: 1, col: 10, x: 610, y: 70, width: 52, height: 54, label: ')\n0', code: 'Digit0', key: '0'},
+                {row: 1, col: 11, x: 670, y: 70, width: 52, height: 54, label: '_\n-', code: 'Minus', key: '-'},
+                {row: 1, col: 12, x: 730, y: 70, width: 52, height: 54, label: '+\n=', code: 'Equal', key: '='},
+                {row: 1, col: 13, x: 790, y: 70, width: 110, height: 54, label: 'Backspace', code: 'Backspace', key: 'Backspace'},
+                // // Navigation cluster - CLOSE to main keyboard
+                {row: 1, col: 14, x: 910, y: 70, width: 52, height: 54, label: 'Ins', code: 'Insert', key: 'Insert'},
+                {row: 1, col: 15, x: 970, y: 70, width: 52, height: 54, label: 'Home', code: 'Home', key: 'Home'},
+                {row: 1, col: 16, x: 1030, y: 70, width: 52, height: 54, label: 'PgUp', code: 'PageUp', key: 'PageUp'},
+
+                // QWERTY row  
+                {row: 2, col: 0, x: 10, y: 130, width: 78, height: 54, label: 'Tab', code: 'Tab', key: 'Tab'},
+                {row: 2, col: 1, x: 100, y: 130, width: 52, height: 54, label: 'Q', code: 'KeyQ', key: 'q'},
+                {row: 2, col: 2, x: 160, y: 130, width: 52, height: 54, label: 'W', code: 'KeyW', key: 'w'},
+                {row: 2, col: 3, x: 220, y: 130, width: 52, height: 54, label: 'E', code: 'KeyE', key: 'e'},
+                {row: 2, col: 4, x: 280, y: 130, width: 52, height: 54, label: 'R', code: 'KeyR', key: 'r'},
+                {row: 2, col: 5, x: 340, y: 130, width: 52, height: 54, label: 'T', code: 'KeyT', key: 't'},
+                {row: 2, col: 6, x: 400, y: 130, width: 52, height: 54, label: 'Y', code: 'KeyY', key: 'y'},
+                {row: 2, col: 7, x: 460, y: 130, width: 52, height: 54, label: 'U', code: 'KeyU', key: 'u'},
+                {row: 2, col: 8, x: 520, y: 130, width: 52, height: 54, label: 'I', code: 'KeyI', key: 'i'},
+                {row: 2, col: 9, x: 580, y: 130, width: 52, height: 54, label: 'O', code: 'KeyO', key: 'o'},
+                {row: 2, col: 10, x: 640, y: 130, width: 52, height: 54, label: 'P', code: 'KeyP', key: 'p'},
+                {row: 2, col: 11, x: 700, y: 130, width: 52, height: 54, label: '{\n[', code: 'BracketLeft', key: '['},
+                {row: 2, col: 12, x: 760, y: 130, width: 52, height: 54, label: '}\n]', code: 'BracketRight', key: ']'},
+                {row: 2, col: 13, x: 820, y: 130, width: 80, height: 54, label: '|\n\\', code: 'Backslash', key: '\\'},
+                {row: 2, col: 14, x: 910, y: 130, width: 52, height: 54, label: 'Del', code: 'Delete', key: 'Delete'},
+                {row: 2, col: 15, x: 970, y: 130, width: 52, height: 54, label: 'End', code: 'End', key: 'End'},
+                {row: 2, col: 16, x: 1030, y: 130, width: 52, height: 54, label: 'PgDn', code: 'PageDown', key: 'PageDown'},
+
+                // ASDF row
+                {row: 3, col: 0, x: 10, y: 190, width: 88, height: 54, label: 'Caps Lock', code: 'CapsLock', key: 'CapsLock'},
+                {row: 3, col: 1, x: 110, y: 190, width: 52, height: 54, label: 'A', code: 'KeyA', key: 'a'},
+                {row: 3, col: 2, x: 170, y: 190, width: 52, height: 54, label: 'S', code: 'KeyS', key: 's'},
+                {row: 3, col: 3, x: 230, y: 190, width: 52, height: 54, label: 'D', code: 'KeyD', key: 'd'},
+                {row: 3, col: 4, x: 290, y: 190, width: 52, height: 54, label: 'F', code: 'KeyF', key: 'f'},
+                {row: 3, col: 5, x: 350, y: 190, width: 52, height: 54, label: 'G', code: 'KeyG', key: 'g'},
+                {row: 3, col: 6, x: 410, y: 190, width: 52, height: 54, label: 'H', code: 'KeyH', key: 'h'},
+                {row: 3, col: 7, x: 470, y: 190, width: 52, height: 54, label: 'J', code: 'KeyJ', key: 'j'},
+                {row: 3, col: 8, x: 530, y: 190, width: 52, height: 54, label: 'K', code: 'KeyK', key: 'k'},
+                {row: 3, col: 9, x: 590, y: 190, width: 52, height: 54, label: 'L', code: 'KeyL', key: 'l'},
+                {row: 3, col: 10, x: 650, y: 190, width: 52, height: 54, label: ':\n;', code: 'Semicolon', key: ';'},
+                {row: 3, col: 11, x: 710, y: 190, width: 52, height: 54, label: '"\n\'', code: 'Quote', key: "'"},
+                {row: 3, col: 12, x: 770, y: 190, width: 130, height: 54, label: 'Enter', code: 'Enter', key: 'Enter', isSpecial: true},
+                // Up arrow - positioned above down arrow  
+                {row: 3, col: 13, x: 970, y: 250, width: 52, height: 54, label: '↑', code: 'ArrowUp', key: 'ArrowUp'},
+
+                // ZXCV row
+                {row: 4, col: 0, x: 10, y: 250, width: 118, height: 54, label: 'Shift', code: 'ShiftLeft', key: 'Shift'},
+                {row: 4, col: 1, x: 140.5, y: 250, width: 52, height: 54, label: 'Z', code: 'KeyZ', key: 'z'},
+                {row: 4, col: 2, x: 200, y: 250, width: 52, height: 54, label: 'X', code: 'KeyX', key: 'x'},
+                {row: 4, col: 3, x: 260, y: 250, width: 52, height: 54, label: 'C', code: 'KeyC', key: 'c'},
+                {row: 4, col: 4, x: 320, y: 250, width: 52, height: 54, label: 'V', code: 'KeyV', key: 'v'},
+                {row: 4, col: 5, x: 380, y: 250, width: 52, height: 54, label: 'B', code: 'KeyB', key: 'b'},
+                {row: 4, col: 6, x: 440, y: 250, width: 52, height: 54, label: 'N', code: 'KeyN', key: 'n'},
+                {row: 4, col: 7, x: 500, y: 250, width: 52, height: 54, label: 'M', code: 'KeyM', key: 'm'},
+                {row: 4, col: 8, x: 560, y: 250, width: 52, height: 54, label: '<\n,', code: 'Comma', key: ','},
+                {row: 4, col: 9, x: 620, y: 250, width: 52, height: 54, label: '>\n.', code: 'Period', key: '.'},
+                {row: 4, col: 10, x: 680, y: 250, width: 52, height: 54, label: '?\n/', code: 'Slash', key: '/'},
+                {row: 4, col: 11, x: 741, y: 250, width: 160, height: 54, label: 'Shift', code: 'ShiftRight', key: 'Shift'},
+                // Arrow cluster - tight inverted T next to navigation
+                {row: 4, col: 12, x: 910, y: 310, width: 52, height: 54, label: '←', code: 'ArrowLeft', key: 'ArrowLeft'},
+                {row: 4, col: 13, x: 970, y: 310, width: 52, height: 54, label: '↓', code: 'ArrowDown', key: 'ArrowDown'},
+                {row: 4, col: 14, x: 1030, y: 310, width: 52, height: 54, label: '→', code: 'ArrowRight', key: 'ArrowRight'},
+
+                // Bottom row
+                {row: 5, col: 0, x: 10, y: 310, width: 72, height: 54, label: 'Ctrl', code: 'ControlLeft', key: 'Control'},
+                {row: 5, col: 1, x: 94, y: 310, width: 52, height: 54, label: 'Win', code: 'MetaLeft', key: 'Meta'},
+                {row: 5, col: 2, x: 154, y: 310, width: 52, height: 54, label: 'Alt', code: 'AltLeft', key: 'Alt'},
+                {row: 5, col: 3, x: 218, y: 310, width: 418, height: 54, label: 'Space', code: 'Space', key: ' '},
+                {row: 5, col: 4, x: 648.5, y: 310, width: 52, height: 54, label: 'Alt', code: 'AltRight', key: 'Alt'},
+                {row: 5, col: 5, x: 708.5, y: 310, width: 52, height: 54, label: 'Win', code: 'MetaRight', key: 'Meta'},
+                {row: 5, col: 6, x: 768, y: 310, width: 52, height: 54, label: 'Menu', code: 'ContextMenu', key: 'ContextMenu'},
+                {row: 5, col: 7, x: 829.5, y: 310, width: 72, height: 54, label: 'Ctrl', code: 'ControlRight', key: 'Control'}
+            ]
+        };
+
+        // DOM elements
+        const modeToggle = document.getElementById('modeToggle');
+        const keyboardLayout = document.getElementById('keyboardLayout');
+        const captureIndicator = document.getElementById('captureIndicator');
+        const keyboardSelect = document.getElementById('keyboardSelect');
+        let currentLayout = 'keychron';
+
+        // Initialize keyboard
+        generateKeyboard();
+        initKeyboardAnalytics();
+
+        function generateKeyboard() {
+            keyboardLayout.innerHTML = '';
+            
+            const keys = keyLayouts[currentLayout];
+            
+            keys.forEach((keyDef) => {
+                const keyEl = createKey(keyDef);
+                keyboardLayout.appendChild(keyEl);
+            });
+        }
+
+        function createKey(keyDef) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'keycap-wrapper';
+            wrapper.dataset.row = keyDef.row;
+            wrapper.dataset.col = keyDef.col;
+            wrapper.dataset.label = keyDef.label.replace('\n', ' ');
+            if (keyDef.code) wrapper.dataset.code = keyDef.code;
+            if (keyDef.key) wrapper.dataset.key = keyDef.key;
+            if (keyDef.spaceSide) wrapper.dataset.spaceSide = keyDef.spaceSide;
+            
+            wrapper.style.left = keyDef.x + 'px';
+            wrapper.style.top = keyDef.y + 'px';
+            wrapper.style.width = keyDef.width + 'px';
+            wrapper.style.height = keyDef.height + 'px';
+            wrapper.style.zIndex = '9';
+            
+            if (keyDef.rotation) {
+                wrapper.style.transform = `rotate(${keyDef.rotation}rad)`;
+                wrapper.style.transformOrigin = 'center center';
+            }
+
+            const activeCover = document.createElement('div');
+            activeCover.className = 'active-cover';
+            wrapper.appendChild(activeCover);
+            
+            const keyContainer = document.createElement('div');
+            keyContainer.className = 'keycap-key';
+            
+            const keyEl = document.createElement('div');
+            
+            // Apply special classes for Escape and Enter keys
+            if (keyDef.isSpecial) {
+                keyEl.className = keyDef.code === 'Escape' ? 'keycap escape-key' : 'keycap enter-key';
+            } else {
+                keyEl.className = `keycap ${keyDef.isKnob ? 'rotate' : ''}`;
+            }
+            
+            keyEl.innerHTML = keyDef.label.replace('\n', '<br>');
+            
+            keyContainer.appendChild(keyEl);
+            wrapper.appendChild(keyContainer);
+
+            return wrapper;
+        }
+
+        function highlightKey(keyElement) {
+            if (keyElement) {
+                const keycap = keyElement.querySelector('.keycap');
+                const activeCover = keyElement.querySelector('.active-cover');
+                if (keycap) keycap.classList.add('active');
+                if (activeCover) activeCover.classList.add('visible');
+            }
+        }
+
+        function unhighlightKey(keyElement) {
+            if (keyElement) {
+                const keycap = keyElement.querySelector('.keycap');
+                const activeCover = keyElement.querySelector('.active-cover');
+                if (keycap) keycap.classList.remove('active');
+                if (activeCover) activeCover.classList.remove('visible');
+            }
+        }
+
+        function toggleMode() {
+            keyboardOnlyMode = !keyboardOnlyMode;
+            
+            if (keyboardOnlyMode) {
+                // Switch to keyboard-only mode
+                modeToggle.classList.add('active');
+                document.body.classList.add('keyboard-only');
+                captureIndicator.style.display = 'block';
+                captureIndicator.textContent = 'KEYBOARD ONLY MODE - Toggle to return to typing test';
+                
+                // Reset analytics for new session
+                resetAnalytics();
+                
+                // End any active typing test
+                if (testActive) {
+                    testActive = false;
+                    clearInterval(timerInterval);
+                    document.body.classList.remove('test-active');
+                    focusOverlay.style.display = 'none';
+                }
+            } else {
+                // Switch back to typing test mode
+                modeToggle.classList.remove('active');
+                document.body.classList.remove('keyboard-only');
+                captureIndicator.style.display = 'none';
+                
+                // Clear any pressed keys
+                pressedKeys.forEach(keyElement => unhighlightKey(keyElement));
+                pressedKeys.clear();
+            }
+        }
+
+        function handleKeyPress(e) {
+            if (e.repeat) return;
+            
+            const currentTime = Date.now();
+            
+            // Record analytics for keyboard mode
+            if (keyboardOnlyMode) {
+                recordKeyPress(e.code, currentTime);
+            }
+            
+            // Handle keyboard visualization (works in both modes)
+            const code = e.code;
+            let foundKeys = [];
+            
+            if (code === 'Space' || code === 'KeyB') {
+                const keys = keyboardLayout.querySelectorAll(`.keycap-wrapper[data-code='${code}']`);
+                foundKeys = Array.from(keys);
+            } else {
+                const key = keyboardLayout.querySelector(`.keycap-wrapper[data-code='${code}']`);
+                if (key) foundKeys = [key];
+            }
+            
+            // Handle key highlighting
+            foundKeys.forEach(foundKey => {
+                if (foundKey && !pressedKeys.has(foundKey)) {
+                    pressedKeys.add(foundKey);
+                    highlightKey(foundKey);
+                }
+            });
+            
+            // Handle typing test only if not in keyboard-only mode
+            if (!keyboardOnlyMode) {
+                handleTyping(e);
+            }
+        }
+
+        function handleKeyRelease(e) {
+            const currentTime = Date.now();
+            
+            // Record analytics for keyboard mode
+            if (keyboardOnlyMode) {
+                recordKeyRelease(e.code, currentTime);
+            }
+            
+            const code = e.code;
+            let foundKeys = [];
+            
+            if (code === 'Space' || code === 'KeyB') {
+                const keys = keyboardLayout.querySelectorAll(`.keycap-wrapper[data-code='${code}']`);
+                foundKeys = Array.from(keys);
+            } else {
+                const key = keyboardLayout.querySelector(`.keycap-wrapper[data-code='${code}']`);
+                if (key) foundKeys = [key];
+            }
+            
+            // Handle key unhighlighting
+            foundKeys.forEach(foundKey => {
+                if (foundKey && pressedKeys.has(foundKey)) {
+                    unhighlightKey(foundKey);
+                    pressedKeys.delete(foundKey);
+                }
+            });
+        }
+
+        function changeKeyboardLayout() {
+            currentLayout = keyboardSelect.value;
+            generateKeyboard();
+        }
+
+        // Event listeners
+        modeToggle.addEventListener('click', toggleMode);
+        keyboardSelect.addEventListener('change', changeKeyboardLayout);
+
+        // Keyboard event listeners
+        document.addEventListener('keydown', handleKeyPress);
+        document.addEventListener('keyup', handleKeyRelease);
+    </script>
+</body>
+</html>
