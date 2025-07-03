@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keyboard Overlay</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: rgba(0, 0, 0, 0.4);
+            color: #ffffff;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .overlay-container {
+            width: 100%;
+            height: 100%;
+            padding: 4px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Stats Header */
+        .stats-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 3px 6px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 4px;
+            margin-bottom: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            cursor: move;
+            user-select: none;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            height: 18px;
+        }
+
+        .stats-header:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 126, 95, 0.3);
+        }
+
+        .stat-item {
+            color: #ff7e5f;
+        }
+
+        .stat-value {
+            color: #ffffff;
+            margin-left: 4px;
+        }
+
+        /* Keyboard Container */
+        .keyboard-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .keyboard-widget {
+            position: relative;
+            transform-origin: top left;
+            transform: scale(0.35) translate(18px, 27px); /* Scale and center the keyboard */
+        }
+
+        /* Compact Key Styles */
+        .key {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            transition: background 0.1s ease, transform 0.1s ease;
+            cursor: default;
+        }
+
+        .key.pressed {
+            background: rgba(255, 126, 95, 0.8) !important;
+            border-color: #ff7e5f !important;
+            transform: scale(0.95);
+            box-shadow: 0 0 10px rgba(255, 126, 95, 0.6);
+        }
+
+        .key.special {
+            background: rgba(255, 126, 95, 0.2);
+            border-color: rgba(255, 126, 95, 0.3);
+        }
+
+        .key.knob {
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Close button */
+        .close-btn {
+            position: absolute;
+            top: 28px;
+            right: 4px;
+            width: 22px;
+            height: 22px;
+            background: rgba(255, 82, 82, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.9;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+
+        .close-btn:hover {
+            opacity: 1;
+            background: rgba(255, 52, 52, 0.95);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: scale(1.1);
+            box-shadow: 0 2px 8px rgba(255, 82, 82, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="overlay-container">
+        <button class="close-btn" id="closeBtn">×</button>
+
+        <div class="stats-header">
+            <div class="stat-item">
+                KPS: <span class="stat-value" id="kpsValue">0.0</span>
+            </div>
+            <div class="stat-item">
+                Total: <span class="stat-value" id="totalKeystrokes">0</span>
+            </div>
+        </div>
+
+        <div class="keyboard-container">
+            <div class="keyboard-widget" id="keyboardWidget"></div>
+        </div>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+
+        // Shared analytics data (simpler version for overlay)
+        class OverlayAnalytics {
+            constructor() {
+                this.totalKeystrokes = 0;
+                this.keyFrequency = {};
+                this.recentKeystrokes = [];
+                this.kpsWindow = 10; // 10 second rolling window
+            }
+
+            recordKeyPress(code, timestamp) {
+                this.totalKeystrokes++;
+                this.keyFrequency[code] = (this.keyFrequency[code] || 0) + 1;
+
+                // Add to rolling window for KPS calculation
+                this.recentKeystrokes.push(timestamp);
+            }
+
+            getKPS() {
+                const now = Date.now();
+                const windowMs = this.kpsWindow * 1000;
+
+                // Remove old keystrokes
+                this.recentKeystrokes = this.recentKeystrokes.filter(
+                    timestamp => (now - timestamp) <= windowMs
+                );
+
+                if (this.recentKeystrokes.length === 0) return 0;
+                if (this.recentKeystrokes.length === 1) return 0;
+
+                const oldestKeystroke = Math.min(...this.recentKeystrokes);
+                const newestKeystroke = Math.max(...this.recentKeystrokes);
+                const timeSpanSeconds = (newestKeystroke - oldestKeystroke) / 1000;
+
+                if (timeSpanSeconds <= 0) return 0;
+                return this.recentKeystrokes.length / timeSpanSeconds;
+            }
+        }
+
+        // True Alice ANSI keyboard layout with authentic positioning (main typing keys only)
+        const aliceLayout = [
+            // Row 1 (Number row)
+            {x: 119.25, y: 71.6485, width: 52, height: 54, code: 'Backquote'},
+            {x: 172.25, y: 71.6485, width: 52, height: 54, code: 'Digit1'},
+            {x: 225.25, y: 71.6485, width: 52, height: 54, code: 'Digit2'},
+            {x: 285.55, y: 74.5045, width: 52, height: 54, code: 'Digit3', rotation: 0.10472},
+            {x: 338.259, y: 80.0445, width: 52, height: 54, code: 'Digit4', rotation: 0.10472},
+            {x: 390.969, y: 85.5845, width: 52, height: 54, code: 'Digit5', rotation: 0.10472},
+            {x: 443.679, y: 91.1245, width: 52, height: 54, code: 'Digit6', rotation: 0.10472},
+            {x: 513.673, y: 95.6433, width: 52, height: 54, code: 'Digit7', rotation: -0.10472},
+            {x: 566.383, y: 90.1033, width: 52, height: 54, code: 'Digit8', rotation: -0.10472},
+            {x: 619.092, y: 84.5633, width: 52, height: 54, code: 'Digit9', rotation: -0.10472},
+            {x: 671.802, y: 79.0233, width: 52, height: 54, code: 'Digit0', rotation: -0.10472},
+            {x: 736.7, y: 71.6485, width: 52, height: 54, code: 'Minus'},
+            {x: 789.7, y: 71.6485, width: 52, height: 54, code: 'Equal'},
+            {x: 842.7, y: 71.6485, width: 105, height: 54, code: 'Backspace'},
+
+            // Row 2 (QWERTY row)
+            {x: 106, y: 126.649, width: 78.5, height: 54, code: 'Tab'},
+            {x: 185.5, y: 126.649, width: 52, height: 54, code: 'KeyQ'},
+            {x: 245.539, y: 125.602, width: 52, height: 54, code: 'KeyW', rotation: 0.10472},
+            {x: 298.249, y: 131.142, width: 52, height: 54, code: 'KeyE', rotation: 0.10472},
+            {x: 350.959, y: 136.682, width: 52, height: 54, code: 'KeyR', rotation: 0.10472},
+            {x: 403.668, y: 142.222, width: 52, height: 54, code: 'KeyT', rotation: 0.10472},
+            {x: 493.067, y: 153.112, width: 52, height: 54, code: 'KeyY', rotation: -0.10472},
+            {x: 545.777, y: 147.572, width: 52, height: 54, code: 'KeyU', rotation: -0.10472},
+            {x: 598.487, y: 142.032, width: 52, height: 54, code: 'KeyI', rotation: -0.10472},
+            {x: 651.196, y: 136.492, width: 52, height: 54, code: 'KeyO', rotation: -0.10472},
+            {x: 703.906, y: 130.952, width: 52, height: 54, code: 'KeyP', rotation: -0.10472},
+            {x: 763.2, y: 126.649, width: 52, height: 54, code: 'BracketLeft'},
+            {x: 816.2, y: 126.649, width: 52, height: 54, code: 'BracketRight'},
+            {x: 869.2, y: 126.649, width: 91.75, height: 54, code: 'Backslash'},
+
+            // Row 3 (ASDF row)
+            {x: 92.75, y: 181.649, width: 91.75, height: 54, code: 'CapsLock'},
+            {x: 185.5, y: 181.649, width: 52, height: 54, code: 'KeyA'},
+            {x: 245.061, y: 180.855, width: 52, height: 54, code: 'KeyS', rotation: 0.10472},
+            {x: 297.771, y: 186.395, width: 52, height: 54, code: 'KeyD', rotation: 0.10472},
+            {x: 350.48, y: 191.935, width: 52, height: 54, code: 'KeyF', rotation: 0.10472},
+            {x: 403.19, y: 197.475, width: 52, height: 54, code: 'KeyG', rotation: 0.10472},
+            {x: 525.171, y: 205.041, width: 52, height: 54, code: 'KeyH', rotation: -0.10472},
+            {x: 577.881, y: 199.501, width: 52, height: 54, code: 'KeyJ', rotation: -0.10472},
+            {x: 630.591, y: 193.961, width: 52, height: 54, code: 'KeyK', rotation: -0.10472},
+            {x: 683.3, y: 188.421, width: 52, height: 54, code: 'KeyL', rotation: -0.10472},
+            {x: 747.3, y: 181.649, width: 52, height: 54, code: 'Semicolon'},
+            {x: 800.3, y: 181.649, width: 52, height: 54, code: 'Quote'},
+            {x: 853.3, y: 181.649, width: 118.25, height: 54, code: 'Enter', isSpecial: true},
+
+            // Row 4 (ZXCV row)
+            {x: 79.5, y: 236.649, width: 118.25, height: 54, code: 'ShiftLeft'},
+            {x: 198.75, y: 236.649, width: 52, height: 54, code: 'KeyZ'},
+            {x: 257.76, y: 237.493, width: 52, height: 54, code: 'KeyX', rotation: 0.10472},
+            {x: 310.47, y: 243.033, width: 52, height: 54, code: 'KeyC', rotation: 0.10472},
+            {x: 363.18, y: 248.573, width: 52, height: 54, code: 'KeyV', rotation: 0.10472},
+            {x: 415.889, y: 254.113, width: 52, height: 54, code: 'KeyB', rotation: 0.10472},
+            {x: 501.93, y: 262.786, width: 52, height: 54, code: 'KeyB', rotation: -0.10472},
+            {x: 554.64, y: 257.246, width: 52, height: 54, code: 'KeyN', rotation: -0.10472},
+            {x: 607.349, y: 251.706, width: 52, height: 54, code: 'KeyM', rotation: -0.10472},
+            {x: 660.059, y: 246.166, width: 52, height: 54, code: 'Comma', rotation: -0.10472},
+            {x: 712.769, y: 240.626, width: 52, height: 54, code: 'Period', rotation: -0.10472},
+            {x: 779.1, y: 236.649, width: 52, height: 54, code: 'Slash'},
+            {x: 832.1, y: 236.649, width: 91.75, height: 54, code: 'ShiftRight'},
+            {x: 938.1, y: 250.399, width: 52, height: 54, code: 'ArrowUp'},
+
+            // Row 5 (Bottom row with Alice layout)
+            {x: 79.5, y: 291.649, width: 65.25, height: 54, code: 'ControlLeft'},
+            {x: 145.75, y: 291.649, width: 65.25, height: 54, code: 'AltLeft'},
+            {x: 251.975, y: 292.884, width: 65.25, height: 54, code: 'MetaLeft', rotation: 0.10472},
+            {x: 317.717, y: 302.579, width: 118.25, height: 54, code: 'Space', rotation: 0.10472, spaceSide: 'left'},
+            {x: 507.454, y: 313.192, width: 134.15, height: 54, code: 'Space', rotation: -0.10472, spaceSide: 'right'},
+            {x: 642.089, y: 303.358, width: 52, height: 54, code: 'MetaRight', rotation: -0.10472},
+            {x: 694.798, y: 297.818, width: 52, height: 54, code: 'ControlRight', rotation: -0.10472},
+            {x: 885.1, y: 305.399, width: 52, height: 54, code: 'ArrowLeft'},
+            {x: 938.1, y: 305.399, width: 52, height: 54, code: 'ArrowDown'},
+            {x: 991.1, y: 305.399, width: 52, height: 54, code: 'ArrowRight'}
+        ];
+
+        // App State
+        let analytics = new OverlayAnalytics();
+        let keyWidgets = {};
+        let pressedKeys = new Set();
+
+        // Initialize overlay
+        function init() {
+            setupKeyboard();
+            setupEventListeners();
+            startUpdateTimer();
+        }
+
+        function setupEventListeners() {
+            // Close button
+            document.getElementById('closeBtn').addEventListener('click', () => {
+                ipcRenderer.invoke('toggle-global-tracking', false);
+            });
+
+            // Make stats header draggable (but not the close button)
+            const statsHeader = document.querySelector('.stats-header');
+            statsHeader.style.cursor = 'move';
+            statsHeader.style.webkitAppRegion = 'drag';
+
+            // Prevent close button from being draggable
+            const closeBtn = document.getElementById('closeBtn');
+            closeBtn.style.webkitAppRegion = 'no-drag';
+        }
+
+        function setupKeyboard() {
+            const container = document.getElementById('keyboardWidget');
+            container.innerHTML = '';
+            keyWidgets = {};
+
+            // Calculate bounds for Alice layout
+            const maxX = Math.max(...aliceLayout.map(k => k.x + k.width));
+            const maxY = Math.max(...aliceLayout.map(k => k.y + k.height));
+
+            // Set container size with Alice layout bounds
+            container.style.width = maxX + 'px';
+            container.style.height = maxY + 'px';
+
+            // Create keys with authentic Alice positioning
+            aliceLayout.forEach(keyDef => {
+                const keyEl = document.createElement('div');
+                keyEl.className = 'key';
+
+                if (keyDef.isSpecial) keyEl.classList.add('special');
+                if (keyDef.isKnob) keyEl.classList.add('knob');
+
+                // Position and size
+                keyEl.style.left = keyDef.x + 'px';
+                keyEl.style.top = keyDef.y + 'px';
+                keyEl.style.width = keyDef.width + 'px';
+                keyEl.style.height = keyDef.height + 'px';
+
+                // Apply Alice characteristic rotations
+                if (keyDef.rotation) {
+                    keyEl.style.transform = `rotate(${keyDef.rotation * 180 / Math.PI}deg)`;
+                }
+
+                container.appendChild(keyEl);
+
+                // Store reference for key press feedback
+                if (!keyWidgets[keyDef.code]) {
+                    keyWidgets[keyDef.code] = [];
+                }
+                keyWidgets[keyDef.code].push(keyEl);
+            });
+        }
+
+        // Track CapsLock state based on system events
+        let capsLockState = false;
+
+        function handleKeyPress(code) {
+            const timestamp = Date.now();
+            analytics.recordKeyPress(code, timestamp);
+
+            // Update display immediately
+            updateDisplay();
+
+            // Special handling for CapsLock toggle
+            if (code === 'CapsLock') {
+                capsLockState = true; // CapsLock is now active
+            }
+
+            // Visual feedback for the specific key pressed
+            if (keyWidgets[code]) {
+                keyWidgets[code].forEach(keyEl => {
+                    if (!pressedKeys.has(keyEl)) {
+                        keyEl.classList.add('pressed');
+                        pressedKeys.add(keyEl);
+
+                        // For modifier keys, use shorter fallback timeout
+                        const isModifierKey = ['ShiftLeft', 'ShiftRight', 'ControlLeft', 'ControlRight', 
+                                             'AltLeft', 'AltRight', 'MetaLeft', 'MetaRight'].includes(code);
+                        
+                        if (isModifierKey) {
+                            // Shorter timeout for modifier keys to handle missed releases
+                            setTimeout(() => {
+                                if (pressedKeys.has(keyEl)) {
+                                    keyEl.classList.remove('pressed');
+                                    pressedKeys.delete(keyEl);
+                                }
+                            }, 1000); // 1 second fallback for modifiers
+                        } else if (code !== 'CapsLock') {
+                            // Longer timeout for regular keys (not CapsLock)
+                            setTimeout(() => {
+                                if (pressedKeys.has(keyEl)) {
+                                    keyEl.classList.remove('pressed');
+                                    pressedKeys.delete(keyEl);
+                                }
+                            }, 5000); // 5 second fallback for regular keys
+                        }
+                        // Note: CapsLock gets no timeout - it's handled by release events only
+                    }
+                });
+            }
+        }
+
+        function handleKeyRelease(code) {
+            // Special handling for CapsLock - only unhighlight when it's turned off
+            if (code === 'CapsLock') {
+                capsLockState = false; // CapsLock is now inactive
+                if (keyWidgets[code]) {
+                    keyWidgets[code].forEach(keyEl => {
+                        keyEl.classList.remove('pressed');
+                        pressedKeys.delete(keyEl);
+                    });
+                }
+                return;
+            }
+
+            // For all other keys including specific modifiers, remove highlighting immediately
+            if (keyWidgets[code]) {
+                keyWidgets[code].forEach(keyEl => {
+                    keyEl.classList.remove('pressed');
+                    pressedKeys.delete(keyEl);
+                });
+            }
+        }
+
+        function updateDisplay() {
+            document.getElementById('totalKeystrokes').textContent = analytics.totalKeystrokes.toLocaleString();
+            document.getElementById('kpsValue').textContent = analytics.getKPS().toFixed(1);
+        }
+
+        function startUpdateTimer() {
+            setInterval(() => {
+                updateDisplay();
+                // Clean up old keystrokes
+                const now = Date.now();
+                const windowMs = analytics.kpsWindow * 1000;
+                analytics.recentKeystrokes = analytics.recentKeystrokes.filter(
+                    timestamp => (now - timestamp) <= windowMs
+                );
+            }, 1000);
+        }
+
+        // Handle global key presses
+        ipcRenderer.on('global-key-press', (event, code) => {
+            handleKeyPress(code);
+        });
+
+        // Handle global key releases
+        ipcRenderer.on('global-key-release', (event, code) => {
+            handleKeyRelease(code);
+        });
+
+        // Load analytics data
+        ipcRenderer.on('analytics-loaded', (event, data) => {
+            if (data && data.length > 0) {
+                data.forEach(entry => {
+                    analytics.keyFrequency[entry.key] = entry.count;
+                    analytics.totalKeystrokes += entry.count;
+                });
+                updateDisplay();
+            }
+        });
+
+        // Sync analytics data from main window
+        ipcRenderer.on('analytics-sync', (event, data) => {
+            if (data) {
+                analytics.totalKeystrokes = data.totalKeystrokes || 0;
+                analytics.keyFrequency = data.keyFrequency || {};
+                updateDisplay();
+            }
+        });
+
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>

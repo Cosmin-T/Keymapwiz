@@ -1,0 +1,1652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TypeChron Viz - Keyboard Analytics</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 100%);
+            color: #ffffff;
+            overflow: hidden;
+            height: 100vh;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        .main-container {
+            width: 100vw;
+            height: 100vh;
+            padding: 1.5vh 2vw;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-sizing: border-box;
+            max-width: none;
+            gap: 1vh;
+        }
+
+        /* Modern Header */
+        .header {
+            text-align: center;
+            position: relative;
+            flex: 0 0 auto;
+            height: 10vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin-bottom: 0.5vh;
+        }
+
+        .global-tracking-toggle {
+            position: absolute;
+            top: 1.5vh;
+            right: 2vw;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 0.8vh;
+            min-width: 140px;
+        }
+
+        .toggle-controls {
+            display: flex;
+            align-items: center;
+            gap: 1.2vw;
+            min-gap: 12px;
+        }
+
+        .toggle-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.3vh;
+            font-weight: 500;
+            min-font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 48px;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            flex-shrink: 0;
+        }
+
+        .toggle-switch:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.18);
+        }
+
+        .toggle-switch.active {
+            background: linear-gradient(135deg, #ff6b5a, #e85d42);
+            box-shadow: 0 4px 15px rgba(255, 107, 90, 0.25);
+        }
+
+        .toggle-knob {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        }
+
+        .toggle-switch.active .toggle-knob {
+            transform: translateX(24px);
+        }
+
+        .permission-status {
+            font-size: 1.1vh;
+            color: rgba(255, 255, 255, 0.6);
+            text-align: right;
+            max-width: 140px;
+            line-height: 1.3;
+            min-font-size: 10px;
+        }
+
+        .permission-status.granted {
+            color: #ff6b5a;
+        }
+
+        .permission-status.denied {
+            color: #ef4444;
+        }
+
+        .title {
+            font-size: 5vh;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ff6b5a, #e85d42);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5vh;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            font-size: 1.4vh;
+            color: rgba(255, 255, 255, 0.65);
+            font-weight: 400;
+            letter-spacing: 0.5px;
+        }
+
+        /* Modern Layout Selector */
+        .layout-section {
+            text-align: center;
+            flex: 0 0 auto;
+            height: 4vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0.5vh;
+        }
+
+        .layout-dropdown {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 0.8vh 1.5vw;
+            font-size: 1.3vh;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            outline: none;
+            font-weight: 500;
+        }
+
+        .layout-dropdown option {
+            background: #2a2a2a;
+            color: white;
+            padding: 8px;
+        }
+
+        .layout-dropdown:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: #ff6b5a;
+            transform: translateY(-1px);
+        }
+
+        .layout-dropdown:focus {
+            border-color: #ff6b5a;
+            box-shadow: 0 0 0 3px rgba(255, 107, 90, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .layout-dropdown:active {
+            transform: translateY(0);
+            transition: all 0.1s ease;
+        }
+
+        /* Keyboard Container */
+        .keyboard-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex: 0 0 auto;
+            height: 26vh;
+            overflow: hidden;
+            margin-bottom: 0.5vh;
+        }
+
+        .keyboard-frame {
+            background: rgba(255, 255, 255, 0.015);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 18px;
+            padding: 1.2vh;
+            position: relative;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            max-width: 95vw;
+            max-height: 24vh;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .keyboard-widget {
+            position: relative;
+            transform-origin: center;
+        }
+
+        /* Modern Key Styles */
+        .key {
+            position: absolute;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            color: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1vh;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.1s ease, transform 0.1s ease;
+            user-select: none;
+        }
+
+        .key:hover:not(.pressed) {
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            border-color: rgba(255, 107, 90, 0.25);
+        }
+
+        .key.pressed {
+            background: linear-gradient(145deg, #ff6b5a, #e85d42) !important;
+            border-color: #ff6b5a !important;
+            transform: scale(0.95);
+            box-shadow: 0 0 20px rgba(255, 107, 90, 0.35), inset 0 2px 4px rgba(0, 0, 0, 0.2);
+            color: white !important;
+        }
+
+        .key.special {
+            background: linear-gradient(145deg, rgba(255, 107, 90, 0.12), rgba(232, 93, 66, 0.08));
+            border-color: rgba(255, 107, 90, 0.18);
+        }
+
+        .key.knob {
+            border-radius: 50%;
+            background: linear-gradient(145deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+        }
+
+        /* Scale Controls */
+        .scale-controls {
+            text-align: center;
+            flex: 0 0 auto;
+            height: 3.5vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0.5vh;
+        }
+
+        .scale-label {
+            color: rgba(255, 255, 255, 0.75);
+            margin-right: 1.5vw;
+            font-weight: 500;
+            font-size: 1.2vh;
+        }
+
+        .scale-btn {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            width: 2.8vh;
+            height: 2.8vh;
+            font-size: 1.4vh;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 0 0.8vw;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .scale-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: #ff6b5a;
+            transform: translateY(-1px);
+        }
+
+        .scale-btn:active {
+            transform: translateY(0);
+            transition: all 0.1s ease;
+        }
+
+        /* Modern Analytics Panel */
+        .analytics-panel {
+            background: rgba(255, 255, 255, 0.015);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 18px;
+            padding: 1.2vh 1.5vw;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 1vh;
+        }
+
+        .live-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.2vw;
+            flex: 0 0 auto;
+            height: 11vh;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1.2vh 0.8vw;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 0.5vh;
+        }
+
+        .stat-item:hover {
+            background: rgba(255, 255, 255, 0.03);
+            border-color: rgba(255, 107, 90, 0.18);
+            transform: translateY(-1px);
+        }
+
+        .stat-item:active {
+            transform: translateY(0);
+            transition: all 0.1s ease;
+        }
+
+        .stat-value {
+            font-size: 2.2vh;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ff6b5a, #e85d42);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 1.1vh;
+            color: rgba(255, 255, 255, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            font-weight: 600;
+            line-height: 1;
+        }
+
+        /* Fixed Hand Balance */
+        .hand-balance {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.8vh;
+        }
+
+        .balance-viz {
+            display: flex;
+            align-items: center;
+            gap: 0.8vh;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .balance-label {
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 700;
+            font-size: 1vh;
+            min-width: 1.5vh;
+        }
+
+        .balance-bar-container {
+            width: 8vh;
+            height: 1.5vh;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 0.75vh;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .balance-bar-left {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            background: linear-gradient(90deg, #FF6B6B, #FF8E8E);
+            transition: width 0.5s ease;
+            border-radius: 0.75vh 0 0 0.75vh;
+        }
+
+        .balance-bar-right {
+            position: absolute;
+            right: 0;
+            top: 0;
+            height: 100%;
+            background: linear-gradient(90deg, #4ECDC4, #45B7B8);
+            transition: width 0.5s ease;
+            border-radius: 0 0.75vh 0.75vh 0;
+        }
+
+        .balance-center {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background: rgba(255, 255, 255, 0.8);
+            transform: translateX(-50%);
+            z-index: 10;
+        }
+
+        /* Content Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 1.5vw;
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.018);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 14px;
+            padding: 1.5vh 1.2vw;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 1vh;
+        }
+
+        .card:hover {
+            background: rgba(255, 255, 255, 0.025);
+            border-color: rgba(255, 107, 90, 0.15);
+            transform: translateY(-1px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+        }
+
+        .card:active {
+            transform: translateY(0);
+            transition: all 0.1s ease;
+        }
+
+        .card-title {
+            font-size: 1.3vh;
+            font-weight: 700;
+            color: #ff6b5a;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            flex: 0 0 auto;
+        }
+
+        /* Top Keys */
+        .top-key-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.6vh;
+            font-size: 1.1vh;
+            padding: 0.4vh 0;
+        }
+
+        .key-name {
+            min-width: 4vw;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1vh;
+        }
+
+        .key-progress {
+            flex: 1;
+            height: 0.6vh;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 0.3vh;
+            margin: 0 1vw;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .key-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6b5a, #e85d42);
+            transition: width 0.5s ease;
+            border-radius: 0.3vh;
+        }
+
+        .key-count {
+            color: #ff6b5a;
+            font-weight: 800;
+            min-width: 3vw;
+            text-align: right;
+            font-size: 1vh;
+        }
+
+        /* Rhythm Chart */
+        .rhythm-chart {
+            flex: 1 1 auto;
+            background: rgba(255, 255, 255, 0.015);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+            min-height: 8vh;
+        }
+
+        .rhythm-canvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Reset Button */
+        .reset-section {
+            text-align: center;
+            flex: 0 0 auto;
+            height: 5vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 0.5vh;
+        }
+
+        .reset-btn {
+            background: linear-gradient(135deg, #FF6B6B, #FF5252);
+            color: white;
+            border: none;
+            padding: 0.8vh 2vw;
+            border-radius: 10px;
+            font-size: 1.1vh;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.25);
+        }
+
+        .reset-btn:hover {
+            background: linear-gradient(135deg, #FF5252, #FF4444);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.35);
+        }
+
+        .reset-btn:active {
+            transform: translateY(0);
+            transition: all 0.1s ease;
+        }
+
+        /* Responsive Design - Maintain no-scroll */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 1vh 1.5vw;
+                gap: 0.8vh;
+            }
+
+            .global-tracking-toggle {
+                position: relative;
+                text-align: center;
+                margin-bottom: 1vh;
+                align-items: center;
+                min-width: auto;
+            }
+
+            .header {
+                height: 12vh;
+                margin-bottom: 0.3vh;
+            }
+
+            .layout-section {
+                height: 3.5vh;
+                margin-bottom: 0.3vh;
+            }
+
+            .keyboard-container {
+                height: 24vh;
+                margin-bottom: 0.3vh;
+            }
+
+            .scale-controls {
+                height: 3vh;
+                margin-bottom: 0.3vh;
+            }
+
+            .live-stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1vw;
+                height: 10vh;
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+                gap: 1vh;
+            }
+
+            .card-title {
+                font-size: 1.4vh;
+            }
+
+            .analytics-panel {
+                padding: 1vh 1.2vw;
+                gap: 0.8vh;
+            }
+
+            .reset-section {
+                height: 4vh;
+                margin-top: 0.3vh;
+            }
+        }
+
+        @media (max-height: 600px) {
+            .main-container {
+                padding: 0.8vh 1.5vw;
+                gap: 0.5vh;
+            }
+
+            .header {
+                height: 8vh;
+                margin-bottom: 0.2vh;
+            }
+
+            .layout-section {
+                height: 3vh;
+                margin-bottom: 0.2vh;
+            }
+
+            .keyboard-container {
+                height: 20vh;
+                margin-bottom: 0.2vh;
+            }
+
+            .scale-controls {
+                height: 2.5vh;
+                margin-bottom: 0.2vh;
+            }
+
+            .live-stats {
+                height: 9vh;
+            }
+
+            .reset-section {
+                height: 3.5vh;
+                margin-top: 0.2vh;
+            }
+
+            .title {
+                font-size: 3.5vh;
+            }
+
+            .stat-value {
+                font-size: 1.8vh;
+            }
+
+            .key {
+                font-size: 0.8vh;
+            }
+
+            .analytics-panel {
+                padding: 0.8vh 1vw;
+                gap: 0.5vh;
+            }
+        }
+
+        @media (max-height: 500px) {
+            .main-container {
+                padding: 0.5vh 1vw;
+                gap: 0.3vh;
+            }
+
+            .header {
+                height: 7vh;
+                margin-bottom: 0.1vh;
+            }
+
+            .layout-section {
+                height: 2.5vh;
+                margin-bottom: 0.1vh;
+            }
+
+            .keyboard-container {
+                height: 16vh;
+                margin-bottom: 0.1vh;
+            }
+
+            .scale-controls {
+                height: 2vh;
+                margin-bottom: 0.1vh;
+            }
+
+            .live-stats {
+                height: 7vh;
+            }
+
+            .reset-section {
+                height: 3vh;
+                margin-top: 0.1vh;
+            }
+
+            .title {
+                font-size: 2.8vh;
+            }
+
+            .subtitle {
+                font-size: 1.1vh;
+            }
+
+            .analytics-panel {
+                padding: 0.6vh 0.8vw;
+                gap: 0.3vh;
+            }
+
+            .stat-item {
+                padding: 0.8vh 0.5vw;
+            }
+        }
+
+        /* Loading State */
+        .loading {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        /* Simplified Transitions for Performance */
+        .key {
+            transition: background 0.1s ease, transform 0.1s ease;
+        }
+
+        .key-progress-fill, .balance-bar-left, .balance-bar-right {
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- Modern Header -->
+        <div class="header">
+            <div class="global-tracking-toggle">
+                <div class="toggle-controls">
+                    <span class="toggle-label">Global Tracking</span>
+                    <div class="toggle-switch" id="globalTrackingToggle">
+                        <div class="toggle-knob"></div>
+                    </div>
+                </div>
+                <div class="permission-status" id="permissionStatus"></div>
+            </div>
+            <h1 class="title">TypeChron Viz</h1>
+            <!-- <p class="subtitle">Advanced Keyboard Analytics & Visualization</p> -->
+        </div>
+
+        <!-- Layout Selector -->
+        <div class="layout-section">
+            <select class="layout-dropdown" id="layoutSelector">
+                <option value="keychron" selected>ANSI Alice Layout</option>
+                <option value="marvo">ANSI 87-key Layout</option>
+            </select>
+        </div>
+
+        <!-- Keyboard Visualization -->
+        <div class="keyboard-container">
+            <div class="keyboard-frame">
+                <div class="keyboard-widget" id="keyboardWidget"></div>
+            </div>
+        </div>
+
+        <!-- Scale Controls -->
+        <div class="scale-controls">
+            <span class="scale-label">Scale:</span>
+            <button class="scale-btn" id="scaleDown">−</button>
+            <button class="scale-btn" id="scaleUp">+</button>
+        </div>
+
+        <!-- Analytics Panel -->
+        <div class="analytics-panel">
+            <div class="live-stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="totalKeystrokes">0</div>
+                    <div class="stat-label">Total Keys</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="avgDwell">0ms</div>
+                    <div class="stat-label">Avg Dwell</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="kpsValue">0.0</div>
+                    <div class="stat-label">Keys/Second</div>
+                </div>
+                <div class="stat-item hand-balance">
+                    <div class="stat-value" id="handBalance">50/50</div>
+                    <div class="stat-label">Hand Balance</div>
+                    <div class="balance-viz">
+                        <span class="balance-label">L</span>
+                        <div class="balance-bar-container">
+                            <div class="balance-bar-left" id="balanceLeft"></div>
+                            <div class="balance-bar-right" id="balanceRight"></div>
+                            <div class="balance-center"></div>
+                        </div>
+                        <span class="balance-label">R</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-grid">
+                <div class="card">
+                    <div class="card-title">Top Keys</div>
+                    <div id="topKeysList"></div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Typing Rhythm</div>
+                    <div class="rhythm-chart">
+                        <canvas class="rhythm-canvas" id="rhythmCanvas"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reset Button -->
+        <div class="reset-section">
+            <button class="reset-btn" id="resetBtn">Reset Analytics</button>
+        </div>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+
+        // Analytics Data
+        class KeyboardAnalytics {
+            constructor() {
+                this.reset();
+                this.loadFromFile();
+            }
+
+            reset() {
+                this.sessionStartTime = Date.now();
+                this.totalKeystrokes = 0;
+                this.keyFrequency = {};
+                this.dwellTimes = [];
+                this.keystrokeTimings = []; // Keep for rhythm chart
+                this.recentKeystrokes = []; // NEW: Rolling window for KPS calculation
+                this.keyDownTimes = {};
+                this.rhythmData = [];
+                this.handBalance = { left: 0, right: 0 };
+                this.kpsWindow = 10; // 10 second rolling window for KPS
+
+                this.leftHandKeys = new Set([
+                    'KeyQ', 'KeyW', 'KeyE', 'KeyR', 'KeyT',
+                    'KeyA', 'KeyS', 'KeyD', 'KeyF', 'KeyG',
+                    'KeyZ', 'KeyX', 'KeyC', 'KeyV', 'KeyB',
+                    'Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5',
+                    'Tab', 'CapsLock', 'ShiftLeft', 'ControlLeft', 'AltLeft', 'MetaLeft',
+                    'Backquote', 'Escape'
+                ]);
+            }
+
+            async loadFromFile() {
+                try {
+                    const data = await ipcRenderer.invoke('load-analytics');
+                    if (data && data.length > 0) {
+                        data.forEach(entry => {
+                            this.keyFrequency[entry.key] = entry.count;
+                            this.totalKeystrokes += entry.count;
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error loading analytics:', error);
+                }
+            }
+
+            async saveToFile() {
+                try {
+                    const data = Object.entries(this.keyFrequency)
+                        .sort((a, b) => b[1] - a[1])
+                        .map(([key, count]) => ({ key, count }));
+                    await ipcRenderer.invoke('save-analytics', data);
+                } catch (error) {
+                    console.error('Error saving analytics:', error);
+                }
+            }
+
+            recordKeyPress(code, timestamp) {
+                this.totalKeystrokes++;
+                this.keyFrequency[code] = (this.keyFrequency[code] || 0) + 1;
+
+                // Add to rolling window for KPS calculation
+                this.recentKeystrokes.push(timestamp);
+
+                // Keep keystroke timings for rhythm chart
+                if (this.keystrokeTimings.length > 0) {
+                    const interval = timestamp - this.keystrokeTimings[this.keystrokeTimings.length - 1];
+                    this.rhythmData.push(interval);
+                    if (this.rhythmData.length > 50) {
+                        this.rhythmData.shift();
+                    }
+                }
+
+                this.keystrokeTimings.push(timestamp);
+                if (this.keystrokeTimings.length > 1000) {
+                    this.keystrokeTimings.shift();
+                }
+
+                this.keyDownTimes[code] = timestamp;
+
+                if (this.leftHandKeys.has(code)) {
+                    this.handBalance.left++;
+                } else {
+                    this.handBalance.right++;
+                }
+            }
+
+            recordKeyRelease(code, timestamp) {
+                if (this.keyDownTimes[code]) {
+                    const dwellTime = timestamp - this.keyDownTimes[code];
+                    this.dwellTimes.push(dwellTime);
+                    if (this.dwellTimes.length > 100) {
+                        this.dwellTimes.shift();
+                    }
+                    delete this.keyDownTimes[code];
+                }
+            }
+
+            getAverageDwell() {
+                if (this.dwellTimes.length === 0) return 0;
+                return this.dwellTimes.reduce((a, b) => a + b, 0) / this.dwellTimes.length;
+            }
+
+            getKPS() {
+                const now = Date.now();
+                const windowMs = this.kpsWindow * 1000; // Convert to milliseconds
+
+                // Remove keystrokes older than the window
+                this.recentKeystrokes = this.recentKeystrokes.filter(
+                    timestamp => (now - timestamp) <= windowMs
+                );
+
+                // If no recent keystrokes, return 0
+                if (this.recentKeystrokes.length === 0) {
+                    return 0;
+                }
+
+                // If only one keystroke, we can't calculate speed yet
+                if (this.recentKeystrokes.length === 1) {
+                    return 0;
+                }
+
+                // Calculate time span of keystrokes in window
+                const oldestKeystroke = Math.min(...this.recentKeystrokes);
+                const newestKeystroke = Math.max(...this.recentKeystrokes);
+                const timeSpanSeconds = (newestKeystroke - oldestKeystroke) / 1000;
+
+                // Avoid division by zero
+                if (timeSpanSeconds <= 0) {
+                    return 0;
+                }
+
+                // Calculate KPS: keystrokes per second in the window
+                return this.recentKeystrokes.length / timeSpanSeconds;
+            }
+
+            getTopKeys(n = 5) {
+                return Object.entries(this.keyFrequency)
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, n);
+            }
+
+            // Clean up old keystrokes to prevent memory bloat
+            cleanupOldKeystrokes() {
+                const now = Date.now();
+                const windowMs = this.kpsWindow * 1000;
+                this.recentKeystrokes = this.recentKeystrokes.filter(
+                    timestamp => (now - timestamp) <= windowMs
+                );
+            }
+        }
+
+        // Keyboard Layouts
+        const keyboardLayouts = {
+            keychron: [
+                // Row 0 (Knob and function keys)
+                {row: 0, col: 0, x: 26.5, y: 2.89852, width: 52, height: 54, label: 'OSL(1)', code: 'KC_ACL0', key: 'OSL(1)', rotation: 0.0, isSpecial: false, isKnob: true},
+                {row: 0, col: 1, x: 106, y: 2.89852, width: 52, height: 54, label: 'Esc', code: 'Escape', key: 'Escape', rotation: 0.0, isSpecial: true},
+                {row: 0, col: 2, x: 172.25, y: 2.89852, width: 52, height: 54, label: 'Scr -', code: 'F1', key: 'F1'},
+                {row: 0, col: 3, x: 225.25, y: 2.89852, width: 52, height: 54, label: 'Scr +', code: 'F2', key: 'F2'},
+                {row: 0, col: 4, x: 284.829, y: 5.30011, width: 52, height: 54, label: 'MCtl', code: 'F3', key: 'F3', rotation: 0.10472},
+                {row: 0, col: 5, x: 337.539, y: 10.8401, width: 52, height: 54, label: 'LPad', code: 'F4', key: 'F4', rotation: 0.10472},
+                {row: 0, col: 6, x: 403.426, y: 17.7651, width: 52, height: 54, label: 'BL -', code: 'F5', key: 'F5', rotation: 0.10472},
+                {row: 0, col: 7, x: 456.136, y: 23.3051, width: 52, height: 54, label: 'BL +', code: 'F6', key: 'F6', rotation: 0.10472},
+                {row: 0, col: 8, x: 540.748, y: 23.6689, width: 52, height: 54, label: 'Prvs', code: 'F7', key: 'F7', rotation: -0.10472},
+                {row: 0, col: 9, x: 593.458, y: 18.1289, width: 52, height: 54, label: 'Play', code: 'F8', key: 'F8', rotation: -0.10472},
+                {row: 0, col: 10, x: 659.345, y: 11.2039, width: 52, height: 54, label: 'Next', code: 'F9', key: 'F9', rotation: -0.10472},
+                {row: 0, col: 11, x: 712.054, y: 5.66387, width: 52, height: 54, label: 'Mute', code: 'F10', key: 'F10', rotation: -0.10472},
+                {row: 0, col: 12, x: 773.8, y: 2.89852, width: 52, height: 54, label: 'Vol -', code: 'F11', key: 'F11'},
+                {row: 0, col: 13, x: 826.8, y: 2.89852, width: 52, height: 54, label: 'Vol +', code: 'F12', key: 'F12'},
+                {row: 0, col: 14, x: 893.05, y: 2.89852, width: 52, height: 54, label: 'Ins', code: 'Insert', key: 'Insert'},
+                {row: 0, col: 15, x: 959.3, y: 2.89852, width: 52, height: 54, label: 'Del', code: 'Delete', key: 'Delete'},
+
+                // Row 1 (Number row)
+                {row: 1, col: 0, x: 39.75, y: 71.6485, width: 52, height: 54, label: 'M1', code: 'N/A', key: 'M1'},
+                {row: 1, col: 1, x: 119.25, y: 71.6485, width: 52, height: 54, label: '~\n`', code: 'Backquote', key: '`'},
+                {row: 1, col: 2, x: 172.25, y: 71.6485, width: 52, height: 54, label: '!\n1', code: 'Digit1', key: '1'},
+                {row: 1, col: 3, x: 225.25, y: 71.6485, width: 52, height: 54, label: '@\n2', code: 'Digit2', key: '2'},
+                {row: 1, col: 4, x: 285.55, y: 74.5045, width: 52, height: 54, label: '#\n3', code: 'Digit3', key: '3', rotation: 0.10472},
+                {row: 1, col: 5, x: 338.259, y: 80.0445, width: 52, height: 54, label: '$\n4', code: 'Digit4', key: '4', rotation: 0.10472},
+                {row: 1, col: 6, x: 390.969, y: 85.5845, width: 52, height: 54, label: '%\n5', code: 'Digit5', key: '5', rotation: 0.10472},
+                {row: 1, col: 7, x: 443.679, y: 91.1245, width: 52, height: 54, label: '^\n6', code: 'Digit6', key: '6', rotation: 0.10472},
+                {row: 1, col: 8, x: 513.673, y: 95.6433, width: 52, height: 54, label: '&\n7', code: 'Digit7', key: '7', rotation: -0.10472},
+                {row: 1, col: 9, x: 566.383, y: 90.1033, width: 52, height: 54, label: '*\n8', code: 'Digit8', key: '8', rotation: -0.10472},
+                {row: 1, col: 10, x: 619.092, y: 84.5633, width: 52, height: 54, label: '(\n9', code: 'Digit9', key: '9', rotation: -0.10472},
+                {row: 1, col: 11, x: 671.802, y: 79.0233, width: 52, height: 54, label: ')\n0', code: 'Digit0', key: '0', rotation: -0.10472},
+                {row: 1, col: 12, x: 736.7, y: 71.6485, width: 52, height: 54, label: '_\n-', code: 'Minus', key: '-'},
+                {row: 1, col: 13, x: 789.7, y: 71.6485, width: 52, height: 54, label: '+\n=', code: 'Equal', key: '='},
+                {row: 1, col: 14, x: 842.7, y: 71.6485, width: 105, height: 54, label: 'Backspace', code: 'Backspace', key: 'Backspace'},
+                {row: 1, col: 15, x: 980.5, y: 71.6485, width: 52, height: 54, label: 'PgUp', code: 'PageUp', key: 'PageUp'},
+
+                // Row 2 (QWERTY row)
+                {row: 2, col: 0, x: 26.5, y: 126.649, width: 52, height: 54, label: 'M2', code: 'N/A', key: 'M2'},
+                {row: 2, col: 1, x: 106, y: 126.649, width: 78.5, height: 54, label: 'Tab', code: 'Tab', key: 'Tab'},
+                {row: 2, col: 2, x: 185.5, y: 126.649, width: 52, height: 54, label: 'Q', code: 'KeyQ', key: 'q'},
+                {row: 2, col: 3, x: 245.539, y: 125.602, width: 52, height: 54, label: 'W', code: 'KeyW', key: 'w', rotation: 0.10472},
+                {row: 2, col: 4, x: 298.249, y: 131.142, width: 52, height: 54, label: 'E', code: 'KeyE', key: 'e', rotation: 0.10472},
+                {row: 2, col: 5, x: 350.959, y: 136.682, width: 52, height: 54, label: 'R', code: 'KeyR', key: 'r', rotation: 0.10472},
+                {row: 2, col: 6, x: 403.668, y: 142.222, width: 52, height: 54, label: 'T', code: 'KeyT', key: 't', rotation: 0.10472},
+                {row: 2, col: 7, x: 493.067, y: 153.112, width: 52, height: 54, label: 'Y', code: 'KeyY', key: 'y', rotation: -0.10472},
+                {row: 2, col: 8, x: 545.777, y: 147.572, width: 52, height: 54, label: 'U', code: 'KeyU', key: 'u', rotation: -0.10472},
+                {row: 2, col: 9, x: 598.487, y: 142.032, width: 52, height: 54, label: 'I', code: 'KeyI', key: 'i', rotation: -0.10472},
+                {row: 2, col: 10, x: 651.196, y: 136.492, width: 52, height: 54, label: 'O', code: 'KeyO', key: 'o', rotation: -0.10472},
+                {row: 2, col: 11, x: 703.906, y: 130.952, width: 52, height: 54, label: 'P', code: 'KeyP', key: 'p', rotation: -0.10472},
+                {row: 2, col: 12, x: 763.2, y: 126.649, width: 52, height: 54, label: '{\n[', code: 'BracketLeft', key: '['},
+                {row: 2, col: 13, x: 816.2, y: 126.649, width: 52, height: 54, label: '}\n]', code: 'BracketRight', key: ']'},
+                {row: 2, col: 14, x: 869.2, y: 126.649, width: 91.75, height: 54, label: '|\n\\', code: 'Backslash', key: '\\'},
+                {row: 2, col: 15, x: 988.45, y: 126.649, width: 52, height: 54, label: 'PgDn', code: 'PageDown', key: 'PageDown'},
+
+                // Row 3 (ASDF row)
+                {row: 3, col: 0, x: 13.25, y: 181.649, width: 52, height: 54, label: 'M3', code: 'N/A', key: 'M3'},
+                {row: 3, col: 1, x: 92.75, y: 181.649, width: 91.75, height: 54, label: 'Caps Lock', code: 'CapsLock', key: 'CapsLock'},
+                {row: 3, col: 2, x: 185.5, y: 181.649, width: 52, height: 54, label: 'A', code: 'KeyA', key: 'a'},
+                {row: 3, col: 3, x: 245.061, y: 180.855, width: 52, height: 54, label: 'S', code: 'KeyS', key: 's', rotation: 0.10472},
+                {row: 3, col: 4, x: 297.771, y: 186.395, width: 52, height: 54, label: 'D', code: 'KeyD', key: 'd', rotation: 0.10472},
+                {row: 3, col: 5, x: 350.48, y: 191.935, width: 52, height: 54, label: 'F', code: 'KeyF', key: 'f', rotation: 0.10472},
+                {row: 3, col: 6, x: 403.19, y: 197.475, width: 52, height: 54, label: 'G', code: 'KeyG', key: 'g', rotation: 0.10472},
+                {row: 3, col: 7, x: 525.171, y: 205.041, width: 52, height: 54, label: 'H', code: 'KeyH', key: 'h', rotation: -0.10472},
+                {row: 3, col: 8, x: 577.881, y: 199.501, width: 52, height: 54, label: 'J', code: 'KeyJ', key: 'j', rotation: -0.10472},
+                {row: 3, col: 9, x: 630.591, y: 193.961, width: 52, height: 54, label: 'K', code: 'KeyK', key: 'k', rotation: -0.10472},
+                {row: 3, col: 10, x: 683.3, y: 188.421, width: 52, height: 54, label: 'L', code: 'KeyL', key: 'l', rotation: -0.10472},
+                {row: 3, col: 11, x: 747.3, y: 181.649, width: 52, height: 54, label: ':\n;', code: 'Semicolon', key: ';'},
+                {row: 3, col: 12, x: 800.3, y: 181.649, width: 52, height: 54, label: '"\n\'', code: 'Quote', key: "'"},
+                {row: 3, col: 14, x: 853.3, y: 181.649, width: 118.25, height: 54, label: 'Enter', code: 'Enter', key: 'Enter', rotation: 0.0, isSpecial: true},
+                {row: 3, col: 15, x: 999.05, y: 181.649, width: 52, height: 54, label: 'Sleep', code: 'Home', key: 'Home'},
+
+                // Row 4 (ZXCV row)
+                {row: 4, col: 0, x: 0, y: 236.649, width: 52, height: 54, label: 'M4', code: 'N/A', key: 'M4'},
+                {row: 4, col: 1, x: 79.5, y: 236.649, width: 118.25, height: 54, label: 'Shift', code: 'ShiftLeft', key: 'Shift'},
+                {row: 4, col: 2, x: 198.75, y: 236.649, width: 52, height: 54, label: 'Z', code: 'KeyZ', key: 'z'},
+                {row: 4, col: 3, x: 257.76, y: 237.493, width: 52, height: 54, label: 'X', code: 'KeyX', key: 'x', rotation: 0.10472},
+                {row: 4, col: 4, x: 310.47, y: 243.033, width: 52, height: 54, label: 'C', code: 'KeyC', key: 'c', rotation: 0.10472},
+                {row: 4, col: 5, x: 363.18, y: 248.573, width: 52, height: 54, label: 'V', code: 'KeyV', key: 'v', rotation: 0.10472},
+                {row: 4, col: 6, x: 415.889, y: 254.113, width: 52, height: 54, label: 'B', code: 'KeyB', key: 'b', rotation: 0.10472},
+                {row: 4, col: 7, x: 554.64, y: 257.246, width: 52, height: 54, label: 'N', code: 'KeyN', key: 'n', rotation: -0.10472},
+                {row: 4, col: 8, x: 607.349, y: 251.706, width: 52, height: 54, label: 'M', code: 'KeyM', key: 'm', rotation: -0.10472},
+                {row: 4, col: 9, x: 660.059, y: 246.166, width: 52, height: 54, label: '<\n,', code: 'Comma', key: ',', rotation: -0.10472},
+                {row: 4, col: 10, x: 712.769, y: 240.626, width: 52, height: 54, label: '>\n.', code: 'Period', key: '.', rotation: -0.10472},
+                {row: 4, col: 11, x: 779.1, y: 236.649, width: 52, height: 54, label: '?\n/', code: 'Slash', key: '/'},
+                {row: 4, col: 12, x: 832.1, y: 236.649, width: 91.75, height: 54, label: 'Shift', code: 'ShiftRight', key: 'Shift'},
+                {row: 4, col: 13, x: 938.1, y: 250.399, width: 52, height: 54, label: '↑', code: 'ArrowUp', key: 'ArrowUp'},
+
+                // Row 5 (Bottom row)
+                {row: 5, col: 0, x: 0, y: 291.649, width: 52, height: 54, label: 'M5', code: 'N/A', key: 'M5'},
+                {row: 5, col: 1, x: 79.5, y: 291.649, width: 65.25, height: 54, label: 'Ctrl', code: 'ControlLeft', key: 'Control'},
+                {row: 5, col: 2, x: 145.75, y: 291.649, width: 65.25, height: 54, label: 'LOpt', code: 'AltLeft', key: 'Alt'},
+                {row: 5, col: 3, x: 251.975, y: 292.884, width: 65.25, height: 54, label: 'LCmd', code: 'MetaLeft', key: 'Meta', rotation: 0.10472},
+                {row: 5, col: 5, x: 317.717, y: 302.579, width: 118.25, height: 54, label: 'Space', code: 'Space', key: ' ', rotation: 0.10472, spaceSide: 'left'},
+                {row: 5, col: 6, x: 436.495, y: 311.581, width: 52, height: 54, label: 'MO(1)', code: 'N/A', key: 'MO(1)', rotation: 0.10472},
+                {row: 5, col: 7, x: 507.454, y: 313.192, width: 134.15, height: 54, label: 'Space', code: 'Space', key: ' ', rotation: -0.10472, spaceSide: 'right'},
+                {row: 5, col: 9, x: 642.089, y: 303.358, width: 52, height: 54, label: 'RCmd', code: 'MetaRight', key: 'Meta', rotation: -0.10472},
+                {row: 5, col: 10, x: 694.798, y: 297.818, width: 52, height: 54, label: 'Ctrl', code: 'ControlRight', key: 'Control', rotation: -0.10472},
+                {row: 5, col: 12, x: 885.1, y: 305.399, width: 52, height: 54, label: '←', code: 'ArrowLeft', key: 'ArrowLeft'},
+                {row: 5, col: 13, x: 938.1, y: 305.399, width: 52, height: 54, label: '↓', code: 'ArrowDown', key: 'ArrowDown'},
+                {row: 5, col: 14, x: 991.1, y: 305.399, width: 52, height: 54, label: '→', code: 'ArrowRight', key: 'ArrowRight'}
+            ],
+
+            marvo: [
+                // Function row
+                {row: 0, col: 0, x: 10, y: 10, width: 52, height: 54, label: 'Esc', code: 'Escape', key: 'Escape', isSpecial: true},
+                {row: 0, col: 1, x: 100, y: 10, width: 52, height: 54, label: 'F1', code: 'F1', key: 'F1'},
+                {row: 0, col: 2, x: 160, y: 10, width: 52, height: 54, label: 'F2', code: 'F2', key: 'F2'},
+                {row: 0, col: 3, x: 220, y: 10, width: 52, height: 54, label: 'F3', code: 'F3', key: 'F3'},
+                {row: 0, col: 4, x: 280, y: 10, width: 52, height: 54, label: 'F4', code: 'F4', key: 'F4'},
+                {row: 0, col: 5, x: 384, y: 10, width: 52, height: 54, label: 'F5', code: 'F5', key: 'F5'},
+                {row: 0, col: 6, x: 444, y: 10, width: 52, height: 54, label: 'F6', code: 'F6', key: 'F6'},
+                {row: 0, col: 7, x: 504, y: 10, width: 52, height: 54, label: 'F7', code: 'F7', key: 'F7'},
+                {row: 0, col: 8, x: 564, y: 10, width: 52, height: 54, label: 'F8', code: 'F8', key: 'F8'},
+                {row: 0, col: 9, x: 668, y: 10, width: 52, height: 54, label: 'F9', code: 'F9', key: 'F9'},
+                {row: 0, col: 10, x: 728, y: 10, width: 52, height: 54, label: 'F10', code: 'F10', key: 'F10'},
+                {row: 0, col: 11, x: 788, y: 10, width: 52, height: 54, label: 'F11', code: 'F11', key: 'F11'},
+                {row: 0, col: 12, x: 848, y: 10, width: 52, height: 54, label: 'F12', code: 'F12', key: 'F12'},
+                {row: 0, col: 13, x: 910, y: 10, width: 52, height: 54, label: 'PrtSc', code: 'PrintScreen', key: 'PrintScreen'},
+                {row: 0, col: 14, x: 970, y: 10, width: 52, height: 54, label: 'ScrLk', code: 'ScrollLock', key: 'ScrollLock'},
+                {row: 0, col: 15, x: 1030, y: 10, width: 52, height: 54, label: 'Pause', code: 'Pause', key: 'Pause'},
+
+                // Number row
+                {row: 1, col: 0, x: 10, y: 70, width: 52, height: 54, label: '~\n`', code: 'Backquote', key: '`'},
+                {row: 1, col: 1, x: 70, y: 70, width: 52, height: 54, label: '!\n1', code: 'Digit1', key: '1'},
+                {row: 1, col: 2, x: 130, y: 70, width: 52, height: 54, label: '@\n2', code: 'Digit2', key: '2'},
+                {row: 1, col: 3, x: 190, y: 70, width: 52, height: 54, label: '#\n3', code: 'Digit3', key: '3'},
+                {row: 1, col: 4, x: 250, y: 70, width: 52, height: 54, label: '$\n4', code: 'Digit4', key: '4'},
+                {row: 1, col: 5, x: 310, y: 70, width: 52, height: 54, label: '%\n5', code: 'Digit5', key: '5'},
+                {row: 1, col: 6, x: 370, y: 70, width: 52, height: 54, label: '^\n6', code: 'Digit6', key: '6'},
+                {row: 1, col: 7, x: 430, y: 70, width: 52, height: 54, label: '&\n7', code: 'Digit7', key: '7'},
+                {row: 1, col: 8, x: 490, y: 70, width: 52, height: 54, label: '*\n8', code: 'Digit8', key: '8'},
+                {row: 1, col: 9, x: 550, y: 70, width: 52, height: 54, label: '(\n9', code: 'Digit9', key: '9'},
+                {row: 1, col: 10, x: 610, y: 70, width: 52, height: 54, label: ')\n0', code: 'Digit0', key: '0'},
+                {row: 1, col: 11, x: 670, y: 70, width: 52, height: 54, label: '_\n-', code: 'Minus', key: '-'},
+                {row: 1, col: 12, x: 730, y: 70, width: 52, height: 54, label: '+\n=', code: 'Equal', key: '='},
+                {row: 1, col: 13, x: 790, y: 70, width: 110, height: 54, label: 'Backspace', code: 'Backspace', key: 'Backspace'},
+                {row: 1, col: 14, x: 910, y: 70, width: 52, height: 54, label: 'Ins', code: 'Insert', key: 'Insert'},
+                {row: 1, col: 15, x: 970, y: 70, width: 52, height: 54, label: 'Home', code: 'Home', key: 'Home'},
+                {row: 1, col: 16, x: 1030, y: 70, width: 52, height: 54, label: 'PgUp', code: 'PageUp', key: 'PageUp'},
+
+                // QWERTY row
+                {row: 2, col: 0, x: 10, y: 130, width: 78, height: 54, label: 'Tab', code: 'Tab', key: 'Tab'},
+                {row: 2, col: 1, x: 100, y: 130, width: 52, height: 54, label: 'Q', code: 'KeyQ', key: 'q'},
+                {row: 2, col: 2, x: 160, y: 130, width: 52, height: 54, label: 'W', code: 'KeyW', key: 'w'},
+                {row: 2, col: 3, x: 220, y: 130, width: 52, height: 54, label: 'E', code: 'KeyE', key: 'e'},
+                {row: 2, col: 4, x: 280, y: 130, width: 52, height: 54, label: 'R', code: 'KeyR', key: 'r'},
+                {row: 2, col: 5, x: 340, y: 130, width: 52, height: 54, label: 'T', code: 'KeyT', key: 't'},
+                {row: 2, col: 6, x: 400, y: 130, width: 52, height: 54, label: 'Y', code: 'KeyY', key: 'y'},
+                {row: 2, col: 7, x: 460, y: 130, width: 52, height: 54, label: 'U', code: 'KeyU', key: 'u'},
+                {row: 2, col: 8, x: 520, y: 130, width: 52, height: 54, label: 'I', code: 'KeyI', key: 'i'},
+                {row: 2, col: 9, x: 580, y: 130, width: 52, height: 54, label: 'O', code: 'KeyO', key: 'o'},
+                {row: 2, col: 10, x: 640, y: 130, width: 52, height: 54, label: 'P', code: 'KeyP', key: 'p'},
+                {row: 2, col: 11, x: 700, y: 130, width: 52, height: 54, label: '{\n[', code: 'BracketLeft', key: '['},
+                {row: 2, col: 12, x: 760, y: 130, width: 52, height: 54, label: '}\n]', code: 'BracketRight', key: ']'},
+                {row: 2, col: 13, x: 820, y: 130, width: 80, height: 54, label: '|\n\\', code: 'Backslash', key: '\\'},
+                {row: 2, col: 14, x: 910, y: 130, width: 52, height: 54, label: 'Del', code: 'Delete', key: 'Delete'},
+                {row: 2, col: 15, x: 970, y: 130, width: 52, height: 54, label: 'End', code: 'End', key: 'End'},
+                {row: 2, col: 16, x: 1030, y: 130, width: 52, height: 54, label: 'PgDn', code: 'PageDown', key: 'PageDown'},
+
+                // ASDF row
+                {row: 3, col: 0, x: 10, y: 190, width: 88, height: 54, label: 'Caps Lock', code: 'CapsLock', key: 'CapsLock'},
+                {row: 3, col: 1, x: 110, y: 190, width: 52, height: 54, label: 'A', code: 'KeyA', key: 'a'},
+                {row: 3, col: 2, x: 170, y: 190, width: 52, height: 54, label: 'S', code: 'KeyS', key: 's'},
+                {row: 3, col: 3, x: 230, y: 190, width: 52, height: 54, label: 'D', code: 'KeyD', key: 'd'},
+                {row: 3, col: 4, x: 290, y: 190, width: 52, height: 54, label: 'F', code: 'KeyF', key: 'f'},
+                {row: 3, col: 5, x: 350, y: 190, width: 52, height: 54, label: 'G', code: 'KeyG', key: 'g'},
+                {row: 3, col: 6, x: 410, y: 190, width: 52, height: 54, label: 'H', code: 'KeyH', key: 'h'},
+                {row: 3, col: 7, x: 470, y: 190, width: 52, height: 54, label: 'J', code: 'KeyJ', key: 'j'},
+                {row: 3, col: 8, x: 530, y: 190, width: 52, height: 54, label: 'K', code: 'KeyK', key: 'k'},
+                {row: 3, col: 9, x: 590, y: 190, width: 52, height: 54, label: 'L', code: 'KeyL', key: 'l'},
+                {row: 3, col: 10, x: 650, y: 190, width: 52, height: 54, label: ':\n;', code: 'Semicolon', key: ';'},
+                {row: 3, col: 11, x: 710, y: 190, width: 52, height: 54, label: '"\n\'', code: 'Quote', key: "'"},
+                {row: 3, col: 12, x: 770, y: 190, width: 130, height: 54, label: 'Enter', code: 'Enter', key: 'Enter', isSpecial: true},
+                {row: 3, col: 13, x: 970, y: 250, width: 52, height: 54, label: '↑', code: 'ArrowUp', key: 'ArrowUp'},
+
+                // ZXCV row
+                {row: 4, col: 0, x: 10, y: 250, width: 118, height: 54, label: 'Shift', code: 'ShiftLeft', key: 'Shift'},
+                {row: 4, col: 1, x: 140.5, y: 250, width: 52, height: 54, label: 'Z', code: 'KeyZ', key: 'z'},
+                {row: 4, col: 2, x: 200, y: 250, width: 52, height: 54, label: 'X', code: 'KeyX', key: 'x'},
+                {row: 4, col: 3, x: 260, y: 250, width: 52, height: 54, label: 'C', code: 'KeyC', key: 'c'},
+                {row: 4, col: 4, x: 320, y: 250, width: 52, height: 54, label: 'V', code: 'KeyV', key: 'v'},
+                {row: 4, col: 5, x: 380, y: 250, width: 52, height: 54, label: 'B', code: 'KeyB', key: 'b'},
+                {row: 4, col: 6, x: 440, y: 250, width: 52, height: 54, label: 'N', code: 'KeyN', key: 'n'},
+                {row: 4, col: 7, x: 500, y: 250, width: 52, height: 54, label: 'M', code: 'KeyM', key: 'm'},
+                {row: 4, col: 8, x: 560, y: 250, width: 52, height: 54, label: '<\n,', code: 'Comma', key: ','},
+                {row: 4, col: 9, x: 620, y: 250, width: 52, height: 54, label: '>\n.', code: 'Period', key: '.'},
+                {row: 4, col: 10, x: 680, y: 250, width: 52, height: 54, label: '?\n/', code: 'Slash', key: '/'},
+                {row: 4, col: 11, x: 741, y: 250, width: 160, height: 54, label: 'Shift', code: 'ShiftRight', key: 'Shift'},
+                {row: 4, col: 12, x: 910, y: 310, width: 52, height: 54, label: '←', code: 'ArrowLeft', key: 'ArrowLeft'},
+                {row: 4, col: 13, x: 970, y: 310, width: 52, height: 54, label: '↓', code: 'ArrowDown', key: 'ArrowDown'},
+                {row: 4, col: 14, x: 1030, y: 310, width: 52, height: 54, label: '→', code: 'ArrowRight', key: 'ArrowRight'},
+
+                // Bottom row
+                {row: 5, col: 0, x: 10, y: 310, width: 72, height: 54, label: 'Ctrl', code: 'ControlLeft', key: 'Control'},
+                {row: 5, col: 1, x: 94, y: 310, width: 52, height: 54, label: 'Win', code: 'MetaLeft', key: 'Meta'},
+                {row: 5, col: 2, x: 154, y: 310, width: 52, height: 54, label: 'Alt', code: 'AltLeft', key: 'Alt'},
+                {row: 5, col: 3, x: 218, y: 310, width: 418, height: 54, label: 'Space', code: 'Space', key: ' '},
+                {row: 5, col: 4, x: 648.5, y: 310, width: 52, height: 54, label: 'Alt', code: 'AltRight', key: 'Alt'},
+                {row: 5, col: 5, x: 708.5, y: 310, width: 52, height: 54, label: 'Win', code: 'MetaRight', key: 'Meta'},
+                {row: 5, col: 6, x: 768, y: 310, width: 52, height: 54, label: 'Menu', code: 'ContextMenu', key: 'ContextMenu'},
+                {row: 5, col: 7, x: 829.5, y: 310, width: 72, height: 54, label: 'Ctrl', code: 'ControlRight', key: 'Control'}
+            ]
+        };
+
+        // App State
+        let analytics = new KeyboardAnalytics();
+        let currentLayout = 'keychron';
+        let scaleFactor = 0.7;
+        let keyWidgets = {};
+        let pressedKeys = new Set();
+        let globalTrackingEnabled = false;
+
+        // Initialize app
+        function init() {
+            setupEventListeners();
+            setupKeyboard();
+            startUpdateTimer();
+            checkGlobalPermissions();
+        }
+
+        function setupEventListeners() {
+            // Global tracking toggle
+            document.getElementById('globalTrackingToggle').addEventListener('click', toggleGlobalTracking);
+
+            // Layout selector
+            const layoutSelector = document.getElementById('layoutSelector');
+            layoutSelector.addEventListener('change', (e) => {
+                const selectedValue = e.target.value;
+                console.log('Layout changed to:', selectedValue);
+
+                // Map dropdown values to layout keys
+                const layoutMap = {
+                    'keychron': 'keychron',
+                    'marvo': 'marvo'
+                };
+
+                if (layoutMap[selectedValue]) {
+                    currentLayout = layoutMap[selectedValue];
+                    setupKeyboard();
+                    console.log('Keyboard setup complete for:', currentLayout);
+                } else {
+                    console.error('Unknown layout:', selectedValue);
+                }
+            });
+
+            // Scale controls
+            document.getElementById('scaleDown').addEventListener('click', () => adjustScale(-0.1));
+            document.getElementById('scaleUp').addEventListener('click', () => adjustScale(0.1));
+
+            // Reset button
+            document.getElementById('resetBtn').addEventListener('click', resetAnalytics);
+
+            // Keyboard events (for when app is focused)
+            document.addEventListener('keydown', handleKeyDown, { passive: true });
+            document.addEventListener('keyup', handleKeyUp, { passive: true });
+
+            // Focus management
+            document.addEventListener('click', (e) => {
+                // Don't blur dropdown when clicking it
+                if (e.target.tagName.toLowerCase() === 'select') {
+                    return;
+                }
+                if (['button'].includes(e.target.tagName.toLowerCase())) {
+                    setTimeout(() => e.target.blur(), 100);
+                }
+            });
+        }
+
+        function setupKeyboard() {
+            const container = document.getElementById('keyboardWidget');
+            container.innerHTML = '';
+            keyWidgets = {};
+            pressedKeys.clear();
+
+            const layout = keyboardLayouts[currentLayout];
+
+            // Calculate bounds
+            const maxX = Math.max(...layout.map(k => k.x + k.width));
+            const maxY = Math.max(...layout.map(k => k.y + k.height));
+
+            // Set container size
+            container.style.width = (maxX * scaleFactor) + 'px';
+            container.style.height = (maxY * scaleFactor) + 'px';
+
+            // Create keys
+            layout.forEach(keyDef => {
+                const keyEl = document.createElement('div');
+                keyEl.className = 'key';
+
+                if (keyDef.isSpecial) keyEl.classList.add('special');
+                if (keyDef.isKnob) keyEl.classList.add('knob');
+
+                // Position and size
+                keyEl.style.left = (keyDef.x * scaleFactor) + 'px';
+                keyEl.style.top = (keyDef.y * scaleFactor) + 'px';
+                keyEl.style.width = (keyDef.width * scaleFactor) + 'px';
+                keyEl.style.height = (keyDef.height * scaleFactor) + 'px';
+
+                // Rotation
+                if (keyDef.rotation) {
+                    keyEl.style.transform = `rotate(${keyDef.rotation * 180 / Math.PI}deg)`;
+                }
+
+                // Label
+                if (keyDef.label.includes('\n')) {
+                    const parts = keyDef.label.split('\n');
+                    keyEl.innerHTML = `<div style="font-size: 8px; line-height: 1; opacity: 0.6;">${parts[0]}</div><div style="font-weight: bold;">${parts[1]}</div>`;
+                } else {
+                    keyEl.textContent = keyDef.label;
+                }
+
+                container.appendChild(keyEl);
+
+                // Store reference
+                if (!keyWidgets[keyDef.code]) {
+                    keyWidgets[keyDef.code] = [];
+                }
+                keyWidgets[keyDef.code].push(keyEl);
+            });
+        }
+
+        function adjustScale(delta) {
+            scaleFactor = Math.max(0.3, Math.min(1.5, scaleFactor + delta));
+            setupKeyboard();
+        }
+
+        function handleKeyDown(e) {
+            if (e.repeat) return;
+            const code = e.code;
+            if (code) {
+                // Don't prevent default for critical system shortcuts
+                if (!e.metaKey || (e.metaKey && ['KeyC', 'KeyV', 'KeyX', 'KeyZ', 'KeyA'].includes(code))) {
+                    // Only prevent function keys, not modifier combinations
+                    if (code.startsWith('F') && !e.ctrlKey && !e.metaKey && !e.altKey) {
+                        e.preventDefault();
+                    }
+                }
+                handleKeyPress(code);
+            }
+        }
+
+        function handleKeyUp(e) {
+            if (e.repeat) return;
+            const code = e.code;
+            if (code) {
+                handleKeyRelease(code);
+            }
+        }
+
+        function handleKeyPress(code) {
+            const timestamp = Date.now();
+            analytics.recordKeyPress(code, timestamp);
+
+            // Update display immediately for real-time feedback
+            updateDisplay();
+
+            // Immediate visual feedback
+            if (keyWidgets[code]) {
+                keyWidgets[code].forEach(keyEl => {
+                    if (!pressedKeys.has(keyEl)) {
+                        keyEl.classList.add('pressed');
+                        pressedKeys.add(keyEl);
+
+                        // Auto-remove pressed state after 150ms
+                        setTimeout(() => {
+                            if (pressedKeys.has(keyEl)) {
+                                keyEl.classList.remove('pressed');
+                                pressedKeys.delete(keyEl);
+                            }
+                        }, 150);
+                    }
+                });
+            }
+        }
+
+        function handleKeyRelease(code) {
+            const timestamp = Date.now();
+            analytics.recordKeyRelease(code, timestamp);
+
+            // Immediate visual feedback
+            if (keyWidgets[code]) {
+                keyWidgets[code].forEach(keyEl => {
+                    keyEl.classList.remove('pressed');
+                    pressedKeys.delete(keyEl);
+                });
+            }
+        }
+
+        async function toggleGlobalTracking() {
+            console.log('=== FRONTEND TOGGLE ===');
+            console.log('Current globalTrackingEnabled:', globalTrackingEnabled);
+            console.log('Requesting new state:', !globalTrackingEnabled);
+
+            try {
+                const result = await ipcRenderer.invoke('toggle-global-tracking', !globalTrackingEnabled);
+                console.log('IPC result received:', result);
+
+                if (result.success) {
+                    globalTrackingEnabled = !globalTrackingEnabled;
+                    const toggle = document.getElementById('globalTrackingToggle');
+                    const status = document.getElementById('permissionStatus');
+
+                    if (globalTrackingEnabled) {
+                        toggle.classList.add('active');
+                        // status.textContent = 'Global tracking ON';
+                        status.className = 'permission-status granted';
+                    } else {
+                        toggle.classList.remove('active');
+                        // status.textContent = 'Global tracking OFF';
+                        status.className = 'permission-status';
+                    }
+
+                    console.log('✅ Frontend updated successfully:', result.message);
+                } else {
+                    console.error('❌ Backend returned failure:', result.message);
+                    const status = document.getElementById('permissionStatus');
+                    status.textContent = result.message;
+                    status.className = 'permission-status denied';
+                }
+            } catch (error) {
+                console.error('❌ IPC call failed with exception:', error);
+                const status = document.getElementById('permissionStatus');
+                status.textContent = 'IPC communication error';
+                status.className = 'permission-status denied';
+            }
+        }
+
+        async function checkGlobalPermissions() {
+            try {
+                const result = await ipcRenderer.invoke('check-global-permissions');
+                const status = document.getElementById('permissionStatus');
+
+                status.textContent = result.message;
+                if (result.hasPermission) {
+                    status.className = 'permission-status granted';
+                } else {
+                    status.className = 'permission-status denied';
+                }
+
+                console.log(`Platform: ${result.platform}, Permissions: ${result.hasPermission}`);
+            } catch (error) {
+                console.error('Error checking permissions:', error);
+            }
+        }
+
+        async function resetAnalytics() {
+            analytics.reset();
+            await analytics.saveToFile();
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            // Update live stats
+            document.getElementById('totalKeystrokes').textContent = analytics.totalKeystrokes.toLocaleString();
+            document.getElementById('avgDwell').textContent = Math.round(analytics.getAverageDwell()) + 'ms';
+            document.getElementById('kpsValue').textContent = analytics.getKPS().toFixed(1);
+
+            // Update hand balance
+            const total = analytics.handBalance.left + analytics.handBalance.right;
+            let leftPercent = 50, rightPercent = 50;
+            if (total > 0) {
+                leftPercent = Math.round((analytics.handBalance.left / total) * 100);
+                rightPercent = 100 - leftPercent;
+            }
+
+            document.getElementById('handBalance').textContent = `${leftPercent}/${rightPercent}`;
+
+            // Update balance bars
+            const leftBar = document.getElementById('balanceLeft');
+            const rightBar = document.getElementById('balanceRight');
+
+            leftBar.style.width = leftPercent + '%';
+            rightBar.style.width = rightPercent + '%';
+
+            // Update top keys
+            updateTopKeys();
+
+            // Update rhythm chart
+            updateRhythmChart();
+        }
+
+        function updateTopKeys() {
+            const container = document.getElementById('topKeysList');
+            container.innerHTML = '';
+
+            const topKeys = analytics.getTopKeys(5);
+            const maxCount = topKeys.length > 0 ? topKeys[0][1] : 1;
+
+            topKeys.forEach(([code, count]) => {
+                const item = document.createElement('div');
+                item.className = 'top-key-item';
+
+                const name = getKeyDisplayName(code);
+                const progressWidth = (count / maxCount) * 100;
+
+                item.innerHTML = `
+                    <span class="key-name">${name}:</span>
+                    <div class="key-progress">
+                        <div class="key-progress-fill" style="width: ${progressWidth}%"></div>
+                    </div>
+                    <span class="key-count">${count}</span>
+                `;
+
+                container.appendChild(item);
+            });
+        }
+
+        function updateRhythmChart() {
+            const canvas = document.getElementById('rhythmCanvas');
+            const ctx = canvas.getContext('2d');
+
+            // Set canvas size
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const data = analytics.rhythmData.slice(-15);
+            if (data.length < 2) {
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+                ctx.font = '12px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('Start typing...', canvas.width / 2, canvas.height / 2);
+                return;
+            }
+
+            // Simple data prep
+            const maxInterval = Math.max(...data.map(d => Math.min(d, 300)));
+            const minInterval = Math.min(...data.map(d => Math.max(d, 0)));
+
+            // Simple line drawing
+            ctx.strokeStyle = '#ff7e5f';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+
+            data.forEach((interval, i) => {
+                const x = (canvas.width * i) / (data.length - 1);
+                const y = canvas.height - ((Math.min(interval, 300) - minInterval) / (maxInterval - minInterval)) * canvas.height;
+
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            });
+
+            ctx.stroke();
+        }
+
+        function getKeyDisplayName(code) {
+            const keyMap = {
+                'Space': 'Space',
+                'Enter': 'Enter',
+                'Backspace': 'Backsp',
+                'ShiftLeft': 'LShift',
+                'ShiftRight': 'RShift',
+                'ControlLeft': 'LCtrl',
+                'ControlRight': 'RCtrl',
+                'AltLeft': 'LAlt',
+                'AltRight': 'RAlt',
+                'MetaLeft': 'LCmd',
+                'MetaRight': 'RCmd',
+                'Tab': 'Tab',
+                'CapsLock': 'Caps',
+                'Escape': 'Esc'
+            };
+
+            if (keyMap[code]) return keyMap[code];
+            if (code.startsWith('Key')) return code.slice(3);
+            if (code.startsWith('Digit')) return code.slice(5);
+            if (code.startsWith('Arrow')) return code.slice(5);
+            return code;
+        }
+
+        function startUpdateTimer() {
+            // Update display less frequently since we update immediately on key presses
+            setInterval(() => {
+                updateDisplay();
+            }, 1000); // Back to 1000ms for responsive KPS updates
+
+            // Clean up old keystrokes periodically
+            setInterval(() => {
+                analytics.cleanupOldKeystrokes();
+            }, 5000); // Every 5 seconds
+
+            // Auto-save
+            setInterval(() => {
+                if (analytics.totalKeystrokes > 0) {
+                    analytics.saveToFile();
+                }
+            }, 10000);
+        }
+
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+
+        // Handle window resize to keep everything visible
+        window.addEventListener('resize', () => {
+            setupKeyboard(); // Recalculate keyboard scaling
+        });
+
+        // Load analytics on startup
+        ipcRenderer.on('analytics-loaded', (event, data) => {
+            if (data && data.length > 0) {
+                data.forEach(entry => {
+                    analytics.keyFrequency[entry.key] = entry.count;
+                    analytics.totalKeystrokes += entry.count;
+                });
+                updateDisplay();
+            }
+        });
+
+        // Handle global key presses from system-wide detection
+        ipcRenderer.on('global-key-press', (event, code) => {
+            // Process global keystrokes the same as local ones
+            handleKeyPress(code);
+
+            // Auto-release after short delay since we can't detect global key releases reliably
+            setTimeout(() => {
+                handleKeyRelease(code);
+            }, 100);
+        });
+
+        // Add a key state cleanup on window blur
+        window.addEventListener('blur', () => {
+            // Clear all pressed states when window loses focus
+            pressedKeys.forEach(keyEl => {
+                keyEl.classList.remove('pressed');
+            });
+            pressedKeys.clear();
+
+            // Clear analytics key down times
+            analytics.keyDownTimes = {};
+        });
+
+        // Prevent function keys when no modifiers are pressed
+        document.addEventListener('keydown', (e) => {
+            // Only prevent function keys when no modifiers are pressed
+            if (e.key.startsWith('F') && e.key.length <= 3 && !e.ctrlKey && !e.metaKey && !e.altKey && !e.shiftKey) {
+                e.preventDefault();
+            }
+            // Allow all other combinations to pass through
+        }, { passive: false });
+    </script>
+</body>
+</html>

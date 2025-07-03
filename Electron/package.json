@@ -1,0 +1,23 @@
+{
+  "name": "typechron-viz",
+  "version": "1.0.0",
+  "description": "Keyboard Analytics Visualization App",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "keyboard",
+    "analytics",
+    "typing"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^37.2.0"
+  },
+  "dependencies": {
+    "electron-window-state": "^5.0.3"
+  }
+}
