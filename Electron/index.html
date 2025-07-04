@@ -75,13 +75,13 @@
 
         .toggle-switch {
             position: relative;
-            width: 40px;
-            height: 20px;
-            background: rgba(255, 255, 255, 0.06);
-            border-radius: 10px;
+            width: 36px;
+            height: 18px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 9px;
             cursor: pointer;
             transition: all 0.2s ease;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             flex-shrink: 0;
         }
 
@@ -98,16 +98,16 @@
             position: absolute;
             top: 1px;
             left: 1px;
-            width: 18px;
-            height: 18px;
+            width: 16px;
+            height: 16px;
             background: white;
             border-radius: 50%;
             transition: all 0.2s ease;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
         }
 
         .toggle-switch.active .toggle-knob {
-            transform: translateX(20px);
+            transform: translateX(18px);
         }
 
         .permission-status {
@@ -154,14 +154,14 @@
         }
 
         .layout-dropdown {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.06);
             color: white;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 0.8vh 1.5vw;
-            font-size: 1.3vh;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            padding: 0.6vh 1.2vw;
+            font-size: 1.2vh;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             outline: none;
             font-weight: 500;
         }
@@ -173,14 +173,14 @@
         }
 
         .layout-dropdown:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: #ff6b5a;
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 107, 90, 0.4);
             transform: translateY(-1px);
         }
 
         .layout-dropdown:focus {
             border-color: #ff6b5a;
-            box-shadow: 0 0 0 3px rgba(255, 107, 90, 0.1);
+            box-shadow: 0 0 0 2px rgba(255, 107, 90, 0.15);
             transform: translateY(-1px);
         }
 
@@ -284,26 +284,27 @@
         }
 
         .scale-btn {
-            background: rgba(255, 255, 255, 0.03);
-            color: rgba(255, 255, 255, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 6px;
-            width: 2.8vh;
-            height: 2.8vh;
-            font-size: 1.2vh;
-            font-weight: 500;
+            background: rgba(255, 255, 255, 0.04);
+            color: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 50%;
+            width: 2.2vh;
+            height: 2.2vh;
+            font-size: 1vh;
+            font-weight: 600;
             cursor: pointer;
-            margin: 0 0.8vw;
-            transition: all 0.2s ease;
+            margin: 0 0.6vw;
+            transition: all 0.15s ease;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
         .scale-btn:hover {
-            background: rgba(255, 255, 255, 0.06);
-            border-color: rgba(255, 107, 90, 0.3);
+            background: rgba(255, 107, 90, 0.1);
+            border-color: rgba(255, 107, 90, 0.4);
             color: #ff6b5a;
+            transform: scale(1.05);
         }
 
         .scale-btn:active {
@@ -316,34 +317,36 @@
             background: rgba(255, 255, 255, 0.01);
             border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 12px;
-            padding: 2vh 2vw;
+            padding: 1.5vh 1.8vw;
             flex: 1 1 auto;
             min-height: 0;
             overflow: hidden;
             display: flex;
-            gap: 3vw;
+            gap: 1.5vw;
         }
 
         /* Left side - Bold metrics */
         .live-metrics {
             flex: 0 0 auto;
-            width: 25vw;
+            width: 18vw;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            gap: 4vh;
+            align-items: center;
+            text-align: center;
+            gap: 2.5vh;
         }
 
         .big-metric {
-            text-align: left;
+            text-align: center;
         }
 
         .big-metric-value {
-            font-size: 8vh;
-            font-weight: 800;
+            font-size: 3.5vh;
+            font-weight: 700;
             color: #ff6b5a;
-            line-height: 0.8;
-            margin-bottom: 1vh;
+            line-height: 0.9;
+            margin-bottom: 0.8vh;
         }
 
         .big-metric-label {
@@ -359,7 +362,7 @@
             flex: 1 1 auto;
             display: flex;
             flex-direction: column;
-            gap: 2vh;
+            gap: 1.5vh;
         }
 
         /* Bottom stats bar */
@@ -462,15 +465,48 @@
             align-items: center;
             padding: 1vh 0;
             gap: 1.5vw;
+            margin-bottom: 0.8vh;
+            position: relative;
+            z-index: 2;
+            background: transparent;
         }
 
         .top-key-compact {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 0.5vh;
-            min-width: 0;
-            flex: 1;
+            justify-content: flex-start;
+            gap: 0.3vh;
+            min-width: 60px;
+            max-width: 90px;
+            padding: 0.2vh 0.5vw;
+            background: transparent;
+            position: relative;
+            z-index: 2;
+        }
+
+        .top-key-compact:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 107, 90, 0.05);
+            border-radius: 6px;
+            padding: 0.3vh 0.5vw;
+        }
+
+        .key-progress-bar {
+            width: 100%;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 0.2vh;
+        }
+
+        .key-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff6b5a, #ff8b7a);
+            border-radius: 2px;
+            transition: width 0.8s ease;
+            width: 0%;
         }
 
         .top-key-compact .key-name {
@@ -484,6 +520,12 @@
             font-size: 1vh;
             color: #ff6b5a;
             font-weight: 700;
+            transition: all 0.3s ease;
+        }
+
+        .top-key-compact:hover .key-count {
+            color: #ff8b7a;
+            transform: scale(1.1);
         }
 
 
@@ -496,6 +538,7 @@
             position: relative;
             overflow: hidden;
             min-height: 25vh;
+            z-index: 1;
         }
 
         .chart-canvas {
@@ -515,22 +558,23 @@
         }
 
         .reset-btn {
-            background: rgba(255, 107, 90, 0.1);
+            background: rgba(255, 107, 90, 0.08);
             color: #ff6b5a;
-            border: 1px solid rgba(255, 107, 90, 0.2);
-            padding: 0.8vh 2vw;
-            border-radius: 8px;
-            font-size: 1.1vh;
+            border: 1px solid rgba(255, 107, 90, 0.25);
+            padding: 0.6vh 1.5vw;
+            border-radius: 6px;
+            font-size: 1vh;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.15s ease;
             text-transform: lowercase;
-            letter-spacing: 0.3px;
+            letter-spacing: 0.2px;
         }
 
         .reset-btn:hover {
             background: rgba(255, 107, 90, 0.15);
             border-color: rgba(255, 107, 90, 0.4);
+            transform: translateY(-1px);
         }
 
         .reset-btn:active {
@@ -586,7 +630,7 @@
             }
 
             .big-metric-value {
-                font-size: 6vh;
+                font-size: 3vh;
             }
 
             .card-title {
@@ -631,7 +675,7 @@
             }
 
             .big-metric-value {
-                font-size: 5vh;
+                font-size: 2.5vh;
             }
 
             .reset-section {
@@ -684,7 +728,7 @@
             }
 
             .big-metric-value {
-                font-size: 4vh;
+                font-size: 2.2vh;
             }
 
             .reset-section {
@@ -723,6 +767,110 @@
 
         .key-progress-fill, .balance-bar-left, .balance-bar-right {
             transition: width 0.3s ease;
+        }
+
+        .hand-balance-bar-container {
+            width: 90px;
+            height: 0.6vh;
+            background: rgba(255,255,255,0.10);
+            border-radius: 0.3vh;
+            margin-top: 0.4vh;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+        }
+        .hand-balance-bar {
+            height: 100%;
+            transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+        }
+        .hand-balance-bar-left {
+            background: #ff6b5a;
+            border-radius: 0.3vh 0 0 0.3vh;
+        }
+        .hand-balance-bar-right {
+            background: transparent;
+            border-radius: 0 0.3vh 0.3vh 0;
+        }
+
+        .hand-balance-bar-row {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: 0.7vw;
+            margin-top: 0.2vh;
+        }
+        .hand-balance-label {
+            font-size: 1.1vh;
+            color: rgba(255,255,255,0.5);
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            user-select: none;
+        }
+
+        .hand-balance-bar-outer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+
+        .hand-balance-metric-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            width: fit-content;
+            margin: 0 auto;
+        }
+
+        #kpsSparkline {
+            width: 80px;
+            height: 20px;
+            background: transparent;
+            display: block;
+        }
+
+        .top-key-compact-bar {
+            height: 14px;
+            border-radius: 7px;
+            background: rgba(255,255,255,0.08);
+            margin-top: 0.2vh;
+            margin-bottom: 0.2vh;
+            position: relative;
+            width: 100%;
+            min-width: 40px;
+            max-width: 120px;
+            display: flex;
+            align-items: center;
+        }
+        .top-key-compact-bar-fill {
+            height: 100%;
+            border-radius: 7px;
+            transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+        .top-key-compact-bar-count {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.1vh;
+            font-weight: 700;
+            color: #fff;
+            z-index: 2;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.18);
+            pointer-events: none;
+        }
+
+        .big-metric-sparkline {
+            width: 80px;
+            height: 20px;
+            display: block;
+            margin: 0.2vh auto 0 auto;
+            background: transparent;
         }
     </style>
 </head>
@@ -771,11 +919,27 @@
             <div class="live-metrics">
                 <div class="big-metric">
                     <div class="big-metric-value" id="totalKeystrokes">0</div>
+                    <canvas class="big-metric-sparkline" id="totalKeysSparkline" width="80" height="20"></canvas>
                     <div class="big-metric-label">total keys</div>
                 </div>
                 <div class="big-metric">
                     <div class="big-metric-value" id="kpsValue">0.0</div>
                     <div class="big-metric-label">keys/sec</div>
+                    <canvas id="kpsSparkline" width="80" height="20" style="display:block;margin:0.2vh auto 0 auto;"></canvas>
+                </div>
+                <div class="big-metric">
+                    <div class="big-metric-value" id="handBalanceLive">50/50</div>
+                    <div class="hand-balance-metric-group">
+                        <div class="big-metric-label">hand balance</div>
+                        <div class="hand-balance-bar-row">
+                            <span class="hand-balance-label">L</span>
+                            <div class="hand-balance-bar-container">
+                                <div class="hand-balance-bar hand-balance-bar-left" id="handBalanceBarLeft"></div>
+                                <div class="hand-balance-bar hand-balance-bar-right" id="handBalanceBarRight"></div>
+                            </div>
+                            <span class="hand-balance-label">R</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -1182,6 +1346,12 @@
         let keyWidgets = {};
         let pressedKeys = new Set();
         let globalTrackingEnabled = false;
+        // Sparkline state
+        let kpsHistory = [];
+        const kpsHistoryLength = 40;
+        let totalKeysHistory = [];
+        const totalKeysHistoryLength = 40;
+        let lastTotalKeysSample = 0;
 
         // Initialize app
         function init() {
@@ -1321,25 +1491,22 @@
         }
 
         function handleKeyPress(code) {
-            const timestamp = Date.now();
-            analytics.recordKeyPress(code, timestamp);
-
-            // Update display immediately for real-time feedback
-            updateDisplay();
+            // Only count if not already pressed (prevents double-counting from multiple sources)
+            if (!pressedKeys.has(code)) {
+                const timestamp = Date.now();
+                analytics.recordKeyPress(code, timestamp);
+                updateDisplay();
+                pressedKeys.add(code);
+            }
 
             // Immediate visual feedback
             if (keyWidgets[code]) {
                 keyWidgets[code].forEach(keyEl => {
-                    if (!pressedKeys.has(keyEl)) {
+                    if (!keyEl.classList.contains('pressed')) {
                         keyEl.classList.add('pressed');
-                        pressedKeys.add(keyEl);
-
                         // Auto-remove pressed state after 150ms
                         setTimeout(() => {
-                            if (pressedKeys.has(keyEl)) {
-                                keyEl.classList.remove('pressed');
-                                pressedKeys.delete(keyEl);
-                            }
+                            keyEl.classList.remove('pressed');
                         }, 150);
                     }
                 });
@@ -1354,9 +1521,10 @@
             if (keyWidgets[code]) {
                 keyWidgets[code].forEach(keyEl => {
                     keyEl.classList.remove('pressed');
-                    pressedKeys.delete(keyEl);
                 });
             }
+            // Remove from pressedKeys set so it can be counted again
+            pressedKeys.delete(code);
         }
 
         async function toggleGlobalTracking() {
@@ -1437,6 +1605,13 @@
                 rightPercent = 100 - leftPercent;
             }
             document.getElementById('handBalance').textContent = `${leftPercent}/${rightPercent}`;
+            // Update new hand balance under key/sec (now styled as a big metric)
+            document.getElementById('handBalanceLive').textContent = `${leftPercent}/${rightPercent}`;
+            // Animate the hand balance bar
+            const barLeft = document.getElementById('handBalanceBarLeft');
+            const barRight = document.getElementById('handBalanceBarRight');
+            barLeft.style.width = leftPercent + '%';
+            barRight.style.width = rightPercent + '%';
 
             // Update session time
             const sessionMinutes = Math.floor((Date.now() - analytics.sessionStartTime) / 60000);
@@ -1447,36 +1622,95 @@
 
             // Update main chart
             updateMainChart();
+
+            // Update KPS sparkline
+            const kps = analytics.getKPS();
+            kpsHistory.push(kps);
+            if (kpsHistory.length > kpsHistoryLength) kpsHistory.shift();
+            drawKpsSparkline();
+
+            // Update total keys sparkline
+            drawTotalKeysSparkline();
         }
 
         function updateTopKeysCompact() {
             const container = document.getElementById('topKeysCompact');
             container.innerHTML = '';
 
-            const topKeys = analytics.getTopKeys(5);
+            // Maintain a short history for each key for sparklines
+            if (!window.topKeyHistories) window.topKeyHistories = {};
+            const histories = window.topKeyHistories;
+            const historyLength = 20;
+            const now = Date.now();
 
-            // Ensure exactly 5 items are always displayed
+            const topKeys = analytics.getTopKeys(5);
+            const counts = topKeys.map(k => k[1]);
+            const maxCount = counts.length > 0 ? Math.max(...counts) : 1;
+            const minCount = counts.length > 0 ? Math.min(...counts) : 0;
+            const allSame = counts.length > 1 && counts.every(c => c === counts[0]);
+
             for (let i = 0; i < 5; i++) {
                 const item = document.createElement('div');
                 item.className = 'top-key-compact';
+                // Vertical layout: count (top), key (middle), animation (bottom)
 
                 if (i < topKeys.length) {
                     const [code, count] = topKeys[i];
                     const name = getKeyDisplayName(code);
 
-                    item.innerHTML = `
-                        <div class="key-name">${name}</div>
-                        <div class="key-count">${count}</div>
-                    `;
-                } else {
-                    // Show placeholder for empty slots
-                    item.innerHTML = `
-                        <div class="key-name">-</div>
-                        <div class="key-count">0</div>
-                    `;
-                    item.style.opacity = '0.3';
-                }
+                    // Update history for sparkline
+                    if (!histories[code]) histories[code] = [];
+                    histories[code].push({ t: now, v: count });
+                    if (histories[code].length > historyLength) histories[code] = histories[code].slice(-historyLength);
 
+                    // Sparkline canvas
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 60;
+                    canvas.height = 18;
+                    canvas.style.display = 'block';
+                    canvas.style.background = 'transparent';
+                    canvas.style.borderRadius = '6px';
+                    canvas.style.boxShadow = '0 1px 4px rgba(0,0,0,0.08)';
+                    canvas.style.margin = '0 auto';
+
+                    // Draw sparkline
+                    const ctx = canvas.getContext('2d');
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    const hist = histories[code];
+                    if (hist.length > 1) {
+                        const minV = Math.min(...hist.map(h => h.v));
+                        const maxV = Math.max(...hist.map(h => h.v));
+                        const range = maxV - minV || 1;
+                        ctx.strokeStyle = '#ff6b5a';
+                        ctx.lineWidth = 2;
+                        ctx.beginPath();
+                        hist.forEach((h, j) => {
+                            const x = (j / (historyLength - 1)) * (canvas.width - 2) + 1;
+                            const y = canvas.height - ((h.v - minV) / range) * (canvas.height - 4) - 2;
+                            if (j === 0) ctx.moveTo(x, y);
+                            else ctx.lineTo(x, y);
+                        });
+                        ctx.stroke();
+                    } else {
+                        ctx.strokeStyle = '#ff6b5a';
+                        ctx.lineWidth = 2;
+                        ctx.beginPath();
+                        ctx.moveTo(1, canvas.height / 2);
+                        ctx.lineTo(canvas.width - 1, canvas.height / 2);
+                        ctx.stroke();
+                    }
+
+                    item.innerHTML = `
+                        <div class="key-count" style="font-size:1.3vh;font-weight:700;text-align:center;">${count}</div>
+                        <div class="key-name" style="font-size:1.2vh;font-weight:600;text-align:center;">${name}</div>
+                    `;
+                    item.appendChild(canvas);
+                } else {
+                    item.innerHTML = `
+                        <div class="key-count">0</div>
+                        <div class="key-name">-</div>
+                    `;
+                }
                 container.appendChild(item);
             }
         }
@@ -1583,22 +1817,78 @@
         }
 
         function startUpdateTimer() {
-            // Update display less frequently since we update immediately on key presses
             setInterval(() => {
                 updateDisplay();
-            }, 1000); // Back to 1000ms for responsive KPS updates
+            }, 1000);
 
-            // Clean up old keystrokes periodically
             setInterval(() => {
                 analytics.cleanupOldKeystrokes();
-            }, 5000); // Every 5 seconds
+            }, 5000);
 
-            // Auto-save
             setInterval(() => {
                 if (analytics.totalKeystrokes > 0) {
                     analytics.saveToFile();
                 }
             }, 10000);
+
+            // Sample total keys for sparkline every second
+            setInterval(() => {
+                if (analytics.totalKeystrokes !== lastTotalKeysSample) {
+                    totalKeysHistory.push(analytics.totalKeystrokes);
+                    if (totalKeysHistory.length > totalKeysHistoryLength) totalKeysHistory.shift();
+                    lastTotalKeysSample = analytics.totalKeystrokes;
+                } else if (totalKeysHistory.length > 0) {
+                    // Repeat last value to keep sparkline moving
+                    totalKeysHistory.push(totalKeysHistory[totalKeysHistory.length - 1]);
+                    if (totalKeysHistory.length > totalKeysHistoryLength) totalKeysHistory.shift();
+                }
+            }, 1000);
+        }
+
+        function drawKpsSparkline() {
+            const canvas = document.getElementById('kpsSparkline');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (kpsHistory.length < 2) return;
+            // Find min/max for scaling
+            let min = Math.min(...kpsHistory);
+            let max = Math.max(...kpsHistory);
+            if (min === max) { min = 0; max = Math.max(1, max); }
+            // Draw line
+            ctx.strokeStyle = '#ff6b5a';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            kpsHistory.forEach((val, i) => {
+                const x = (i / (kpsHistoryLength - 1)) * (canvas.width - 1);
+                const y = canvas.height - ((val - min) / (max - min)) * (canvas.height - 4) - 2;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            });
+            ctx.stroke();
+        }
+
+        function drawTotalKeysSparkline() {
+            const canvas = document.getElementById('totalKeysSparkline');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (totalKeysHistory.length < 2) return;
+            // Find min/max for scaling
+            let min = Math.min(...totalKeysHistory);
+            let max = Math.max(...totalKeysHistory);
+            if (min === max) { min = 0; max = Math.max(1, max); }
+            // Draw line
+            ctx.strokeStyle = '#ff6b5a';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            totalKeysHistory.forEach((val, i) => {
+                const x = (i / (totalKeysHistoryLength - 1)) * (canvas.width - 1);
+                const y = canvas.height - ((val - min) / (max - min)) * (canvas.height - 4) - 2;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            });
+            ctx.stroke();
         }
 
         // Initialize when DOM is loaded
