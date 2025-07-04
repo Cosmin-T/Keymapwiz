@@ -13,39 +13,39 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-            background: rgba(0, 0, 0, 0.4);
+            background: rgba(0, 0, 0, 0.25);
             color: #ffffff;
             overflow: hidden;
             height: 100vh;
             width: 100vw;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(16px);
         }
 
         .overlay-container {
             width: 100%;
             height: 100%;
-            padding: 4px;
+            padding: 6px;
             display: flex;
             flex-direction: column;
         }
 
-        /* Stats Header */
+        /* Minimal Stats Header */
         .stats-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 3px 6px;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 4px;
-            margin-bottom: 4px;
-            font-size: 10px;
-            font-weight: 600;
+            padding: 4px 8px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 6px;
+            margin-bottom: 6px;
+            font-size: 11px;
+            font-weight: 500;
             cursor: move;
             user-select: none;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            height: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            height: 20px;
         }
 
         .stats-header:hover {
@@ -73,8 +73,8 @@
 
         .keyboard-widget {
             position: relative;
-            transform-origin: top left;
-            transform: scale(0.35) translate(18px, 27px); /* Scale and center the keyboard */
+            transform-origin: center center;
+            transform: scale(0.35) translate(-93%, -95%);
         }
 
         /* Compact Key Styles */
@@ -104,14 +104,12 @@
             background: rgba(255, 255, 255, 0.15);
         }
 
-        /* Close button */
-        .close-btn {
+        /* Control buttons */
+        .control-btn {
             position: absolute;
             top: 28px;
-            right: 4px;
             width: 22px;
             height: 22px;
-            background: rgba(255, 82, 82, 0.8);
             border: 1px solid rgba(255, 255, 255, 0.3);
             border-radius: 50%;
             color: #ffffff;
@@ -127,6 +125,24 @@
             z-index: 1000;
         }
 
+        .maximize-btn {
+            right: 30px;
+            background: rgba(76, 175, 80, 0.8);
+        }
+
+        .maximize-btn:hover {
+            opacity: 1;
+            background: rgba(56, 142, 60, 0.95);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: scale(1.1);
+            box-shadow: 0 2px 8px rgba(76, 175, 80, 0.4);
+        }
+
+        .close-btn {
+            right: 4px;
+            background: rgba(255, 82, 82, 0.8);
+        }
+
         .close-btn:hover {
             opacity: 1;
             background: rgba(255, 52, 52, 0.95);
@@ -138,7 +154,8 @@
 </head>
 <body>
     <div class="overlay-container">
-        <button class="close-btn" id="closeBtn">×</button>
+        <button class="control-btn maximize-btn" id="maximizeBtn">□</button>
+        <button class="control-btn close-btn" id="closeBtn">×</button>
 
         <div class="stats-header">
             <div class="stat-item">
@@ -286,18 +303,25 @@
         }
 
         function setupEventListeners() {
-            // Close button
-            document.getElementById('closeBtn').addEventListener('click', () => {
-                ipcRenderer.invoke('toggle-global-tracking', false);
+            // Maximize button
+            document.getElementById('maximizeBtn').addEventListener('click', () => {
+                ipcRenderer.send('restore-main-window');
             });
 
-            // Make stats header draggable (but not the close button)
+            // Close button
+            document.getElementById('closeBtn').addEventListener('click', () => {
+                ipcRenderer.send('exit-application');
+            });
+
+            // Make stats header draggable (but not the control buttons)
             const statsHeader = document.querySelector('.stats-header');
             statsHeader.style.cursor = 'move';
             statsHeader.style.webkitAppRegion = 'drag';
 
-            // Prevent close button from being draggable
+            // Prevent control buttons from being draggable
+            const maximizeBtn = document.getElementById('maximizeBtn');
             const closeBtn = document.getElementById('closeBtn');
+            maximizeBtn.style.webkitAppRegion = 'no-drag';
             closeBtn.style.webkitAppRegion = 'no-drag';
         }
 
@@ -366,9 +390,9 @@
                         pressedKeys.add(keyEl);
 
                         // For modifier keys, use shorter fallback timeout
-                        const isModifierKey = ['ShiftLeft', 'ShiftRight', 'ControlLeft', 'ControlRight', 
+                        const isModifierKey = ['ShiftLeft', 'ShiftRight', 'ControlLeft', 'ControlRight',
                                              'AltLeft', 'AltRight', 'MetaLeft', 'MetaRight'].includes(code);
-                        
+
                         if (isModifierKey) {
                             // Shorter timeout for modifier keys to handle missed releases
                             setTimeout(() => {
@@ -429,6 +453,11 @@
                     timestamp => (now - timestamp) <= windowMs
                 );
             }, 1000);
+
+            // Request analytics sync from main window more frequently
+            setInterval(() => {
+                ipcRenderer.send('request-analytics-sync-overlay');
+            }, 2000);
         }
 
         // Handle global key presses
@@ -457,6 +486,12 @@
             if (data) {
                 analytics.totalKeystrokes = data.totalKeystrokes || 0;
                 analytics.keyFrequency = data.keyFrequency || {};
+
+                // Update KPS if provided
+                if (data.kps !== undefined) {
+                    document.getElementById('kpsValue').textContent = data.kps.toFixed(1);
+                }
+
                 updateDisplay();
             }
         });

@@ -1,235 +1,243 @@
 [
     {
         "key": "Space",
-        "count": 1403
+        "count": 1856
     },
     {
         "key": "Backspace",
-        "count": 909
+        "count": 1336
     },
     {
         "key": "KeyA",
-        "count": 834
+        "count": 1071
     },
     {
         "key": "KeyE",
-        "count": 810
-    },
-    {
-        "key": "KeyO",
-        "count": 690
+        "count": 1036
     },
     {
         "key": "KeyD",
-        "count": 681
+        "count": 880
+    },
+    {
+        "key": "KeyO",
+        "count": 834
     },
     {
         "key": "KeyI",
-        "count": 656
+        "count": 829
     },
     {
         "key": "KeyS",
-        "count": 595
+        "count": 771
     },
     {
         "key": "KeyT",
-        "count": 549
-    },
-    {
-        "key": "KeyW",
-        "count": 487
+        "count": 729
     },
     {
         "key": "KeyH",
-        "count": 483
+        "count": 634
     },
     {
-        "key": "KeyN",
-        "count": 331
+        "key": "KeyW",
+        "count": 604
     },
     {
         "key": "KeyL",
-        "count": 317
+        "count": 436
+    },
+    {
+        "key": "KeyN",
+        "count": 414
     },
     {
         "key": "KeyU",
-        "count": 314
-    },
-    {
-        "key": "KeyJ",
-        "count": 311
+        "count": 393
     },
     {
         "key": "KeyR",
-        "count": 298
+        "count": 389
     },
     {
         "key": "KeyK",
-        "count": 286
+        "count": 366
     },
     {
-        "key": "KeyP",
-        "count": 213
-    },
-    {
-        "key": "KeyF",
-        "count": 201
-    },
-    {
-        "key": "KeyC",
-        "count": 178
-    },
-    {
-        "key": "KeyG",
-        "count": 172
-    },
-    {
-        "key": "KeyY",
-        "count": 159
+        "key": "KeyJ",
+        "count": 356
     },
     {
         "key": "ShiftLeft",
-        "count": 134
+        "count": 262
     },
     {
-        "key": "ArrowRight",
-        "count": 130
+        "key": "KeyP",
+        "count": 254
     },
     {
-        "key": "KeyM",
-        "count": 119
-    },
-    {
-        "key": "Enter",
-        "count": 107
+        "key": "KeyF",
+        "count": 235
     },
     {
         "key": "KeyB",
-        "count": 104
+        "count": 233
     },
     {
-        "key": "ArrowLeft",
-        "count": 104
+        "key": "KeyC",
+        "count": 229
     },
     {
-        "key": "KeyV",
-        "count": 89
+        "key": "KeyY",
+        "count": 211
     },
     {
-        "key": "ArrowDown",
-        "count": 76
+        "key": "ArrowRight",
+        "count": 207
     },
     {
-        "key": "Semicolon",
-        "count": 70
+        "key": "KeyG",
+        "count": 191
+    },
+    {
+        "key": "KeyM",
+        "count": 185
     },
     {
         "key": "AltLeft",
-        "count": 66
-    },
-    {
-        "key": "KeyZ",
-        "count": 64
-    },
-    {
-        "key": "Comma",
-        "count": 47
+        "count": 172
     },
     {
         "key": "MetaLeft",
-        "count": 46
+        "count": 161
     },
     {
-        "key": "Tab",
-        "count": 39
+        "key": "ArrowLeft",
+        "count": 151
+    },
+    {
+        "key": "Enter",
+        "count": 148
+    },
+    {
+        "key": "KeyV",
+        "count": 128
+    },
+    {
+        "key": "ArrowDown",
+        "count": 110
+    },
+    {
+        "key": "KeyZ",
+        "count": 100
     },
     {
         "key": "ArrowUp",
-        "count": 35
+        "count": 78
     },
     {
-        "key": "Digit0",
-        "count": 33
+        "key": "Semicolon",
+        "count": 75
     },
     {
-        "key": "Quote",
-        "count": 32
+        "key": "Comma",
+        "count": 55
     },
     {
         "key": "Escape",
-        "count": 31
+        "count": 55
+    },
+    {
+        "key": "Tab",
+        "count": 45
+    },
+    {
+        "key": "Quote",
+        "count": 44
+    },
+    {
+        "key": "Minus",
+        "count": 42
+    },
+    {
+        "key": "Digit0",
+        "count": 41
+    },
+    {
+        "key": "KeyX",
+        "count": 40
+    },
+    {
+        "key": "Digit1",
+        "count": 38
     },
     {
         "key": "Digit2",
-        "count": 28
-    },
-    {
-        "key": "Backquote",
-        "count": 27
+        "count": 37
     },
     {
         "key": "ControlLeft",
-        "count": 26
+        "count": 35
+    },
+    {
+        "key": "Digit4",
+        "count": 30
+    },
+    {
+        "key": "Backquote",
+        "count": 28
+    },
+    {
+        "key": "Slash",
+        "count": 27
     },
     {
         "key": "BracketLeft",
         "count": 25
     },
     {
-        "key": "Digit1",
-        "count": 24
+        "key": "KeyQ",
+        "count": 25
     },
     {
         "key": "Shift",
         "count": 23
     },
     {
-        "key": "KeyX",
-        "count": 22
-    },
-    {
-        "key": "KeyQ",
-        "count": 22
-    },
-    {
-        "key": "Minus",
-        "count": 22
-    },
-    {
         "key": "Equal",
-        "count": 17
-    },
-    {
-        "key": "Digit9",
-        "count": 17
-    },
-    {
-        "key": "Digit4",
-        "count": 14
-    },
-    {
-        "key": "Digit3",
-        "count": 14
+        "count": 23
     },
     {
         "key": "CapsLock",
-        "count": 14
+        "count": 22
     },
     {
         "key": "Period",
-        "count": 13
+        "count": 22
     },
     {
-        "key": "Slash",
-        "count": 13
+        "key": "Digit9",
+        "count": 22
     },
     {
         "key": "Digit8",
-        "count": 11
+        "count": 22
+    },
+    {
+        "key": "Digit3",
+        "count": 20
+    },
+    {
+        "key": "Digit5",
+        "count": 14
     },
     {
         "key": "MetaRight",
-        "count": 7
+        "count": 12
+    },
+    {
+        "key": "Digit7",
+        "count": 8
     },
     {
         "key": "ControlRight",
@@ -241,10 +249,6 @@
     },
     {
         "key": "Alt",
-        "count": 5
-    },
-    {
-        "key": "Digit5",
         "count": 5
     },
     {
@@ -261,11 +265,11 @@
     },
     {
         "key": "Backslash",
-        "count": 2
+        "count": 3
     },
     {
-        "key": "Digit7",
-        "count": 2
+        "key": "Digit6",
+        "count": 3
     },
     {
         "key": "PageUp",
@@ -273,10 +277,6 @@
     },
     {
         "key": "PageDown",
-        "count": 1
-    },
-    {
-        "key": "Digit6",
         "count": 1
     }
 ]
