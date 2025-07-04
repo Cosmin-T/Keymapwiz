@@ -1,119 +1,123 @@
 [
     {
         "key": "Space",
-        "count": 410
+        "count": 528
     },
     {
         "key": "KeyA",
-        "count": 321
-    },
-    {
-        "key": "KeyS",
-        "count": 275
-    },
-    {
-        "key": "Backspace",
-        "count": 264
+        "count": 358
     },
     {
         "key": "KeyE",
-        "count": 257
+        "count": 322
     },
     {
-        "key": "KeyD",
-        "count": 249
+        "key": "Backspace",
+        "count": 316
+    },
+    {
+        "key": "KeyS",
+        "count": 310
     },
     {
         "key": "KeyT",
-        "count": 208
+        "count": 281
+    },
+    {
+        "key": "KeyD",
+        "count": 273
     },
     {
         "key": "KeyO",
-        "count": 162
-    },
-    {
-        "key": "KeyW",
-        "count": 146
+        "count": 198
     },
     {
         "key": "KeyI",
-        "count": 135
+        "count": 177
+    },
+    {
+        "key": "KeyW",
+        "count": 155
     },
     {
         "key": "KeyH",
-        "count": 116
-    },
-    {
-        "key": "KeyL",
-        "count": 102
-    },
-    {
-        "key": "KeyU",
-        "count": 100
+        "count": 143
     },
     {
         "key": "KeyN",
-        "count": 97
+        "count": 133
+    },
+    {
+        "key": "KeyL",
+        "count": 122
+    },
+    {
+        "key": "KeyU",
+        "count": 117
     },
     {
         "key": "KeyR",
-        "count": 81
+        "count": 103
     },
     {
         "key": "ShiftLeft",
-        "count": 78
+        "count": 95
     },
     {
         "key": "KeyK",
-        "count": 75
+        "count": 84
     },
     {
         "key": "AltLeft",
-        "count": 56
+        "count": 63
+    },
+    {
+        "key": "Enter",
+        "count": 58
     },
     {
         "key": "KeyJ",
         "count": 55
     },
     {
-        "key": "Enter",
+        "key": "KeyM",
         "count": 49
     },
     {
-        "key": "KeyM",
-        "count": 44
+        "key": "MetaLeft",
+        "count": 48
     },
     {
         "key": "KeyY",
-        "count": 41
-    },
-    {
-        "key": "KeyG",
-        "count": 36
-    },
-    {
-        "key": "MetaLeft",
-        "count": 36
-    },
-    {
-        "key": "KeyF",
-        "count": 34
+        "count": 48
     },
     {
         "key": "KeyC",
-        "count": 32
+        "count": 48
+    },
+    {
+        "key": "KeyG",
+        "count": 46
+    },
+    {
+        "key": "KeyF",
+        "count": 45
     },
     {
         "key": "KeyP",
-        "count": 30
+        "count": 35
+    },
+    {
+        "key": "KeyB",
+        "count": 29
     },
     {
         "key": "Slash",
         "count": 24
     },
     {
-        "key": "KeyB",
-        "count": 19
+        "key": "KeyV",
+        "count": 20
     },
     {
         "key": "ArrowLeft",
@@ -125,10 +129,10 @@
     },
     {
         "key": "KeyQ",
-        "count": 13
+        "count": 14
     },
     {
-        "key": "KeyV",
+        "key": "Period",
         "count": 13
     },
     {
@@ -141,14 +145,30 @@
     },
     {
         "key": "KeyZ",
-        "count": 9
+        "count": 10
+    },
+    {
+        "key": "KeyX",
+        "count": 10
     },
     {
         "key": "ArrowUp",
         "count": 7
     },
     {
+        "key": "Comma",
+        "count": 7
+    },
+    {
+        "key": "Digit4",
+        "count": 7
+    },
+    {
         "key": "ArrowDown",
+        "count": 6
+    },
+    {
+        "key": "Escape",
         "count": 6
     },
     {
@@ -160,12 +180,8 @@
         "count": 5
     },
     {
-        "key": "KeyX",
-        "count": 3
-    },
-    {
-        "key": "Comma",
-        "count": 3
+        "key": "Digit2",
+        "count": 4
     },
     {
         "key": "Digit0",
@@ -180,23 +196,7 @@
         "count": 3
     },
     {
-        "key": "Escape",
-        "count": 2
-    },
-    {
-        "key": "Digit2",
-        "count": 2
-    },
-    {
-        "key": "Period",
-        "count": 1
-    },
-    {
         "key": "Backslash",
-        "count": 1
-    },
-    {
-        "key": "Digit4",
         "count": 1
     },
     {

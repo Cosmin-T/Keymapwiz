@@ -45,15 +45,15 @@
             flex-direction: column;
             justify-content: center;
             margin-bottom: 0.5vh;
+            -webkit-app-region: drag;
         }
 
         .global-tracking-toggle {
-            position: absolute;
-            top: 1.5vh;
-            right: 2vw;
+            position: relative;
+            margin: 0 auto 1vh auto;
             display: flex;
             flex-direction: column;
-            align-items: flex-end;
+            align-items: center;
             gap: 0.8vh;
             min-width: 140px;
         }
@@ -75,18 +75,18 @@
 
         .toggle-switch {
             position: relative;
-            width: 36px;
-            height: 18px;
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 9px;
+            width: 44px;
+            height: 28px;
+            background: #232323;
+            border-radius: 8px;
             cursor: pointer;
-            transition: all 0.2s ease;
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: background 0.2s cubic-bezier(0.4,0,0.2,1), border-color 0.2s cubic-bezier(0.4,0,0.2,1);
+            border: 2px solid #333;
             flex-shrink: 0;
-        }
-
-        .toggle-switch:hover:not(.active) {
-            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.10);
         }
 
         .toggle-switch.active {
@@ -97,17 +97,45 @@
         .toggle-knob {
             position: absolute;
             top: 1px;
-            left: 1px;
-            width: 16px;
-            height: 16px;
-            background: white;
-            border-radius: 50%;
-            transition: all 0.2s ease;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+            left: 3px;
+            width: 22px;
+            height: 22px;
+            background: #fff;
+            border-radius: 6px;
+            transition: left 0.22s cubic-bezier(0.4,0,0.2,1), background 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .toggle-switch.active .toggle-knob {
-            transform: translateX(18px);
+            left: 19px;
+            background: #fff3f1;
+        }
+
+        .toggle-switch .toggle-icon {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            font-size: 1.1em;
+            color: #ff6b5a;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .toggle-switch.active .toggle-icon.on {
+            opacity: 1;
+        }
+
+        .toggle-switch:not(.active) .toggle-icon.off {
+            opacity: 1;
         }
 
         .permission-status {
@@ -164,6 +192,7 @@
             transition: all 0.2s ease;
             outline: none;
             font-weight: 500;
+            -webkit-app-region: no-drag;
         }
 
         .layout-dropdown option {
@@ -298,6 +327,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            -webkit-app-region: no-drag;
         }
 
         .scale-btn:hover {
@@ -569,6 +599,7 @@
             transition: all 0.15s ease;
             text-transform: lowercase;
             letter-spacing: 0.2px;
+            -webkit-app-region: no-drag;
         }
 
         .reset-btn:hover {
@@ -872,21 +903,39 @@
             margin: 0.2vh auto 0 auto;
             background: transparent;
         }
+
+        /* Tooltip styles */
+        .tooltip {
+            visibility: hidden;
+            opacity: 0;
+            background: #232323;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 4px 12px;
+            position: absolute;
+            z-index: 10;
+            font-size: 1.1vh;
+            font-weight: 500;
+            left: 50%;
+            top: -32px;
+            transform: translateX(-50%);
+            pointer-events: none;
+            transition: opacity 0.18s cubic-bezier(0.4,0,0.2,1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+            white-space: nowrap;
+        }
+        .has-tooltip:hover .tooltip,
+        .has-tooltip:focus .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
     <div class="main-container">
         <!-- Modern Header -->
         <div class="header">
-            <div class="global-tracking-toggle">
-                <div class="toggle-controls">
-                    <span class="toggle-label">Global Tracking</span>
-                    <div class="toggle-switch" id="globalTrackingToggle">
-                        <div class="toggle-knob"></div>
-                    </div>
-                </div>
-                <div class="permission-status" id="permissionStatus"></div>
-            </div>
             <h1 class="title">TypeChron Viz</h1>
             <!-- <p class="subtitle">Advanced Keyboard Analytics & Visualization</p> -->
         </div>
@@ -898,6 +947,16 @@
                 <option value="marvo">ANSI 87-key Layout</option>
             </select>
         </div>
+        <!-- Global Tracking Toggle (moved below layout selector) -->
+        <div class="global-tracking-toggle">
+            <div class="toggle-controls has-tooltip">
+                <div class="toggle-switch" id="globalTrackingToggle">
+                    <div class="toggle-knob"></div>
+                </div>
+                <span class="tooltip">Global Tracking</span>
+            </div>
+            <div class="permission-status" id="permissionStatus"></div>
+        </div>
 
         <!-- Keyboard Visualization -->
         <div class="keyboard-container">
@@ -908,9 +967,14 @@
 
         <!-- Scale Controls -->
         <div class="scale-controls">
-            <span class="scale-label">Scale:</span>
-            <button class="scale-btn" id="scaleDown">−</button>
-            <button class="scale-btn" id="scaleUp">+</button>
+            <div class="has-tooltip" style="display:inline-block;">
+                <button class="scale-btn" id="scaleDown">−</button>
+                <span class="tooltip">Scale Down</span>
+            </div>
+            <div class="has-tooltip" style="display:inline-block;">
+                <button class="scale-btn" id="scaleUp">+</button>
+                <span class="tooltip">Scale Up</span>
+            </div>
         </div>
 
         <!-- Analytics Panel -->
@@ -975,7 +1039,10 @@
 
         <!-- Reset Button -->
         <div class="reset-section">
-            <button class="reset-btn" id="resetBtn">Reset Analytics</button>
+            <div class="has-tooltip" style="display:inline-block;">
+                <button class="reset-btn" id="resetBtn">Reset Analytics</button>
+                <span class="tooltip">Reset Analytics</span>
+            </div>
         </div>
     </div>
 
