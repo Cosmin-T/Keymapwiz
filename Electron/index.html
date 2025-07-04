@@ -75,40 +75,39 @@
 
         .toggle-switch {
             position: relative;
-            width: 48px;
-            height: 24px;
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 12px;
+            width: 40px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 10px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255, 255, 255, 0.12);
+            transition: all 0.2s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
             flex-shrink: 0;
         }
 
         .toggle-switch:hover:not(.active) {
-            background: rgba(255, 255, 255, 0.12);
-            border-color: rgba(255, 255, 255, 0.18);
+            background: rgba(255, 255, 255, 0.1);
         }
 
         .toggle-switch.active {
-            background: linear-gradient(135deg, #ff6b5a, #e85d42);
-            box-shadow: 0 4px 15px rgba(255, 107, 90, 0.25);
+            background: #ff6b5a;
+            border-color: #ff6b5a;
         }
 
         .toggle-knob {
             position: absolute;
-            top: 2px;
-            left: 2px;
-            width: 20px;
-            height: 20px;
+            top: 1px;
+            left: 1px;
+            width: 18px;
+            height: 18px;
             background: white;
             border-radius: 50%;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+            transition: all 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
         }
 
         .toggle-switch.active .toggle-knob {
-            transform: translateX(24px);
+            transform: translateX(20px);
         }
 
         .permission-status {
@@ -285,93 +284,111 @@
         }
 
         .scale-btn {
-            background: rgba(255, 255, 255, 0.05);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.03);
+            color: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 6px;
             width: 2.8vh;
             height: 2.8vh;
-            font-size: 1.4vh;
-            font-weight: 600;
+            font-size: 1.2vh;
+            font-weight: 500;
             cursor: pointer;
             margin: 0 0.8vw;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
         .scale-btn:hover {
-            background: rgba(255, 255, 255, 0.08);
-            border-color: #ff6b5a;
-            transform: translateY(-1px);
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 107, 90, 0.3);
+            color: #ff6b5a;
         }
 
         .scale-btn:active {
-            transform: translateY(0);
+            transform: scale(0.95);
             transition: all 0.1s ease;
         }
 
-        /* Minimal Analytics Panel */
+        /* Image-inspired Analytics Panel */
         .analytics-panel {
             background: rgba(255, 255, 255, 0.01);
             border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 12px;
-            padding: 1.5vh 1.8vw;
+            padding: 2vh 2vw;
             flex: 1 1 auto;
             min-height: 0;
             overflow: hidden;
             display: flex;
-            flex-direction: column;
-            gap: 1.2vh;
+            gap: 3vw;
         }
 
-        .live-stats {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1.2vw;
+        /* Left side - Bold metrics */
+        .live-metrics {
             flex: 0 0 auto;
-            height: 11vh;
-        }
-
-        .stat-item {
-            text-align: center;
-            padding: 1.5vh 1vw;
-            background: rgba(255, 255, 255, 0.015);
-            border: 1px solid rgba(255, 255, 255, 0.04);
-            border-radius: 8px;
-            transition: all 0.2s ease;
+            width: 25vw;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            gap: 0.6vh;
+            gap: 4vh;
         }
 
-        .stat-item:hover {
-            background: rgba(255, 255, 255, 0.03);
-            border-color: rgba(255, 107, 90, 0.18);
-            transform: translateY(-1px);
+        .big-metric {
+            text-align: left;
         }
 
-        .stat-item:active {
-            transform: translateY(0);
-            transition: all 0.1s ease;
-        }
-
-        .stat-value {
-            font-size: 2.4vh;
-            font-weight: 600;
+        .big-metric-value {
+            font-size: 8vh;
+            font-weight: 800;
             color: #ff6b5a;
-            line-height: 1;
+            line-height: 0.8;
+            margin-bottom: 1vh;
         }
 
-        .stat-label {
-            font-size: 1.1vh;
-            color: rgba(255, 255, 255, 0.6);
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            font-weight: 600;
-            line-height: 1;
+        .big-metric-label {
+            font-size: 1.4vh;
+            color: rgba(255, 255, 255, 0.7);
+            text-transform: lowercase;
+            letter-spacing: 0.5px;
+            font-weight: 400;
+        }
+
+        /* Right side - Chart and details */
+        .chart-section {
+            flex: 1 1 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 2vh;
+        }
+
+        /* Bottom stats bar */
+        .bottom-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5vh 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            gap: 2vw;
+        }
+
+        .bottom-stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5vh;
+        }
+
+        .bottom-stat-value {
+            font-size: 1.8vh;
+            font-weight: 700;
+            color: #ff6b5a;
+        }
+
+        .bottom-stat-label {
+            font-size: 1vh;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: lowercase;
         }
 
         /* Fixed Hand Balance */
@@ -438,102 +455,50 @@
             z-index: 10;
         }
 
-        /* Content Grid */
-        .content-grid {
-            display: grid;
-            grid-template-columns: 1fr 2fr;
+        /* Top 5 Keys - Compact horizontal layout */
+        .top-keys-compact {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1vh 0;
             gap: 1.5vw;
-            flex: 1 1 auto;
-            min-height: 0;
-            overflow: hidden;
         }
 
-        .card {
-            background: rgba(255, 255, 255, 0.01);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            padding: 1.8vh 1.5vw;
-            transition: all 0.2s ease;
-            overflow: hidden;
+        .top-key-compact {
             display: flex;
             flex-direction: column;
-            gap: 1.2vh;
-        }
-
-        .card:hover {
-            background: rgba(255, 255, 255, 0.025);
-            border-color: rgba(255, 107, 90, 0.15);
-            transform: translateY(-1px);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
-        }
-
-        .card:active {
-            transform: translateY(0);
-            transition: all 0.1s ease;
-        }
-
-        .card-title {
-            font-size: 1.3vh;
-            font-weight: 700;
-            color: #ff6b5a;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            flex: 0 0 auto;
-        }
-
-        /* Top Keys */
-        .top-key-item {
-            display: flex;
             align-items: center;
-            margin-bottom: 0.6vh;
-            font-size: 1.1vh;
-            padding: 0.4vh 0;
-        }
-
-        .key-name {
-            min-width: 4vw;
-            font-weight: 700;
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 1vh;
-        }
-
-        .key-progress {
+            gap: 0.5vh;
+            min-width: 0;
             flex: 1;
-            height: 0.6vh;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 0.3vh;
-            margin: 0 1vw;
-            overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .key-progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #ff6b5a, #e85d42);
-            transition: width 0.5s ease;
-            border-radius: 0.3vh;
+        .top-key-compact .key-name {
+            font-size: 1.2vh;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.8);
+            text-transform: uppercase;
         }
 
-        .key-count {
-            color: #ff6b5a;
-            font-weight: 800;
-            min-width: 3vw;
-            text-align: right;
+        .top-key-compact .key-count {
             font-size: 1vh;
+            color: #ff6b5a;
+            font-weight: 700;
         }
 
-        /* Rhythm Chart */
-        .rhythm-chart {
+
+        /* Main Chart */
+        .main-chart {
             flex: 1 1 auto;
             background: rgba(255, 255, 255, 0.015);
             border: 1px solid rgba(255, 255, 255, 0.04);
             border-radius: 10px;
             position: relative;
             overflow: hidden;
-            min-height: 8vh;
+            min-height: 25vh;
         }
 
-        .rhythm-canvas {
+        .chart-canvas {
             width: 100%;
             height: 100%;
         }
@@ -550,28 +515,26 @@
         }
 
         .reset-btn {
-            background: linear-gradient(135deg, #FF6B6B, #FF5252);
-            color: white;
-            border: none;
+            background: rgba(255, 107, 90, 0.1);
+            color: #ff6b5a;
+            border: 1px solid rgba(255, 107, 90, 0.2);
             padding: 0.8vh 2vw;
-            border-radius: 10px;
+            border-radius: 8px;
             font-size: 1.1vh;
-            font-weight: 700;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.25);
+            transition: all 0.2s ease;
+            text-transform: lowercase;
+            letter-spacing: 0.3px;
         }
 
         .reset-btn:hover {
-            background: linear-gradient(135deg, #FF5252, #FF4444);
-            transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.35);
+            background: rgba(255, 107, 90, 0.15);
+            border-color: rgba(255, 107, 90, 0.4);
         }
 
         .reset-btn:active {
-            transform: translateY(0);
+            transform: scale(0.98);
             transition: all 0.1s ease;
         }
 
@@ -610,15 +573,20 @@
                 margin-bottom: 0.3vh;
             }
 
-            .live-stats {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 1vw;
-                height: 10vh;
+            .analytics-panel {
+                flex-direction: column;
+                gap: 2vh;
             }
 
-            .content-grid {
-                grid-template-columns: 1fr;
-                gap: 1vh;
+            .live-metrics {
+                width: 100%;
+                flex-direction: row;
+                justify-content: space-around;
+                gap: 2vw;
+            }
+
+            .big-metric-value {
+                font-size: 6vh;
             }
 
             .card-title {
@@ -662,8 +630,8 @@
                 margin-bottom: 0.2vh;
             }
 
-            .live-stats {
-                height: 9vh;
+            .big-metric-value {
+                font-size: 5vh;
             }
 
             .reset-section {
@@ -715,8 +683,8 @@
                 margin-bottom: 0.1vh;
             }
 
-            .live-stats {
-                height: 7vh;
+            .big-metric-value {
+                font-size: 4vh;
             }
 
             .reset-section {
@@ -799,43 +767,43 @@
 
         <!-- Analytics Panel -->
         <div class="analytics-panel">
-            <div class="live-stats">
-                <div class="stat-item">
-                    <div class="stat-value" id="totalKeystrokes">0</div>
-                    <div class="stat-label">Total Keys</div>
+            <!-- Left side - Bold metrics -->
+            <div class="live-metrics">
+                <div class="big-metric">
+                    <div class="big-metric-value" id="totalKeystrokes">0</div>
+                    <div class="big-metric-label">total keys</div>
                 </div>
-                <div class="stat-item">
-                    <div class="stat-value" id="avgDwell">0ms</div>
-                    <div class="stat-label">Avg Dwell</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value" id="kpsValue">0.0</div>
-                    <div class="stat-label">Keys/Second</div>
-                </div>
-                <div class="stat-item hand-balance">
-                    <div class="stat-value" id="handBalance">50/50</div>
-                    <div class="stat-label">Hand Balance</div>
-                    <div class="balance-viz">
-                        <span class="balance-label">L</span>
-                        <div class="balance-bar-container">
-                            <div class="balance-bar-left" id="balanceLeft"></div>
-                            <div class="balance-bar-right" id="balanceRight"></div>
-                            <div class="balance-center"></div>
-                        </div>
-                        <span class="balance-label">R</span>
-                    </div>
+                <div class="big-metric">
+                    <div class="big-metric-value" id="kpsValue">0.0</div>
+                    <div class="big-metric-label">keys/sec</div>
                 </div>
             </div>
 
-            <div class="content-grid">
-                <div class="card">
-                    <div class="card-title">Top Keys</div>
-                    <div id="topKeysList"></div>
+            <!-- Right side - Chart and details -->
+            <div class="chart-section">
+                <!-- Top 5 Keys - Compact -->
+                <div class="top-keys-compact" id="topKeysCompact">
+                    <!-- Will be populated by JS -->
                 </div>
-                <div class="card">
-                    <div class="card-title">Typing Rhythm</div>
-                    <div class="rhythm-chart">
-                        <canvas class="rhythm-canvas" id="rhythmCanvas"></canvas>
+
+                <!-- Main Chart -->
+                <div class="main-chart">
+                    <canvas class="chart-canvas" id="mainCanvas"></canvas>
+                </div>
+
+                <!-- Bottom stats -->
+                <div class="bottom-stats">
+                    <div class="bottom-stat">
+                        <div class="bottom-stat-value" id="avgDwell">0ms</div>
+                        <div class="bottom-stat-label">avg dwell</div>
+                    </div>
+                    <div class="bottom-stat">
+                        <div class="bottom-stat-value" id="handBalance">50/50</div>
+                        <div class="bottom-stat-label">hand balance</div>
+                    </div>
+                    <div class="bottom-stat">
+                        <div class="bottom-stat-value" id="sessionTime">0m</div>
+                        <div class="bottom-stat-label">session time</div>
                     </div>
                 </div>
             </div>
@@ -1456,10 +1424,10 @@
         }
 
         function updateDisplay() {
-            // Update live stats
+            // Update big metrics
             document.getElementById('totalKeystrokes').textContent = analytics.totalKeystrokes.toLocaleString();
-            document.getElementById('avgDwell').textContent = Math.round(analytics.getAverageDwell()) + 'ms';
             document.getElementById('kpsValue').textContent = analytics.getKPS().toFixed(1);
+            document.getElementById('avgDwell').textContent = Math.round(analytics.getAverageDwell()) + 'ms';
 
             // Update hand balance
             const total = analytics.handBalance.left + analytics.handBalance.right;
@@ -1468,55 +1436,43 @@
                 leftPercent = Math.round((analytics.handBalance.left / total) * 100);
                 rightPercent = 100 - leftPercent;
             }
-
             document.getElementById('handBalance').textContent = `${leftPercent}/${rightPercent}`;
 
-            // Update balance bars
-            const leftBar = document.getElementById('balanceLeft');
-            const rightBar = document.getElementById('balanceRight');
+            // Update session time
+            const sessionMinutes = Math.floor((Date.now() - analytics.sessionStartTime) / 60000);
+            document.getElementById('sessionTime').textContent = sessionMinutes + 'm';
 
-            leftBar.style.width = leftPercent + '%';
-            rightBar.style.width = rightPercent + '%';
+            // Update compact top keys
+            updateTopKeysCompact();
 
-            // Update top keys
-            updateTopKeys();
-
-            // Update rhythm chart
-            updateRhythmChart();
+            // Update main chart
+            updateMainChart();
         }
 
-        function updateTopKeys() {
-            const container = document.getElementById('topKeysList');
+        function updateTopKeysCompact() {
+            const container = document.getElementById('topKeysCompact');
             container.innerHTML = '';
 
             const topKeys = analytics.getTopKeys(5);
-            const maxCount = topKeys.length > 0 ? topKeys[0][1] : 1;
 
             // Ensure exactly 5 items are always displayed
             for (let i = 0; i < 5; i++) {
                 const item = document.createElement('div');
-                item.className = 'top-key-item';
+                item.className = 'top-key-compact';
 
                 if (i < topKeys.length) {
                     const [code, count] = topKeys[i];
                     const name = getKeyDisplayName(code);
-                    const progressWidth = (count / maxCount) * 100;
 
                     item.innerHTML = `
-                        <span class="key-name">${name}:</span>
-                        <div class="key-progress">
-                            <div class="key-progress-fill" style="width: ${progressWidth}%"></div>
-                        </div>
-                        <span class="key-count">${count}</span>
+                        <div class="key-name">${name}</div>
+                        <div class="key-count">${count}</div>
                     `;
                 } else {
                     // Show placeholder for empty slots
                     item.innerHTML = `
-                        <span class="key-name">-:</span>
-                        <div class="key-progress">
-                            <div class="key-progress-fill" style="width: 0%"></div>
-                        </div>
-                        <span class="key-count">0</span>
+                        <div class="key-name">-</div>
+                        <div class="key-count">0</div>
                     `;
                     item.style.opacity = '0.3';
                 }
@@ -1525,8 +1481,8 @@
             }
         }
 
-        function updateRhythmChart() {
-            const canvas = document.getElementById('rhythmCanvas');
+        function updateMainChart() {
+            const canvas = document.getElementById('mainCanvas');
             const ctx = canvas.getContext('2d');
 
             // Set canvas size
@@ -1536,27 +1492,40 @@
             // Clear canvas
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            const data = analytics.rhythmData.slice(-15);
+            const data = analytics.rhythmData.slice(-30);
             if (data.length < 2) {
                 ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-                ctx.font = '12px sans-serif';
+                ctx.font = '14px sans-serif';
                 ctx.textAlign = 'center';
-                ctx.fillText('Start typing...', canvas.width / 2, canvas.height / 2);
+                ctx.fillText('Start typing to see rhythm pattern...', canvas.width / 2, canvas.height / 2);
                 return;
             }
 
-            // Simple data prep
-            const maxInterval = Math.max(...data.map(d => Math.min(d, 300)));
+            // Enhanced chart drawing
+            const maxInterval = Math.max(...data.map(d => Math.min(d, 400)));
             const minInterval = Math.min(...data.map(d => Math.max(d, 0)));
+            const range = maxInterval - minInterval || 1;
 
-            // Simple line drawing
-            ctx.strokeStyle = '#ff7e5f';
-            ctx.lineWidth = 2;
+            // Grid lines
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= 4; i++) {
+                const y = (canvas.height * i) / 4;
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+
+            // Main line
+            ctx.strokeStyle = '#ff6b5a';
+            ctx.lineWidth = 2.5;
             ctx.beginPath();
 
             data.forEach((interval, i) => {
                 const x = (canvas.width * i) / (data.length - 1);
-                const y = canvas.height - ((Math.min(interval, 300) - minInterval) / (maxInterval - minInterval)) * canvas.height;
+                const normalizedValue = (Math.min(interval, 400) - minInterval) / range;
+                const y = canvas.height - (normalizedValue * canvas.height * 0.8) - canvas.height * 0.1;
 
                 if (i === 0) {
                     ctx.moveTo(x, y);
@@ -1566,6 +1535,26 @@
             });
 
             ctx.stroke();
+
+            // Fill area under curve
+            ctx.globalAlpha = 0.2;
+            ctx.fillStyle = '#ff6b5a';
+            ctx.beginPath();
+            data.forEach((interval, i) => {
+                const x = (canvas.width * i) / (data.length - 1);
+                const normalizedValue = (Math.min(interval, 400) - minInterval) / range;
+                const y = canvas.height - (normalizedValue * canvas.height * 0.8) - canvas.height * 0.1;
+
+                if (i === 0) {
+                    ctx.moveTo(x, canvas.height);
+                    ctx.lineTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            });
+            ctx.lineTo(canvas.width, canvas.height);
+            ctx.fill();
+            ctx.globalAlpha = 1;
         }
 
         function getKeyDisplayName(code) {

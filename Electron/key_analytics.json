@@ -1,79 +1,79 @@
 [
     {
         "key": "Space",
-        "count": 2040
+        "count": 2076
     },
     {
         "key": "Backspace",
-        "count": 1486
+        "count": 1491
     },
     {
         "key": "KeyA",
-        "count": 1147
+        "count": 1209
     },
     {
         "key": "KeyE",
-        "count": 1124
+        "count": 1148
     },
     {
         "key": "KeyD",
-        "count": 934
-    },
-    {
-        "key": "KeyI",
-        "count": 889
+        "count": 1010
     },
     {
         "key": "KeyO",
-        "count": 885
+        "count": 901
+    },
+    {
+        "key": "KeyI",
+        "count": 897
     },
     {
         "key": "KeyS",
-        "count": 811
+        "count": 845
     },
     {
         "key": "KeyT",
-        "count": 804
+        "count": 811
     },
     {
         "key": "KeyH",
-        "count": 685
+        "count": 701
     },
     {
         "key": "KeyW",
-        "count": 625
+        "count": 673
     },
     {
         "key": "KeyL",
-        "count": 485
+        "count": 511
     },
     {
         "key": "KeyN",
-        "count": 473
+        "count": 476
     },
     {
         "key": "KeyU",
-        "count": 426
+        "count": 432
     },
     {
         "key": "KeyR",
-        "count": 418
+        "count": 424
     },
     {
         "key": "KeyK",
-        "count": 392
+        "count": 424
     },
     {
         "key": "KeyJ",
-        "count": 382
+        "count": 414
     },
     {
         "key": "ShiftLeft",
-        "count": 295
+        "count": 301
     },
     {
         "key": "KeyB",
-        "count": 267
+        "count": 271
     },
     {
         "key": "KeyP",
@@ -81,7 +81,7 @@
     },
     {
         "key": "KeyF",
-        "count": 249
+        "count": 251
     },
     {
         "key": "KeyC",
@@ -89,7 +89,7 @@
     },
     {
         "key": "KeyY",
-        "count": 229
+        "count": 239
     },
     {
         "key": "ArrowRight",
@@ -97,23 +97,23 @@
     },
     {
         "key": "KeyM",
-        "count": 209
+        "count": 211
     },
     {
         "key": "KeyG",
-        "count": 207
+        "count": 211
     },
     {
         "key": "AltLeft",
-        "count": 197
+        "count": 210
     },
     {
         "key": "MetaLeft",
-        "count": 171
+        "count": 172
     },
     {
         "key": "Enter",
-        "count": 166
+        "count": 167
     },
     {
         "key": "ArrowLeft",
@@ -121,7 +121,7 @@
     },
     {
         "key": "KeyV",
-        "count": 146
+        "count": 147
     },
     {
         "key": "ArrowDown",
@@ -145,7 +145,7 @@
     },
     {
         "key": "Escape",
-        "count": 55
+        "count": 57
     },
     {
         "key": "Tab",
@@ -180,6 +180,10 @@
         "count": 37
     },
     {
+        "key": "Slash",
+        "count": 34
+    },
+    {
         "key": "Digit4",
         "count": 31
     },
@@ -188,12 +192,8 @@
         "count": 28
     },
     {
-        "key": "Slash",
-        "count": 28
-    },
-    {
         "key": "KeyQ",
-        "count": 26
+        "count": 27
     },
     {
         "key": "BracketLeft",
@@ -213,7 +213,7 @@
     },
     {
         "key": "Period",
-        "count": 22
+        "count": 23
     },
     {
         "key": "Digit9",
