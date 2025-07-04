@@ -581,27 +581,21 @@ ipcMain.on('sync-analytics-to-overlay', (event, data) => {
 });
 
 // Toggle main window visibility from overlay
-ipcMain.handle('restore-main-window', () => {
+ipcMain.on('restore-main-window', () => {
   if (mainWindow && !mainWindow.isDestroyed()) {
-    if (mainWindow.isMinimized() || !mainWindow.isVisible()) {
-      // If minimized or hidden, restore and show
-      if (mainWindow.isMinimized()) {
-        mainWindow.restore();
-      }
+    if (mainWindow.isVisible()) {
+      // If visible, hide it
+      mainWindow.hide();
+    } else {
+      // If hidden, show it
       mainWindow.show();
       mainWindow.focus();
-      return { success: true, message: "Main window restored" };
-    } else {
-      // If visible and active, minimize it
-      mainWindow.minimize();
-      return { success: true, message: "Main window minimized" };
     }
   }
-  return { success: false, message: "Main window not available" };
 });
 
 // Exit application from overlay
-ipcMain.handle('exit-application', () => {
+ipcMain.on('exit-application', () => {
   // Clean shutdown
   stopGlobalKeyListener();
   destroyOverlayWindow();
@@ -612,7 +606,6 @@ ipcMain.handle('exit-application', () => {
   }
   
   app.quit();
-  return { success: true, message: "Application exiting" };
 });
 
 // App event handlers
