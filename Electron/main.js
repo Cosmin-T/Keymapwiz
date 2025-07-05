@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain, systemPreferences, screen, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
+const os = require('os');
 const { spawn } = require('child_process');
 
 let mainWindow;
@@ -10,8 +11,8 @@ let macKeyCaptureProc = null;
 let isGlobalTrackingEnabled = false;
 let permissionCheckInterval = null;
 
-// Analytics data storage
-const analyticsFile = path.join(__dirname, 'key_analytics.json');
+// Analytics data storage - use user data directory for persistence
+const analyticsFile = path.join(app.getPath('userData'), 'key_analytics.json');
 
 // Show restart dialog when permissions are granted
 function showRestartDialog() {
@@ -134,8 +135,9 @@ function setupMacGlobalKeys() {
   console.log("✅ PERMISSION GRANTED");
   // ... rest of the function stays the same
 
-  // Create Swift key capture process
-  const swiftScript = path.join(__dirname, 'mac_key_capture.swift');
+  // Create Swift key capture process in a writable location
+  const tempDir = os.tmpdir();
+  const swiftScript = path.join(tempDir, 'mac_key_capture.swift');
 
   // Always regenerate Swift script to ensure latest version with modifier key support
   createMacKeyScript(swiftScript);
@@ -232,6 +234,11 @@ class GlobalKeyMonitor {
                 if type == .keyDown {
                     let keyCode = event.getIntegerValueField(.keyboardEventKeycode)
                     let keyString = GlobalKeyMonitor.keyCodeToString(keyCode: keyCode)
+                    // Debug logging for unknown keys
+                    if keyString.hasPrefix("Unknown") {
+                        print("DEBUG: Unmapped keyCode \\(keyCode)")
+                        fflush(stdout)
+                    }
                     print("KEY: \\(keyString)")
                     fflush(stdout)
                 } else if type == .keyUp {
@@ -268,13 +275,13 @@ class GlobalKeyMonitor {
     static func keyCodeToString(keyCode: Int64) -> String {
         let keyMap: [Int64: String] = [
             0: "KeyA", 1: "KeyS", 2: "KeyD", 3: "KeyF", 4: "KeyH", 5: "KeyG", 6: "KeyZ", 7: "KeyX",
-            8: "KeyC", 9: "KeyV", 11: "KeyB", 12: "KeyQ", 13: "KeyW", 14: "KeyE", 15: "KeyR",
+            8: "KeyC", 9: "KeyV", 10: "IntlBackslash", 11: "KeyB", 12: "KeyQ", 13: "KeyW", 14: "KeyE", 15: "KeyR",
             16: "KeyY", 17: "KeyT", 18: "Digit1", 19: "Digit2", 20: "Digit3", 21: "Digit4", 22: "Digit6",
             23: "Digit5", 24: "Equal", 25: "Digit9", 26: "Digit7", 27: "Minus", 28: "Digit8", 29: "Digit0",
             30: "BracketRight", 31: "KeyO", 32: "KeyU", 33: "BracketLeft", 34: "KeyI", 35: "KeyP",
             36: "Enter", 37: "KeyL", 38: "KeyJ", 39: "Quote", 40: "KeyK", 41: "Semicolon",
             42: "Backslash", 43: "Comma", 44: "Slash", 45: "KeyN", 46: "KeyM", 47: "Period",
-            48: "Tab", 49: "Space", 50: "Backquote", 51: "Backspace", 53: "Escape",
+            48: "Tab", 49: "Space", 50: "Backquote", 51: "Backspace", 52: "NumpadEnter", 53: "Escape",
             54: "MetaRight", 55: "MetaLeft", 56: "ShiftLeft", 57: "CapsLock", 58: "AltLeft",
             59: "ControlLeft", 60: "ShiftRight", 61: "AltRight", 62: "ControlRight",
             63: "Function", 64: "F17", 65: "NumpadDecimal", 67: "NumpadMultiply", 69: "NumpadAdd",
@@ -282,11 +289,12 @@ class GlobalKeyMonitor {
             76: "NumpadEnter", 78: "NumpadSubtract", 79: "F18", 80: "F19", 81: "NumpadEqual",
             82: "Numpad0", 83: "Numpad1", 84: "Numpad2", 85: "Numpad3", 86: "Numpad4",
             87: "Numpad5", 88: "Numpad6", 89: "Numpad7", 91: "Numpad8", 92: "Numpad9",
-            96: "F5", 97: "F6", 98: "F7", 99: "F3", 100: "F8", 101: "F9", 103: "F11",
-            105: "F13", 106: "F16", 107: "F14", 109: "F10", 111: "F12", 113: "F15",
-            114: "Help", 115: "Home", 116: "PageUp", 117: "Delete", 118: "F4", 119: "End",
+            93: "IntlYen", 94: "IntlRo", 95: "NumpadComma",
+            96: "F5", 97: "F6", 98: "F7", 99: "F3", 100: "F8", 101: "F9", 102: "F11Alt", 103: "F11",
+            104: "F13Alt", 105: "F13", 106: "F16", 107: "F14", 108: "F10Alt", 109: "F10", 110: "F12Alt", 111: "F12",
+            112: "F15Alt", 113: "F15", 114: "Help", 115: "Home", 116: "PageUp", 117: "Delete", 118: "F4", 119: "End",
             120: "F2", 121: "PageDown", 122: "F1", 123: "ArrowLeft", 124: "ArrowRight",
-            125: "ArrowDown", 126: "ArrowUp"
+            125: "ArrowDown", 126: "ArrowUp", 127: "Power", 128: "F20", 129: "F21", 130: "F22", 131: "F23", 132: "F24"
         ]
 
         return keyMap[keyCode] ?? "Unknown\\(keyCode)"

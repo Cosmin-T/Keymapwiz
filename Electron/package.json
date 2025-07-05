@@ -24,12 +24,14 @@
       "main.js",
       "index.html",
       "overlay.html",
+      "mac_key_capture.swift",
       "package.json",
       "node_modules/",
       "!node_modules/.cache"
     ],
     "mac": {
       "category": "public.app-category.productivity",
+      "icon": "build/icon.png",
       "target": [
         {
           "target": "dmg",
