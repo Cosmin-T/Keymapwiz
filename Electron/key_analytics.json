@@ -1,63 +1,63 @@
 [
     {
         "key": "Space",
-        "count": 528
+        "count": 563
     },
     {
         "key": "KeyA",
-        "count": 358
-    },
-    {
-        "key": "KeyE",
-        "count": 322
+        "count": 377
     },
     {
         "key": "Backspace",
-        "count": 316
+        "count": 351
+    },
+    {
+        "key": "KeyE",
+        "count": 335
     },
     {
         "key": "KeyS",
-        "count": 310
+        "count": 324
     },
     {
         "key": "KeyT",
-        "count": 281
+        "count": 312
     },
     {
         "key": "KeyD",
-        "count": 273
+        "count": 279
     },
     {
         "key": "KeyO",
-        "count": 198
+        "count": 200
     },
     {
         "key": "KeyI",
-        "count": 177
+        "count": 186
     },
     {
         "key": "KeyW",
-        "count": 155
+        "count": 159
     },
     {
         "key": "KeyH",
-        "count": 143
+        "count": 155
     },
     {
         "key": "KeyN",
-        "count": 133
+        "count": 136
     },
     {
         "key": "KeyL",
-        "count": 122
+        "count": 123
     },
     {
         "key": "KeyU",
-        "count": 117
+        "count": 120
     },
     {
         "key": "KeyR",
-        "count": 103
+        "count": 106
     },
     {
         "key": "ShiftLeft",
@@ -73,35 +73,35 @@
     },
     {
         "key": "Enter",
-        "count": 58
+        "count": 60
     },
     {
         "key": "KeyJ",
         "count": 55
     },
     {
-        "key": "KeyM",
-        "count": 49
+        "key": "MetaLeft",
+        "count": 52
     },
     {
-        "key": "MetaLeft",
-        "count": 48
+        "key": "KeyM",
+        "count": 51
     },
     {
         "key": "KeyY",
-        "count": 48
+        "count": 50
     },
     {
         "key": "KeyC",
-        "count": 48
+        "count": 49
     },
     {
         "key": "KeyG",
-        "count": 46
+        "count": 48
     },
     {
         "key": "KeyF",
-        "count": 45
+        "count": 47
     },
     {
         "key": "KeyP",
@@ -109,7 +109,7 @@
     },
     {
         "key": "KeyB",
-        "count": 29
+        "count": 34
     },
     {
         "key": "Slash",
@@ -141,7 +141,7 @@
     },
     {
         "key": "Quote",
-        "count": 10
+        "count": 11
     },
     {
         "key": "KeyZ",

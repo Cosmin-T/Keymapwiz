@@ -1985,7 +1985,8 @@
             // Sync analytics data to overlay immediately for real-time updates
             ipcRenderer.send('sync-analytics-to-overlay', {
                 totalKeystrokes: analytics.totalKeystrokes,
-                keyFrequency: analytics.keyFrequency
+                keyFrequency: analytics.keyFrequency,
+                kps: analytics.getKPS()
             });
 
             // Auto-release after short delay since we can't detect global key releases reliably

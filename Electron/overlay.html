@@ -179,36 +179,17 @@
             constructor() {
                 this.totalKeystrokes = 0;
                 this.keyFrequency = {};
-                this.recentKeystrokes = [];
-                this.kpsWindow = 10; // 10 second rolling window
+                this.currentKPS = 0; // KPS value from main app
             }
 
             recordKeyPress(code, timestamp) {
                 this.totalKeystrokes++;
                 this.keyFrequency[code] = (this.keyFrequency[code] || 0) + 1;
-
-                // Add to rolling window for KPS calculation
-                this.recentKeystrokes.push(timestamp);
             }
 
             getKPS() {
-                const now = Date.now();
-                const windowMs = this.kpsWindow * 1000;
-
-                // Remove old keystrokes
-                this.recentKeystrokes = this.recentKeystrokes.filter(
-                    timestamp => (now - timestamp) <= windowMs
-                );
-
-                if (this.recentKeystrokes.length === 0) return 0;
-                if (this.recentKeystrokes.length === 1) return 0;
-
-                const oldestKeystroke = Math.min(...this.recentKeystrokes);
-                const newestKeystroke = Math.max(...this.recentKeystrokes);
-                const timeSpanSeconds = (newestKeystroke - oldestKeystroke) / 1000;
-
-                if (timeSpanSeconds <= 0) return 0;
-                return this.recentKeystrokes.length / timeSpanSeconds;
+                // KPS is now provided by main app via sync
+                return this.currentKPS || 0;
             }
         }
 
@@ -446,12 +427,6 @@
         function startUpdateTimer() {
             setInterval(() => {
                 updateDisplay();
-                // Clean up old keystrokes
-                const now = Date.now();
-                const windowMs = analytics.kpsWindow * 1000;
-                analytics.recentKeystrokes = analytics.recentKeystrokes.filter(
-                    timestamp => (now - timestamp) <= windowMs
-                );
             }, 1000);
 
             // Request analytics sync from main window more frequently
@@ -489,6 +464,7 @@
 
                 // Update KPS if provided
                 if (data.kps !== undefined) {
+                    analytics.currentKPS = data.kps;
                     document.getElementById('kpsValue').textContent = data.kps.toFixed(1);
                 }
 

@@ -21,3 +21,5 @@ yarn-error.log*
 Thumbs.db
 desktop.ini
 Electron/node_modules/
+/tasks
+tasks/
