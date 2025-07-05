@@ -23,3 +23,7 @@ desktop.ini
 Electron/node_modules/
 /tasks
 tasks/
+.claude/
+claude/
+/claude
+/claude/

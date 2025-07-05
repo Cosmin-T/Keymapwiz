@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, systemPreferences, screen } = require('electron');
+const { app, BrowserWindow, ipcMain, systemPreferences, screen, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const { spawn } = require('child_process');
@@ -8,9 +8,54 @@ let overlayWindow = null;
 let globalKeyListener = null;
 let macKeyCaptureProc = null;
 let isGlobalTrackingEnabled = false;
+let permissionCheckInterval = null;
 
 // Analytics data storage
 const analyticsFile = path.join(__dirname, 'key_analytics.json');
+
+// Show restart dialog when permissions are granted
+function showRestartDialog() {
+  const choice = dialog.showMessageBoxSync(mainWindow, {
+    type: 'info',
+    title: 'Permissions Granted',
+    message: 'Accessibility permissions have been granted!',
+    detail: 'The app needs to restart to enable global key tracking. Would you like to restart now?',
+    buttons: ['Restart Now', 'Restart Later'],
+    defaultId: 0,
+    cancelId: 1
+  });
+
+  if (choice === 0) {
+    // Restart the app
+    app.relaunch();
+    app.exit();
+  }
+}
+
+// Start periodic permission checking
+function startPermissionCheck() {
+  if (permissionCheckInterval) {
+    clearInterval(permissionCheckInterval);
+  }
+
+  permissionCheckInterval = setInterval(() => {
+    const hasPermission = systemPreferences.isTrustedAccessibilityClient(false);
+    if (hasPermission) {
+      console.log("✅ PERMISSIONS GRANTED - Prompting for restart");
+      clearInterval(permissionCheckInterval);
+      permissionCheckInterval = null;
+      showRestartDialog();
+    }
+  }, 1000); // Check every second
+}
+
+// Stop permission checking
+function stopPermissionCheck() {
+  if (permissionCheckInterval) {
+    clearInterval(permissionCheckInterval);
+    permissionCheckInterval = null;
+  }
+}
 
 // Load analytics data
 function loadAnalytics() {
@@ -78,6 +123,10 @@ function setupMacGlobalKeys() {
       console.log("❌ PERMISSION DENIED");
       console.log("Go to: System Preferences → Security & Privacy → Privacy → Accessibility");
       console.log("Look for and enable:", app.getName());
+      
+      // Start checking for permissions periodically
+      startPermissionCheck();
+      
       return false;
     }
   }
@@ -629,5 +678,6 @@ app.on('will-quit', () => {
   // Clean shutdown
   stopGlobalKeyListener();
   destroyOverlayWindow();
+  stopPermissionCheck();
   console.log('Application shutting down...');
 });

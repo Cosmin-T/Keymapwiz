@@ -50,3 +50,9 @@ coverage/
 # Temporary folders
 tmp/
 temp/
+
+# Claude AI files
+.claude/
+claude/
+/claude
+/claude/
