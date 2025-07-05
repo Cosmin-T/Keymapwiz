@@ -162,6 +162,9 @@
                 KPS: <span class="stat-value" id="kpsValue">0.0</span>
             </div>
             <div class="stat-item">
+                WPM: <span class="stat-value" id="wpmValue">0.0</span>
+            </div>
+            <div class="stat-item">
                 Total: <span class="stat-value" id="totalKeystrokes">0</span>
             </div>
         </div>
@@ -466,6 +469,11 @@
                 if (data.kps !== undefined) {
                     analytics.currentKPS = data.kps;
                     document.getElementById('kpsValue').textContent = data.kps.toFixed(1);
+                }
+
+                // Update WPM if provided
+                if (data.wpm !== undefined) {
+                    document.getElementById('wpmValue').textContent = data.wpm.toFixed(1);
                 }
 
                 updateDisplay();
