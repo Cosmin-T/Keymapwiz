@@ -91,7 +91,7 @@ class GlobalKeyMonitor {
         if changedFlags.contains(.maskShift) {
             // Detect left vs right shift based on keyCode
             let keyString = (keyCode == 56) ? "ShiftLeft" : "ShiftRight"
-            
+
             if currentFlags.contains(.maskShift) {
                 print("KEY: \(keyString)")
                 fflush(stdout)
@@ -104,7 +104,7 @@ class GlobalKeyMonitor {
         if changedFlags.contains(.maskControl) {
             // Detect left vs right control based on keyCode
             let keyString = (keyCode == 59) ? "ControlLeft" : "ControlRight"
-            
+
             if currentFlags.contains(.maskControl) {
                 print("KEY: \(keyString)")
                 fflush(stdout)
@@ -117,7 +117,7 @@ class GlobalKeyMonitor {
         if changedFlags.contains(.maskAlternate) {
             // Detect left vs right alt based on keyCode
             let keyString = (keyCode == 58) ? "AltLeft" : "AltRight"
-            
+
             if currentFlags.contains(.maskAlternate) {
                 print("KEY: \(keyString)")
                 fflush(stdout)
@@ -130,7 +130,7 @@ class GlobalKeyMonitor {
         if changedFlags.contains(.maskCommand) {
             // Detect left vs right command based on keyCode
             let keyString = (keyCode == 55) ? "MetaLeft" : "MetaRight"
-            
+
             if currentFlags.contains(.maskCommand) {
                 print("KEY: \(keyString)")
                 fflush(stdout)

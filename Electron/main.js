@@ -253,7 +253,7 @@ class GlobalKeyMonitor {
         if changedFlags.contains(.maskShift) {
             // Detect left vs right shift based on keyCode
             let keyString = (keyCode == 56) ? "ShiftLeft" : "ShiftRight"
-            
+
             if currentFlags.contains(.maskShift) {
                 print("KEY: \\(keyString)")
                 fflush(stdout)
@@ -266,7 +266,7 @@ class GlobalKeyMonitor {
         if changedFlags.contains(.maskControl) {
             // Detect left vs right control based on keyCode
             let keyString = (keyCode == 59) ? "ControlLeft" : "ControlRight"
-            
+
             if currentFlags.contains(.maskControl) {
                 print("KEY: \\(keyString)")
                 fflush(stdout)
@@ -279,7 +279,7 @@ class GlobalKeyMonitor {
         if changedFlags.contains(.maskAlternate) {
             // Detect left vs right alt based on keyCode
             let keyString = (keyCode == 58) ? "AltLeft" : "AltRight"
-            
+
             if currentFlags.contains(.maskAlternate) {
                 print("KEY: \\(keyString)")
                 fflush(stdout)
@@ -292,7 +292,7 @@ class GlobalKeyMonitor {
         if changedFlags.contains(.maskCommand) {
             // Detect left vs right command based on keyCode
             let keyString = (keyCode == 55) ? "MetaLeft" : "MetaRight"
-            
+
             if currentFlags.contains(.maskCommand) {
                 print("KEY: \\(keyString)")
                 fflush(stdout)
@@ -395,8 +395,8 @@ function stopGlobalKeyListener() {
 // Create main window
 function createMainWindow() {
   mainWindow = new BrowserWindow({
-    width: 1400,
-    height: 900,
+    width: 1450,
+    height: 1300,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -599,12 +599,12 @@ ipcMain.on('exit-application', () => {
   // Clean shutdown
   stopGlobalKeyListener();
   destroyOverlayWindow();
-  
+
   // Close main window and quit
   if (mainWindow && !mainWindow.isDestroyed()) {
     mainWindow.close();
   }
-  
+
   app.quit();
 });
 
