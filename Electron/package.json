@@ -30,19 +30,13 @@
       "!node_modules/.cache"
     ],
     "mac": {
-      "category": "public.app-category.productivity",
       "icon": "build/icon.png",
-      "target": [
-        {
-          "target": "dmg",
-          "arch": ["x64", "arm64"]
-        }
-      ],
-      "entitlements": "build/entitlements.mac.plist",
-      "entitlementsInherit": "build/entitlements.mac.plist",
-      "hardenedRuntime": true,
+      "target": "dmg",
+      "identity": null,
+      "hardenedRuntime": false,
       "gatekeeperAssess": false
     },
+    "afterPack": "./sign-app.js",
     "dmg": {
       "title": "Typechron Viz",
       "contents": [

@@ -63,7 +63,7 @@
 
         .keyboard-info {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
         }
 
         .keyboard-selector {
@@ -99,6 +99,88 @@
         .keyboard-selector select:focus {
             box-shadow: 0 0 0 2px rgba(255, 126, 95, 0.5);
         }
+
+        .control-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            margin-top: 40px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .time-selector {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .time-selector label {
+            color: #ddd;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .time-selector input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 200px;
+            height: 6px;
+            background: rgba(80, 80, 80, 0.3);
+            border-radius: 3px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .time-selector input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #ff7e5f;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(255, 126, 95, 0.3);
+            transition: all 0.3s;
+        }
+
+        .time-selector input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(255, 126, 95, 0.4);
+        }
+
+        .time-selector input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #ff7e5f;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 6px rgba(255, 126, 95, 0.3);
+            transition: all 0.3s;
+        }
+
+        .time-selector input[type="range"]:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .time-selector input[type="range"]:disabled::-webkit-slider-thumb {
+            cursor: not-allowed;
+        }
+
+
 
         .keyboard-background {
             width: 1200px;
@@ -636,6 +718,46 @@
             display: none;
         }
 
+        /* Modal Styles */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 999;
+            display: none;
+            backdrop-filter: blur(5px);
+        }
+
+        .results-summary {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            display: none;
+            max-height: 90vh;
+            overflow: hidden;
+            padding-bottom: 20px;
+        }
+
+        .results-summary.show {
+            animation: modalIn 0.6s ease-out;
+        }
+
+        @keyframes modalIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -60%) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
         body.keyboard-only .header {
             margin-bottom: 20px;
         }
@@ -772,7 +894,8 @@
             display: flex;
             justify-content: center;
             gap: 25px;
-            margin-top: 30px;
+            margin-top: 20px;
+            margin-bottom: 10px;
         }
 
         .test-btn {
@@ -811,9 +934,17 @@
             transition: all 0.3s;
         }
 
+        #startTestBtn {
+            display: none;
+        }
+
         body.test-active .instructions {
             opacity: 0.4;
             filter: brightness(0.5);
+        }
+
+        body.test-active .test-controls {
+            display: none;
         }
 
         /* Make words brighter during test */
@@ -833,6 +964,22 @@
             z-index: 999;
             display: none;
             pointer-events: none;
+        }
+
+        /* Graph tooltip */
+        .graph-tooltip {
+            position: fixed;
+            background: rgba(40, 40, 40, 0.95);
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            pointer-events: none;
+            z-index: 1001;
+            border: 1px solid rgba(255, 126, 95, 0.3);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            display: none;
         }
     </style>
 </head>
@@ -862,14 +1009,28 @@
                     <!-- Keyboard layout will be generated here -->
                 </div>
             </div>
-            <div class="controls">
-                <span class="mode-label">Typing Test</span>
-                <div class="toggle-switch" id="modeToggle">
-                    <div class="toggle-slider"></div>
-                </div>
-                <span class="mode-label">Keyboard Only</span>
-            </div>
-        </div>
+              <div class="control-row">
+                  <div class="control-group">
+                      <span class="mode-label">Typing Test</span>
+                      <div class="toggle-switch" id="modeToggle">
+                          <div class="toggle-slider"></div>
+                      </div>
+                      <span class="mode-label">Keyboard Only</span>
+                  </div>
+                  <div class="control-group">
+                      <span class="mode-label">Words</span>
+                      <div class="toggle-switch" id="wordModeToggle">
+                          <div class="toggle-slider"></div>
+                      </div>
+                      <span class="mode-label">Sentences</span>
+                  </div>
+              </div>
+              <div class="time-selector">
+                  <label for="timeSlider">Test Duration: <span id="timeValue">15</span>s</label>
+                  <input type="range" id="timeSlider" min="15" max="60" step="15" value="15">
+              </div>
+
+         </div>
 
         <!-- NEW: Keyboard Analytics Panel -->
         <div class="keyboard-analytics" id="keyboardAnalytics">
@@ -942,10 +1103,10 @@
                     </div>
                     <div class="heatmap-container" id="heatmapContainer">
                         <!-- Heatmap will be generated here -->
-                    </div>
-                </div>
-            </div>
-        </div>
+                   </div>
+               </div>
+             </div>
+         </div>
         
         <!-- Stats Container -->
         <div class="stats-container">
@@ -963,12 +1124,23 @@
             </div>
         </div>
         
-        <!-- Words Display -->
-        <div id="wordsDisplay"></div>
-        
-        <!-- Test Results Summary -->
-        <div class="results-summary" id="resultsSummary">
-            <div class="results-container">
+         <!-- Words Display -->
+         <div id="wordsDisplay"></div>
+
+         <!-- Start Test Button -->
+         <div class="test-controls">
+             <button class="test-btn" id="startTestBtn">Start New Test</button>
+         </div>
+
+          <!-- Modal Backdrop -->
+          <div class="modal-backdrop" id="modalBackdrop"></div>
+
+          <!-- Graph Tooltip (outside modal for proper positioning) -->
+          <div class="graph-tooltip" id="graphTooltip"></div>
+
+          <!-- Test Results Summary -->
+          <div class="results-summary" id="resultsSummary" style="display: none;">
+             <div class="results-container">
                 <div class="results-left">
                     <div class="big-stats">
                         <div class="big-wpm" id="bigWpm">0</div>
@@ -978,16 +1150,16 @@
                     </div>
                     <div class="test-info">
                         <div>test type</div>
-                        <div><span>time 30</span></div>
+                        <div><span>time <span id="testTimeDisplay">30</span></span></div>
                         <div><span>english</span></div>
                     </div>
                 </div>
-                <div class="results-right">
-                    <div class="graph-container">
-                        <div class="graph-title">Words per Minute</div>
-                        <canvas id="wpmGraph" class="wpm-graph" width="800" height="140"></canvas>
-                    </div>
-                    <div class="detail-stats">
+                 <div class="results-right">
+                     <div class="graph-container">
+                         <div class="graph-title">Words per Minute</div>
+                         <canvas id="wpmGraph" class="wpm-graph" width="800" height="140"></canvas>
+                     </div>
+                     <div class="detail-stats">
                         <div class="detail-stat">
                             <div class="detail-stat-label">raw</div>
                             <div class="detail-stat-value" id="rawWpm">0</div>
@@ -1000,13 +1172,16 @@
                             <div class="detail-stat-label">consistency</div>
                             <div class="detail-stat-value" id="consistency">0%</div>
                         </div>
-                        <div class="detail-stat">
-                            <div class="detail-stat-label">time</div>
-                            <div class="detail-stat-value" id="testTime">30s</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                         <div class="detail-stat">
+                             <div class="detail-stat-label">time</div>
+                             <div class="detail-stat-value" id="testTime">30s</div>
+                         </div>
+                     </div>
+                      <div class="test-controls">
+                          <button id="startNewTestBtn" class="test-btn">Start New Test</button>
+                      </div>
+              </div>
+          </div>
         </div>
         
         <!-- Instructions -->
@@ -1024,7 +1199,9 @@
         let correctChars = 0;
         let totalCharsAttempted = 0;
         let startTime = null;
-        let timer = 30; // 30 seconds timer
+        let timer = 15; // Default 15 seconds timer
+        let testDuration = 15; // Selected test duration
+        let useSentences = false; // Mode: false = words, true = sentences
         let canStartTest = true;
         let testJustEnded = false;
         let timerInterval = null;
@@ -1045,9 +1222,211 @@
         const timerDisplay = document.getElementById('timer');
         const focusOverlay = document.getElementById('focusOverlay');
         const testResultsList = document.getElementById('testResultsList');
+        const timeSlider = document.getElementById('timeSlider');
+        const timeValue = document.getElementById('timeValue');
+        const startNewTestBtn = document.getElementById('startNewTestBtn');
+
+        // Time slider event listener
+        timeSlider.addEventListener('input', function() {
+            if (!testActive) {
+                testDuration = parseInt(this.value);
+                timer = testDuration;
+                timerDisplay.textContent = `${timer}s`;
+                timeValue.textContent = testDuration;
+                document.getElementById('testTimeDisplay').textContent = testDuration;
+            } else {
+                // Reset to current test duration if changed during active test
+                this.value = testDuration.toString();
+                timeValue.textContent = testDuration;
+            }
+        });
+
+        // Word/Sentence mode toggle event listener
+        document.getElementById('wordModeToggle').addEventListener('click', function() {
+            this.classList.toggle('active');
+            useSentences = !useSentences;
+            // Regenerate words immediately when mode changes
+            if (!testActive) {
+                generateWords();
+            }
+        });
+
+        // Start new test button event listener
+        startNewTestBtn.addEventListener('click', function() {
+            // Hide the modal
+            document.getElementById('modalBackdrop').style.display = 'none';
+            const resultsSummary = document.getElementById('resultsSummary');
+            resultsSummary.style.display = 'none';
+            resultsSummary.classList.remove('show');
+
+            // Reset for new test
+            canStartTest = true;
+            testJustEnded = false;
+
+            // Reset all state variables first
+            currentWordIndex = 0;
+            currentCharIndex = 0;
+            correctChars = 0;
+            totalCharsAttempted = 0;
+            timer = testDuration;
+            
+            // Clear the display
+            wordsDisplay.innerHTML = '';
+            
+            // Generate new words and render
+            generateWords();
+            
+            // Reset displays
+            wpmDisplay.textContent = '0';
+            accuracyDisplay.textContent = '100%';
+            timerDisplay.textContent = `${timer}s`;
+            updateResultsDisplay();
+            document.getElementById('testTimeDisplay').textContent = testDuration;
+        });
+
+        // Start test button event listener
+        document.getElementById('startTestBtn').addEventListener('click', function() {
+            if (!testActive && canStartTest) {
+                // Generate new words and reset for fresh start
+                generateWords();
+                currentWordIndex = 0;
+                currentCharIndex = 0;
+                correctChars = 0;
+                totalCharsAttempted = 0;
+                timer = testDuration;
+                wpmDisplay.textContent = '0';
+                accuracyDisplay.textContent = '100%';
+                timerDisplay.textContent = `${timer}s`;
+                updateResultsDisplay();
+            }
+        });
 
         // Global set to track words used across ALL tests - no repeats ever
         let globalUsedWords = new Set();
+
+        // Sentences for sentence mode - expanded collection
+        const sentences = [
+            "The quick brown fox jumps over the lazy dog.",
+            "A journey of a thousand miles begins with a single step.",
+            "To be or not to be, that is the question.",
+            "All that glitters is not gold.",
+            "The early bird catches the worm.",
+            "Actions speak louder than words.",
+            "When in Rome, do as the Romans do.",
+            "A picture is worth a thousand words.",
+            "Beauty is in the eye of the beholder.",
+            "The pen is mightier than the sword.",
+            "Time flies when you're having fun.",
+            "Don't count your chickens before they hatch.",
+            "Every cloud has a silver lining.",
+            "Fortune favors the bold.",
+            "Honesty is the best policy.",
+            "Knowledge is power.",
+            "Laughter is the best medicine.",
+            "Money can't buy happiness.",
+            "No news is good news.",
+            "Practice makes perfect.",
+            "Rome wasn't built in a day.",
+            "Slow and steady wins the race.",
+            "The grass is always greener on the other side.",
+            "There is no place like home.",
+            "Two heads are better than one.",
+            "You can't judge a book by its cover.",
+            "A watched pot never boils.",
+            "Beggars can't be choosers.",
+            "Better late than never.",
+            "Cleanliness is next to godliness.",
+            "The best things in life are free.",
+            "You reap what you sow.",
+            "Where there's smoke, there's fire.",
+            "Strike while the iron is hot.",
+            "The apple doesn't fall far from the tree.",
+            "Birds of a feather flock together.",
+            "Curiosity killed the cat.",
+            "Don't put all your eggs in one basket.",
+            "Easy come, easy go.",
+            "Familiarity breeds contempt.",
+            "Good things come to those who wait.",
+            "Haste makes waste.",
+            "If the shoe fits, wear it.",
+            "It takes two to tango.",
+            "Keep your friends close and your enemies closer.",
+            "Let sleeping dogs lie.",
+            "Make hay while the sun shines.",
+            "Necessity is the mother of invention.",
+            "Once bitten, twice shy.",
+            "Out of sight, out of mind.",
+            "People who live in glass houses shouldn't throw stones.",
+            "The squeaky wheel gets the grease.",
+            "There's no such thing as a free lunch.",
+            "Too many cooks spoil the broth.",
+            "Variety is the spice of life.",
+            "What goes around comes around.",
+            "You can lead a horse to water, but you can't make it drink.",
+            "A bird in the hand is worth two in the bush.",
+            "Absence makes the heart grow fonder.",
+            "Blood is thicker than water.",
+            "Don't bite the hand that feeds you.",
+            "Don't cry over spilled milk.",
+            "Every dog has its day.",
+            "Fool me once, shame on you; fool me twice, shame on me.",
+            "Great minds think alike.",
+            "Hope for the best, prepare for the worst.",
+            "Ignorance is bliss.",
+            "It's a piece of cake.",
+            "Kill two birds with one stone.",
+            "Let bygones be bygones.",
+            "Look before you leap.",
+            "Nothing ventured, nothing gained.",
+            "One man's trash is another man's treasure.",
+            "The calm before the storm.",
+            "The devil is in the details.",
+            "The proof is in the pudding.",
+            "There's no time like the present.",
+            "When it rains, it pours.",
+            "You can't have your cake and eat it too.",
+            "A penny saved is a penny earned.",
+            "A rolling stone gathers no moss.",
+            "Don't put the cart before the horse.",
+            "Every rose has its thorn.",
+            "If it ain't broke, don't fix it.",
+            "It's not over till the fat lady sings.",
+            "Jack of all trades, master of none.",
+            "Keep your chin up.",
+            "Lightning never strikes the same place twice.",
+            "Misery loves company.",
+            "No pain, no gain.",
+            "Old habits die hard.",
+            "Patience is a virtue.",
+            "The best laid plans often go awry.",
+            "The road to hell is paved with good intentions.",
+            "There's more than one way to skin a cat.",
+            "You can't teach an old dog new tricks.",
+            "A stitch in time saves nine.",
+            "Barking up the wrong tree.",
+            "Don't judge a book by its cover.",
+            "Every man for himself.",
+            "First come, first served.",
+            "Give credit where credit is due.",
+            "Hit the nail on the head.",
+            "In for a penny, in for a pound.",
+            "It's the thought that counts.",
+            "Keep your eyes on the prize.",
+            "Let the cat out of the bag.",
+            "Make a long story short.",
+            "Never say never.",
+            "On thin ice.",
+            "Put your money where your mouth is.",
+            "The ball is in your court.",
+            "The early bird gets the worm.",
+            "The whole nine yards.",
+            "Under the weather.",
+            "When pigs fly.",
+            "You scratch my back, I'll scratch yours."
+        ];
+
+        // Track used sentences to avoid repeats
+        let globalUsedSentences = new Set();
 
         // Massive Monkeytype-style word list - NO FAKER
         const allWords = [
@@ -1067,32 +1446,58 @@
         function generateWords() {
             words = [];
             const usedWords = new Set();
-            
-            for (let i = 0; i < 30; i++) {  // Generate 30 words (3 rows x 10 words)
-                let word;
+
+            if (useSentences) {
+                // Use sentences mode with no repeats
                 let attempts = 0;
-                
-                do {
+                while (words.length < 30 && attempts < 100) {
+                    let sentence;
+                    let sentenceAttempts = 0;
+                    
+                    do {
+                        sentence = sentences[Math.floor(Math.random() * sentences.length)];
+                        sentenceAttempts++;
+                        
+                        if (sentenceAttempts > 50) {
+                            globalUsedSentences.clear();
+                            break;
+                        }
+                    } while (globalUsedSentences.has(sentence));
+                    
+                    globalUsedSentences.add(sentence);
+                    const newWords = sentence.split(' ').filter(word => word.length > 0);
+                    words = words.concat(newWords);
                     attempts++;
-                    
-                    // Pick random word from our massive list
-                    word = allWords[Math.floor(Math.random() * allWords.length)];
-                    
-                    // Fallback if we can't find unused words
-                    if (attempts > 200) {
-                        // Reset global used words if we've exhausted the pool
-                        globalUsedWords.clear();
+                }
+                words = words.slice(0, 30); // Take first 30 words
+            } else {
+                // Use words mode (original logic)
+                for (let i = 0; i < 30; i++) {  // Generate 30 words (3 rows x 10 words)
+                    let word;
+                    let attempts = 0;
+
+                    do {
+                        attempts++;
+
+                        // Pick random word from our massive list
                         word = allWords[Math.floor(Math.random() * allWords.length)];
-                        break;
-                    }
-                    
-                } while (usedWords.has(word) || globalUsedWords.has(word) || word === '');
-                
-                usedWords.add(word);
-                globalUsedWords.add(word);
-                words.push(word);
+
+                        // Fallback if we can't find unused words
+                        if (attempts > 200) {
+                            // Reset global used words if we've exhausted the pool
+                            globalUsedWords.clear();
+                            word = allWords[Math.floor(Math.random() * allWords.length)];
+                            break;
+                        }
+
+                    } while (usedWords.has(word) || globalUsedWords.has(word) || word === '');
+
+                    usedWords.add(word);
+                    globalUsedWords.add(word);
+                    words.push(word);
+                }
             }
-            
+
             renderWords();
         }
 
@@ -1160,7 +1565,9 @@
             testActive = true;
             startTime = new Date();
             lastKeystrokeTime = startTime.getTime();
-            
+
+
+
             // Reset advanced stats
             wpmHistory = [];
             keystrokeTimestamps = [];
@@ -1169,10 +1576,17 @@
             incorrectCharsTyped = 0;
             extraCharsTyped = 0;
             missedCharsTyped = 0;
-            
+
             if (timerInterval) clearInterval(timerInterval);
             timerInterval = setInterval(updateTimer, 1000);
-            
+
+            // Disable time selector during test
+            timeSlider.disabled = true;
+
+            // Start continuous stats update (every 100ms)
+            if (window.statsUpdateInterval) clearInterval(window.statsUpdateInterval);
+            window.statsUpdateInterval = setInterval(updateStats, 100);
+
             // Add test-active class to body for focus mode
             document.body.classList.add('test-active');
             focusOverlay.style.display = 'block';
@@ -1194,37 +1608,33 @@
             canStartTest = false;
             clearInterval(timerInterval);
             
+            // Stop continuous stats update
+            if (window.statsUpdateInterval) clearInterval(window.statsUpdateInterval);
+
+            // Re-enable time selector after test
+            timeSlider.disabled = false;
+
             // Calculate final WPM and accuracy
             const elapsedTime = (new Date() - startTime) / 1000 / 60;
             const wpm = Math.round((correctChars / 5) / elapsedTime);
             const accuracy = totalCharsAttempted > 0 ? Math.round((correctChars / totalCharsAttempted) * 100) : 100;
-            
+
             wpmDisplay.textContent = wpm;
             accuracyDisplay.textContent = `${accuracy}%`;
-            
+
             // Save the test result
             saveTestResult(wpm, accuracy);
-            
+
             // Remove focus mode
             document.body.classList.remove('test-active');
             focusOverlay.style.display = 'none';
-            
-            // Wait 2 seconds before allowing new test
-            setTimeout(() => {
-                canStartTest = true;
-                testJustEnded = false;
-                
-                // Generate new words and reset - start from 1st word of 1st row
-                generateWords();
-                currentWordIndex = 0;
-                currentCharIndex = 0;
-                correctChars = 0;
-                totalCharsAttempted = 0;
-                timer = 30;
-                wpmDisplay.textContent = '0';
-                accuracyDisplay.textContent = '100%';
-                timerDisplay.textContent = `${timer}s`;
-            }, 2000);
+
+            // Show modal with results
+            document.getElementById('modalBackdrop').style.display = 'block';
+            const resultsSummary = document.getElementById('resultsSummary');
+            resultsSummary.style.display = 'block';
+            resultsSummary.classList.add('show');
+            document.getElementById('startNewTestBtn').style.display = 'block';
         }
 
         function handleTyping(e) {
@@ -1339,7 +1749,9 @@
         function updateStats() {
             // Calculate WPM (Words Per Minute) - Standard formula: (correct chars / 5) / time in minutes
             const elapsedTime = (new Date() - startTime) / 1000 / 60;
-            const wpm = elapsedTime > 0 ? Math.round((correctChars / 5) / elapsedTime) : 0;
+            // Cap WPM at reasonable maximum (e.g., 300 WPM) to avoid crazy high numbers at the start
+            const rawWpmCalc = elapsedTime > 0 ? Math.round((correctChars / 5) / elapsedTime) : 0;
+            const wpm = Math.min(rawWpmCalc, 300);
             wpmDisplay.textContent = wpm;
             
             // Calculate Accuracy - Standard formula: (correct chars / total chars attempted) * 100
@@ -1380,23 +1792,23 @@
         function drawWpmGraph() {
             const canvas = document.getElementById('wpmGraph');
             if (!canvas) return;
-            
+
             const ctx = canvas.getContext('2d');
             const width = canvas.width;
             const height = canvas.height;
-            
+
             // Clear canvas
             ctx.clearRect(0, 0, width, height);
-            
+
             if (wpmHistory.length < 2) return;
-            
+
             // Calculate scales
-            const maxWpm = Math.max(...wpmHistory.map(h => Math.max(h.wpm, h.rawWpm))) + 10;
-            const minWpm = Math.max(0, Math.min(...wpmHistory.map(h => Math.min(h.wpm, h.rawWpm))) - 10);
-            const maxTime = 30;
+            const maxWpm = Math.max(...wpmHistory.map(h => h.wpm)) + 10;
+            const minWpm = Math.max(0, Math.min(...wpmHistory.map(h => h.wpm)) - 10);
+            const maxTime = testDuration;
             
-            // Draw grid lines
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+            // Draw subtle grid lines
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
             ctx.lineWidth = 1;
             
             // Vertical grid lines (time)
@@ -1417,9 +1829,60 @@
                 ctx.stroke();
             }
             
-            // Draw WPM line (yellow)
+            // Draw gradient fill under the line
             if (wpmHistory.length > 1) {
-                ctx.strokeStyle = '#ffcc4d';
+                const gradient = ctx.createLinearGradient(0, 0, 0, height);
+                gradient.addColorStop(0, 'rgba(255, 126, 95, 0.3)');
+                gradient.addColorStop(1, 'rgba(255, 126, 95, 0.0)');
+                
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                
+                // Start from bottom left
+                ctx.moveTo(0, height);
+                
+                // Draw along the WPM line
+                wpmHistory.forEach((point, index) => {
+                    const x = (point.time / maxTime) * width;
+                    const y = height - ((point.wpm - minWpm) / (maxWpm - minWpm)) * height;
+                    
+                    if (index === 0) {
+                        ctx.lineTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                });
+                
+                // Close the path to bottom right
+                const lastPoint = wpmHistory[wpmHistory.length - 1];
+                const lastX = (lastPoint.time / maxTime) * width;
+                ctx.lineTo(lastX, height);
+                ctx.closePath();
+                ctx.fill();
+            }
+            
+            // Draw WPM line with glow effect
+            if (wpmHistory.length > 1) {
+                // Outer glow
+                ctx.strokeStyle = 'rgba(255, 126, 95, 0.4)';
+                ctx.lineWidth = 6;
+                ctx.beginPath();
+                
+                wpmHistory.forEach((point, index) => {
+                    const x = (point.time / maxTime) * width;
+                    const y = height - ((point.wpm - minWpm) / (maxWpm - minWpm)) * height;
+                    
+                    if (index === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+                });
+                
+                ctx.stroke();
+                
+                // Main line
+                ctx.strokeStyle = '#ff7e5f';
                 ctx.lineWidth = 3;
                 ctx.beginPath();
                 
@@ -1435,27 +1898,102 @@
                 });
                 
                 ctx.stroke();
+                
+                // Draw dots at each data point
+                ctx.fillStyle = '#ff7e5f';
+                wpmHistory.forEach((point) => {
+                    const x = (point.time / maxTime) * width;
+                    const y = height - ((point.wpm - minWpm) / (maxWpm - minWpm)) * height;
+                    
+                    ctx.beginPath();
+                    ctx.arc(x, y, 4, 0, 2 * Math.PI);
+                    ctx.fill();
+                });
             }
             
-            // Draw Raw WPM line (gray)
-            if (wpmHistory.length > 1) {
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                
-                wpmHistory.forEach((point, index) => {
-                    const x = (point.time / maxTime) * width;
-                    const y = height - ((point.rawWpm - minWpm) / (maxWpm - minWpm)) * height;
-                    
-                    if (index === 0) {
-                        ctx.moveTo(x, y);
-                    } else {
-                        ctx.lineTo(x, y);
+            // Add mouse event listeners for tooltips
+            canvas.onmousemove = function(e) {
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+
+                // Calculate time at mouse position using actual canvas dimensions
+                const scaleX = mouseX / rect.width;
+                const timeAtMouse = scaleX * maxTime;
+
+                // Only show tooltip if mouse is within valid range
+                if (mouseX < 0 || mouseX > rect.width || timeAtMouse > actualMaxTime) {
+                    document.getElementById('graphTooltip').style.display = 'none';
+                    return;
+                }
+
+                // Find the closest data point
+                let closestPoint = null;
+                let minDistance = Infinity;
+
+                wpmHistory.forEach(point => {
+                    const pointX = (point.time / maxTime) * rect.width;
+                    const pointY = rect.height - ((point.wpm - minWpm) / (maxWpm - minWpm)) * rect.height;
+                    const distance = Math.sqrt((mouseX - pointX) ** 2 + (mouseY - pointY) ** 2);
+
+                    if (distance < minDistance) {
+                        minDistance = distance;
+                        closestPoint = point;
                     }
                 });
-                
-                ctx.stroke();
-            }
+
+                if (closestPoint && minDistance < 30) { // Within 30 pixels of a data point
+                    const tooltip = document.getElementById('graphTooltip');
+                    tooltip.textContent = `${closestPoint.wpm} WPM`;
+                    tooltip.style.left = (e.clientX + 10) + 'px';
+                    tooltip.style.top = (e.clientY - 30) + 'px';
+                    tooltip.style.display = 'block';
+                } else {
+                    document.getElementById('graphTooltip').style.display = 'none';
+                }
+            };
+
+            canvas.onmousemove = function(e) {
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+
+                // Scale mouse position to canvas coordinates
+                const canvasX = (mouseX / rect.width) * width;
+                const canvasY = (mouseY / rect.height) * height;
+
+                // Calculate time at mouse position
+                const timeAtMouse = (canvasX / width) * maxTime;
+
+                // Find the closest data point
+                let closestPoint = null;
+                let minDistance = Infinity;
+
+                wpmHistory.forEach(point => {
+                    const pointX = (point.time / maxTime) * width;
+                    const pointY = height - ((point.wpm - minWpm) / (maxWpm - minWpm)) * height;
+                    const distance = Math.sqrt((canvasX - pointX) ** 2 + (canvasY - pointY) ** 2);
+
+                    if (distance < minDistance) {
+                        minDistance = distance;
+                        closestPoint = point;
+                    }
+                });
+
+                if (closestPoint && minDistance < 30) {
+                    const tooltip = document.getElementById('graphTooltip');
+                    tooltip.textContent = `${closestPoint.wpm} WPM`;
+                    tooltip.style.left = (e.clientX + 10) + 'px';
+                    tooltip.style.top = (e.clientY - 30) + 'px';
+                    tooltip.style.display = 'block';
+                } else {
+                    document.getElementById('graphTooltip').style.display = 'none';
+                }
+            };
+
+            canvas.onmouseleave = function() {
+                document.getElementById('graphTooltip').style.display = 'none';
+            };
         }
 
         function saveTestResult(wpm, accuracy) {
@@ -1486,7 +2024,8 @@
                 document.getElementById('rawWpm').textContent = '0';
                 document.getElementById('charBreakdown').innerHTML = '0/0/0/0';
                 document.getElementById('consistency').textContent = '100%';
-                document.getElementById('testTime').textContent = '30s';
+                document.getElementById('testTime').textContent = `${testDuration}s`;
+                document.getElementById('testTimeDisplay').textContent = testDuration;
                 return;
             }
             
@@ -1497,7 +2036,8 @@
             // Update detail stats
             document.getElementById('rawWpm').textContent = lastTestResult.rawWpm;
             document.getElementById('consistency').textContent = `${lastTestResult.consistency}%`;
-            document.getElementById('testTime').textContent = '30s';
+            document.getElementById('testTime').textContent = `${testDuration}s`;
+            document.getElementById('testTimeDisplay').textContent = testDuration;
             
             // Update character breakdown with colors
             const charBreakdown = document.getElementById('charBreakdown');
@@ -1587,13 +2127,14 @@
         currentCharIndex = 0;
         correctChars = 0;
         totalCharsAttempted = 0;
-        timer = 30; // FIXED: Set to 30 seconds
+        timer = testDuration;
         wpmDisplay.textContent = '0';
         accuracyDisplay.textContent = '100%';
         timerDisplay.textContent = `${timer}s`;
 
         // Initialize results display
         updateResultsDisplay();
+        document.getElementById('testTimeDisplay').textContent = testDuration;
 
         // ================== NEW: Keyboard Analytics System ==================
         
