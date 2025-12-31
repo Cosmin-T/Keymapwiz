@@ -29,6 +29,35 @@
             margin-bottom: 40px;
             padding: 20px;
             transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .settings-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(80, 80, 80, 0.3);
+            border: 1px solid #5a5a5a;
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .settings-button:hover {
+            background: rgba(100, 100, 100, 0.4);
+            border-color: #ff7e5f;
+        }
+
+        .settings-icon {
+            width: 16px;
+            height: 16px;
+            fill: #fff;
         }
 
         body.test-active .header {
@@ -797,6 +826,7 @@
             border-radius: 8px;
             transition: all 0.3s;
             position: relative;
+            white-space: nowrap;
         }
 
         .word.future {
@@ -834,6 +864,7 @@
         .char.current {
             position: relative;
             color: #ffffff;
+            scroll-margin: 0;
         }
 
         .char.current::after {
@@ -846,6 +877,29 @@
             background: #ff7e5f;
             animation: blink 1.4s infinite;
             border-radius: 2px;
+        }
+
+        .char.ghost {
+            position: relative;
+        }
+
+        .char.ghost::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 126, 95, 0.4);
+            border-radius: 4px;
+            z-index: -1;
+            animation: ghostPulse 2s infinite;
+            box-shadow: 0 0 8px rgba(255, 126, 95, 0.3);
+        }
+
+        @keyframes ghostPulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
         }
 
         @keyframes blink {
@@ -981,6 +1035,233 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
             display: none;
         }
+
+        /* Settings Modal Backdrop */
+        .settings-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1099;
+            display: none;
+            backdrop-filter: blur(5px);
+        }
+
+        /* Settings Modal */
+        .settings-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(40, 40, 40, 0.98);
+            padding: 45px;
+            border-radius: 20px;
+            z-index: 1100;
+            display: none;
+            max-width: 650px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 126, 95, 0.1);
+            text-align: center;
+            border: 1px solid rgba(255, 126, 95, 0.1);
+        }
+
+        .settings-modal.show {
+            animation: modalIn 0.6s ease-out;
+        }
+
+        .settings-header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .settings-title {
+            color: #ff7e5f;
+            font-size: 2.2em;
+            font-weight: 700;
+            margin: 0;
+            text-shadow: 0 0 15px rgba(255, 126, 95, 0.4);
+        }
+
+        .settings-content {
+            display: flex;
+            flex-direction: column;
+            gap: 35px;
+        }
+
+        .setting-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            padding: 25px;
+            background: rgba(60, 60, 60, 0.3);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 126, 95, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .setting-group:hover {
+            border-color: rgba(255, 126, 95, 0.3);
+            background: rgba(70, 70, 70, 0.3);
+        }
+
+        .setting-separator {
+            height: 1px;
+            background: rgba(255, 126, 95, 0.2);
+            margin: 20px 0;
+        }
+
+        .setting-label {
+            color: #fff;
+            font-size: 20px;
+            font-weight: 600;
+            text-align: left;
+            margin-bottom: 5px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .setting-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .value-controls {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .control-btn {
+            background: rgba(80, 80, 80, 0.6);
+            border: 2px solid rgba(255, 126, 95, 0.2);
+            border-radius: 10px;
+            padding: 12px 18px;
+            color: #fff;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            min-width: 50px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .control-btn:hover {
+            background: rgba(100, 100, 100, 0.7);
+            border-color: #ff7e5f;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 126, 95, 0.2);
+        }
+
+        .control-btn:active {
+            transform: translateY(0);
+        }
+
+        .control-value {
+            color: #ff7e5f;
+            font-size: 22px;
+            font-weight: 700;
+            min-width: 65px;
+            text-align: center;
+            background: rgba(255, 126, 95, 0.1);
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 126, 95, 0.2);
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 65px;
+            height: 32px;
+            background: rgba(80, 80, 80, 0.6);
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255, 126, 95, 0.2);
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+
+        .toggle-switch.active {
+            background: linear-gradient(135deg, #ff7e5f, #e56a4a);
+            border-color: #ff7e5f;
+            box-shadow: 0 0 20px rgba(255, 126, 95, 0.3);
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 24px;
+            height: 24px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .toggle-switch.active .toggle-slider {
+            transform: translateX(31px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+        }
+
+
+
+
+
+        /* Ghost Progress Indicator */
+        .ghost-progress {
+            background: rgba(40, 40, 40, 0.9);
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin: 20px auto;
+            max-width: 600px;
+            text-align: center;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+
+        .ghost-status {
+            color: #4CAF50;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .ghost-bar {
+            width: 100%;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ghost-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff7e5f, #e56a4a);
+            border-radius: 6px;
+            transition: width 0.3s ease;
+            position: relative;
+        }
+
+        .ghost-target {
+            position: absolute;
+            top: 0;
+            width: 3px;
+            height: 100%;
+            background: #ff7e5f;
+            border-radius: 2px;
+            box-shadow: 0 0 8px rgba(255, 126, 95, 0.6);
+        }
+
+        .ghost-fill.behind {
+            background: linear-gradient(90deg, #ff9800, #ffb74d);
+        }
+
+        .ghost-status.behind {
+            color: #ff9800;
+        }
     </style>
 </head>
 <body>
@@ -989,6 +1270,11 @@
     
     <div class="container">
         <div class="header">
+            <button class="settings-button" id="settingsBtn" title="Settings">
+                <svg class="settings-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.22,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.67 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z"/>
+                </svg>
+            </button>
             <h1>TypeChron Viz</h1>
             <p class="subtitle">Visualize typing on multiple keyboard layouts</p>
         </div>
@@ -1108,21 +1394,30 @@
              </div>
          </div>
         
-        <!-- Stats Container -->
-        <div class="stats-container">
-            <div class="stat-box">
-                <div class="stat-label">Words/Min</div>
-                <div class="stat-value" id="wpm">0</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-label">Accuracy</div>
-                <div class="stat-value" id="accuracy">100%</div>
-            </div>
-            <div class="stat-box">
-                <div class="stat-label">Time</div>
-                <div class="stat-value" id="timer">60s</div>
-            </div>
-        </div>
+         <!-- Ghost Progress Indicator -->
+         <div class="ghost-progress" id="ghostProgress" style="display: none;">
+             <div class="ghost-status" id="ghostStatus">Chasing Ghost...</div>
+             <div class="ghost-bar">
+                 <div class="ghost-fill" id="ghostFill"></div>
+                 <div class="ghost-target" id="ghostTarget"></div>
+             </div>
+         </div>
+
+         <!-- Stats Container -->
+         <div class="stats-container">
+             <div class="stat-box">
+                 <div class="stat-label">Words/Min</div>
+                 <div class="stat-value" id="wpm">0</div>
+             </div>
+             <div class="stat-box">
+                 <div class="stat-label">Accuracy</div>
+                 <div class="stat-value" id="accuracy">100%</div>
+             </div>
+             <div class="stat-box">
+                 <div class="stat-label">Time</div>
+                 <div class="stat-value" id="timer">60s</div>
+             </div>
+         </div>
         
          <!-- Words Display -->
          <div id="wordsDisplay"></div>
@@ -1135,10 +1430,49 @@
           <!-- Modal Backdrop -->
           <div class="modal-backdrop" id="modalBackdrop"></div>
 
-          <!-- Graph Tooltip (outside modal for proper positioning) -->
-          <div class="graph-tooltip" id="graphTooltip"></div>
+           <!-- Graph Tooltip (outside modal for proper positioning) -->
+           <div class="graph-tooltip" id="graphTooltip"></div>
 
-          <!-- Test Results Summary -->
+           <!-- Settings Modal Backdrop -->
+           <div class="settings-backdrop" id="settingsBackdrop"></div>
+
+           <!-- Settings Modal -->
+           <div class="settings-modal" id="settingsModal">
+               <div class="settings-header">
+                   <h2 class="settings-title">Settings</h2>
+               </div>
+
+               <div class="settings-content">
+                   <div class="setting-group">
+                       <div class="setting-label">Text Size</div>
+                       <div class="setting-controls">
+                           <div class="value-controls">
+                               <button class="control-btn" id="decreaseFont">-</button>
+                               <span class="control-value" id="fontSizeDisplay">1.5em</span>
+                               <button class="control-btn" id="increaseFont">+</button>
+                           </div>
+                       </div>
+                   </div>
+
+                   <div class="setting-separator"></div>
+
+                   <div class="setting-group">
+                       <div class="setting-label">Ghost Mode Target WPM</div>
+                       <div class="setting-controls">
+                           <div class="value-controls">
+                               <button class="control-btn" id="decreaseWpm">-</button>
+                               <span class="control-value" id="wpmTargetDisplay">80</span>
+                               <button class="control-btn" id="increaseWpm">+</button>
+                           </div>
+                           <div class="toggle-switch" id="ghostModeToggle">
+                               <div class="toggle-slider"></div>
+                           </div>
+                       </div>
+                   </div>
+               </div>
+           </div>
+
+           <!-- Test Results Summary -->
           <div class="results-summary" id="resultsSummary" style="display: none;">
              <div class="results-container">
                 <div class="results-left">
@@ -1215,6 +1549,22 @@
         let incorrectCharsTyped = 0;
         let extraCharsTyped = 0;
         let missedCharsTyped = 0;
+        let allowScrolling = false;
+        let testStartTime = 0;
+
+        // Settings variables
+        let currentFontSize = 1.5; // em units
+        const minFontSize = 1.0;
+        const maxFontSize = 3.0;
+        const fontSizeStep = 0.1;
+
+        // Ghost mode variables
+        let targetWpm = 80;
+        let ghostModeEnabled = false;
+        let ghostPosition = 0; // Current character position of the ghost
+        const minWpm = 10;
+        const maxWpm = 200;
+        const wpmStep = 1;
 
         const wordsDisplay = document.getElementById('wordsDisplay');
         const wpmDisplay = document.getElementById('wpm');
@@ -1226,6 +1576,25 @@
         const timeValue = document.getElementById('timeValue');
         const startNewTestBtn = document.getElementById('startNewTestBtn');
 
+        // Settings modal elements
+        const settingsBtn = document.getElementById('settingsBtn');
+        const settingsModal = document.getElementById('settingsModal');
+        const settingsBackdrop = document.getElementById('settingsBackdrop');
+        const decreaseFontBtn = document.getElementById('decreaseFont');
+        const increaseFontBtn = document.getElementById('increaseFont');
+        const fontSizeDisplay = document.getElementById('fontSizeDisplay');
+
+        // WPM target elements
+        const decreaseWpmBtn = document.getElementById('decreaseWpm');
+        const increaseWpmBtn = document.getElementById('increaseWpm');
+        const wpmTargetDisplay = document.getElementById('wpmTargetDisplay');
+        const ghostModeToggle = document.getElementById('ghostModeToggle');
+
+        // Prevent modal clicks from closing the modal
+        settingsModal.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+
         // Time slider event listener
         timeSlider.addEventListener('input', function() {
             if (!testActive) {
@@ -1234,6 +1603,8 @@
                 timerDisplay.textContent = `${timer}s`;
                 timeValue.textContent = testDuration;
                 document.getElementById('testTimeDisplay').textContent = testDuration;
+                // Save test duration to localStorage
+                localStorage.setItem('typeChronTestDuration', testDuration);
             } else {
                 // Reset to current test duration if changed during active test
                 this.value = testDuration.toString();
@@ -1248,6 +1619,80 @@
             // Regenerate words immediately when mode changes
             if (!testActive) {
                 generateWords();
+            }
+        });
+
+        // Settings button event listener
+        settingsBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            settingsBackdrop.style.display = 'block';
+            settingsModal.style.display = 'block';
+            settingsModal.classList.add('show');
+        });
+
+        // Close settings modal when clicking outside or pressing Escape
+        document.addEventListener('click', function(e) {
+            if (e.target === settingsBackdrop) {
+                closeSettingsModal();
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && settingsModal.style.display === 'block') {
+                closeSettingsModal();
+            }
+        });
+
+        function closeSettingsModal() {
+            settingsBackdrop.style.display = 'none';
+            settingsModal.style.display = 'none';
+            settingsModal.classList.remove('show');
+        }
+
+        // Font size controls
+        decreaseFontBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (currentFontSize > minFontSize) {
+                currentFontSize -= fontSizeStep;
+                updateFontSize();
+            }
+        });
+
+        increaseFontBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (currentFontSize < maxFontSize) {
+                currentFontSize += fontSizeStep;
+                updateFontSize();
+            }
+        });
+
+        // WPM target controls
+        decreaseWpmBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (targetWpm > minWpm) {
+                targetWpm -= wpmStep;
+                updateWpmTarget();
+            }
+        });
+
+        increaseWpmBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (targetWpm < maxWpm) {
+                targetWpm += wpmStep;
+                updateWpmTarget();
+            }
+        });
+
+        ghostModeToggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            ghostModeEnabled = !ghostModeEnabled;
+            updateGhostModeToggle();
+        });
+
+        increaseFontBtn.addEventListener('click', function() {
+            if (currentFontSize < maxFontSize) {
+                currentFontSize += fontSizeStep;
+                updateFontSize();
             }
         });
 
@@ -1269,6 +1714,8 @@
             correctChars = 0;
             totalCharsAttempted = 0;
             timer = testDuration;
+            allowScrolling = false;
+            testStartTime = 0;
             
             // Clear the display
             wordsDisplay.innerHTML = '';
@@ -1509,7 +1956,8 @@
                 const rowDiv = document.createElement('div');
                 rowDiv.className = 'word-row';
                 rowDiv.style.display = 'block';
-                // rowDiv.style.marginBottom = '10px';
+                rowDiv.style.whiteSpace = 'nowrap';
+                rowDiv.style.marginBottom = '10px';
                 
                 
                 for (let col = 0; col < 10; col++) {  // 10 words per row
@@ -1565,7 +2013,7 @@
             testActive = true;
             startTime = new Date();
             lastKeystrokeTime = startTime.getTime();
-
+            allowScrolling = true; // Enable scrolling when test starts
 
 
             // Reset advanced stats
@@ -1587,6 +2035,10 @@
             if (window.statsUpdateInterval) clearInterval(window.statsUpdateInterval);
             window.statsUpdateInterval = setInterval(updateStats, 100);
 
+            // Initialize ghost progress and clear ghost cursor
+            updateGhostProgress(0);
+            clearGhostCursor();
+
             // Add test-active class to body for focus mode
             document.body.classList.add('test-active');
             focusOverlay.style.display = 'block';
@@ -1607,7 +2059,7 @@
             testJustEnded = true;
             canStartTest = false;
             clearInterval(timerInterval);
-            
+
             // Stop continuous stats update
             if (window.statsUpdateInterval) clearInterval(window.statsUpdateInterval);
 
@@ -1621,6 +2073,10 @@
 
             wpmDisplay.textContent = wpm;
             accuracyDisplay.textContent = `${accuracy}%`;
+
+            // Hide ghost progress and clear ghost cursor
+            document.getElementById('ghostProgress').style.display = 'none';
+            clearGhostCursor();
 
             // Save the test result
             saveTestResult(wpm, accuracy);
@@ -1645,9 +2101,10 @@
 
             // Start test if not active and user types a character
             if (!testActive && e.key.length === 1 && canStartTest) {
+                testStartTime = Date.now();
                 startTest();
             }
-            
+
             if (!testActive) return;
             
             const currentWord = words[currentWordIndex];
@@ -1680,6 +2137,12 @@
             // Handle character keys
             if (e.key.length === 1) {
                 const currentCharElem = document.getElementById(`char-${currentWordIndex}-${currentCharIndex}`);
+                
+                // Check if we're at the end of the word
+                if (!currentCharElem) {
+                    return; // Ignore extra characters beyond word length
+                }
+                
                 totalCharsAttempted++;
                 
                 // Record keystroke timing
@@ -1705,17 +2168,17 @@
                 // Move to next character
                 currentCharIndex++;
                 
+                // Highlight next character
+                const nextCharElem = document.getElementById(`char-${currentWordIndex}-${currentCharIndex}`);
+                if (nextCharElem) {
+                    nextCharElem.classList.add('current');
+                }
+                
                 // Update stats
                 updateStats();
-                
-                // Check if we've reached the end of the word
-                if (currentCharIndex >= currentWord.length) {
-                    if (currentCharElem) currentCharElem.classList.remove('current');
-                } else {
-                    // Highlight next character
-                    const nextCharElem = document.getElementById(`char-${currentWordIndex}-${currentCharIndex}`);
-                    if (nextCharElem) nextCharElem.classList.add('current');
-                }
+
+                // Auto-scroll to current word in test mode only
+                autoScrollToCurrentWord();
             }
             // Handle backspace
             else if (e.key === 'Backspace') {
@@ -1753,10 +2216,103 @@
             const rawWpmCalc = elapsedTime > 0 ? Math.round((correctChars / 5) / elapsedTime) : 0;
             const wpm = Math.min(rawWpmCalc, 300);
             wpmDisplay.textContent = wpm;
-            
+
             // Calculate Accuracy - Standard formula: (correct chars / total chars attempted) * 100
             const accuracy = totalCharsAttempted > 0 ? Math.round((correctChars / totalCharsAttempted) * 100) : 100;
             accuracyDisplay.textContent = `${accuracy}%`;
+
+            // Update ghost progress if enabled
+            updateGhostProgress(wpm);
+        }
+
+        function updateGhostProgress(currentWpm) {
+            const ghostProgress = document.getElementById('ghostProgress');
+            const ghostStatus = document.getElementById('ghostStatus');
+            const ghostFill = document.getElementById('ghostFill');
+            const ghostTarget = document.getElementById('ghostTarget');
+
+            if (!ghostModeEnabled) {
+                ghostProgress.style.display = 'none';
+                clearGhostCursor();
+                return;
+            }
+
+            ghostProgress.style.display = 'block';
+
+            // Calculate progress percentage (cap at 150% of target for visual purposes)
+            const maxDisplayWpm = targetWpm * 1.5;
+            const progressPercent = Math.min((currentWpm / maxDisplayWpm) * 100, 100);
+            const targetPercent = (targetWpm / maxDisplayWpm) * 100;
+
+            ghostFill.style.width = progressPercent + '%';
+            ghostTarget.style.left = targetPercent + '%';
+
+            // Update status text and styling
+            if (currentWpm >= targetWpm) {
+                ghostStatus.textContent = `Ahead of Ghost! (+${currentWpm - targetWpm} WPM)`;
+                ghostStatus.classList.remove('behind');
+                ghostFill.classList.remove('behind');
+            } else {
+                ghostStatus.textContent = `Chasing Ghost... (${targetWpm - currentWpm} WPM behind)`;
+                ghostStatus.classList.add('behind');
+                ghostFill.classList.add('behind');
+            }
+
+            // Update ghost cursor position in text
+            updateGhostCursor();
+        }
+
+        function updateGhostCursor() {
+            if (!ghostModeEnabled || !testActive) {
+                clearGhostCursor();
+                return;
+            }
+
+            // Calculate ghost position based on elapsed time and target WPM
+            const elapsedTime = (new Date() - startTime) / 1000 / 60; // minutes
+            const targetChars = Math.floor((targetWpm * 5) * elapsedTime); // 5 chars per word
+
+            // Find which word and character the ghost should be at
+            let totalChars = 0;
+            let ghostWordIndex = 0;
+            let ghostCharIndex = 0;
+
+            for (let wordIdx = 0; wordIdx < words.length; wordIdx++) {
+                const wordLength = words[wordIdx].length + 1; // +1 for space
+                if (totalChars + wordLength > targetChars) {
+                    ghostWordIndex = wordIdx;
+                    ghostCharIndex = targetChars - totalChars;
+                    break;
+                }
+                totalChars += wordLength;
+            }
+
+            // Find the character element
+            const ghostCharElement = document.getElementById(`char-${ghostWordIndex}-${ghostCharIndex}`);
+
+            clearGhostCursor();
+
+            if (ghostCharElement && !ghostCharElement.classList.contains('current')) {
+                ghostCharElement.classList.add('ghost');
+            }
+        }
+
+        function clearGhostCursor() {
+            const ghostChars = document.querySelectorAll('.char.ghost');
+            ghostChars.forEach(char => char.classList.remove('ghost'));
+        }
+
+        function autoScrollToCurrentWord() {
+            // Only scroll if test is active AND user has typed at least one character
+            if (!testActive || totalCharsAttempted === 0) return;
+            
+            const currentWord = document.getElementById(`word-${currentWordIndex}`);
+            if (!currentWord) return;
+            
+            currentWord.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
         }
 
         function updateRealTimeStats() {
@@ -1779,15 +2335,68 @@
 
         function calculateConsistency() {
             if (wpmHistory.length < 3) return 100;
-            
+
             const wpmValues = wpmHistory.map(entry => entry.wpm);
             const mean = wpmValues.reduce((a, b) => a + b) / wpmValues.length;
             const variance = wpmValues.reduce((sum, wpm) => sum + Math.pow(wpm - mean, 2), 0) / wpmValues.length;
             const standardDeviation = Math.sqrt(variance);
-            
+
             const consistencyPercentage = Math.max(0, Math.round(100 - (standardDeviation / mean * 100)));
             return consistencyPercentage;
         }
+
+        function updateFontSize() {
+            wordsDisplay.style.fontSize = currentFontSize + 'em';
+            fontSizeDisplay.textContent = currentFontSize.toFixed(1) + 'em';
+
+            // Save to localStorage
+            localStorage.setItem('typeChronFontSize', currentFontSize);
+        }
+
+        function updateWpmTarget() {
+            wpmTargetDisplay.textContent = targetWpm;
+            localStorage.setItem('typeChronTargetWpm', targetWpm);
+        }
+
+        function updateGhostModeToggle() {
+            if (ghostModeEnabled) {
+                ghostModeToggle.classList.add('active');
+            } else {
+                ghostModeToggle.classList.remove('active');
+            }
+            localStorage.setItem('typeChronGhostMode', ghostModeEnabled);
+        }
+
+        // Load saved settings on page load
+        window.addEventListener('load', function() {
+            const savedFontSize = localStorage.getItem('typeChronFontSize');
+            if (savedFontSize) {
+                currentFontSize = parseFloat(savedFontSize);
+                updateFontSize();
+            }
+
+            const savedTargetWpm = localStorage.getItem('typeChronTargetWpm');
+            if (savedTargetWpm) {
+                targetWpm = parseInt(savedTargetWpm);
+                updateWpmTarget();
+            }
+
+            const savedGhostMode = localStorage.getItem('typeChronGhostMode');
+            if (savedGhostMode) {
+                ghostModeEnabled = savedGhostMode === 'true';
+                updateGhostModeToggle();
+            }
+
+            const savedTestDuration = localStorage.getItem('typeChronTestDuration');
+            if (savedTestDuration) {
+                testDuration = parseInt(savedTestDuration);
+                timer = testDuration;
+                timerDisplay.textContent = `${timer}s`;
+                timeValue.textContent = testDuration;
+                timeSlider.value = testDuration;
+                document.getElementById('testTimeDisplay').textContent = testDuration;
+            }
+        });
 
         function drawWpmGraph() {
             const canvas = document.getElementById('wpmGraph');
@@ -2128,6 +2737,7 @@
         correctChars = 0;
         totalCharsAttempted = 0;
         timer = testDuration;
+        allowScrolling = false; // Disable scrolling on page load
         wpmDisplay.textContent = '0';
         accuracyDisplay.textContent = '100%';
         timerDisplay.textContent = `${timer}s`;
