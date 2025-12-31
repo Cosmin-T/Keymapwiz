@@ -1170,6 +1170,17 @@
             border-radius: 8px;
             border: 1px solid rgba(255, 126, 95, 0.2);
         }
+        
+        /* Remove number input arrows */
+        .control-value::-webkit-outer-spin-button,
+        .control-value::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        
+        .control-value[type=number] {
+            -moz-appearance: textfield;
+        }
 
         .toggle-switch {
             position: relative;
@@ -1461,7 +1472,7 @@
                        <div class="setting-controls">
                            <div class="value-controls">
                                <button class="control-btn" id="decreaseWpm">-</button>
-                               <span class="control-value" id="wpmTargetDisplay">80</span>
+                                <input type="number" class="control-value" id="wpmTargetDisplay" value="80" min="10" max="200" style="border: none; background: rgba(255, 126, 95, 0.1); color: #ff7e5f; text-align: center; width: 65px;">
                                <button class="control-btn" id="increaseWpm">+</button>
                            </div>
                            <div class="toggle-switch" id="ghostModeToggle">
@@ -1562,6 +1573,7 @@
         let targetWpm = 80;
         let ghostModeEnabled = false;
         let ghostPosition = 0; // Current character position of the ghost
+        let totalWordsRemoved = 0; // Track how many words have been removed from sliding
         const minWpm = 10;
         const maxWpm = 200;
         const wpmStep = 1;
@@ -1616,6 +1628,8 @@
         document.getElementById('wordModeToggle').addEventListener('click', function() {
             this.classList.toggle('active');
             useSentences = !useSentences;
+            // Save to localStorage
+            localStorage.setItem('typeChronUseSentences', useSentences);
             // Regenerate words immediately when mode changes
             if (!testActive) {
                 generateWords();
@@ -2014,6 +2028,7 @@
             startTime = new Date();
             lastKeystrokeTime = startTime.getTime();
             allowScrolling = true; // Enable scrolling when test starts
+            totalWordsRemoved = 0; // Reset removed words counter for ghost
 
 
             // Reset advanced stats
@@ -2099,8 +2114,8 @@
                 return;
             }
 
-            // Start test if not active and user types a character
-            if (!testActive && e.key.length === 1 && canStartTest) {
+            // Start test if not active and user types a character (letters only, no numpad)
+            if (!testActive && e.key.length === 1 && canStartTest && /^[a-zA-Z]$/.test(e.key) && !e.code.startsWith('Numpad')) {
                 testStartTime = Date.now();
                 startTest();
             }
@@ -2136,6 +2151,11 @@
             
             // Handle character keys
             if (e.key.length === 1) {
+                // Ignore numbers (including numpad) and symbols - only allow letters
+                if (!/^[a-zA-Z]$/.test(e.key) || e.code.startsWith('Numpad')) {
+                    return;
+                }
+                
                 const currentCharElem = document.getElementById(`char-${currentWordIndex}-${currentCharIndex}`);
                 
                 // Check if we're at the end of the word
@@ -2270,18 +2290,41 @@
 
             // Calculate ghost position based on elapsed time and target WPM
             const elapsedTime = (new Date() - startTime) / 1000 / 60; // minutes
-            const targetChars = Math.floor((targetWpm * 5) * elapsedTime); // 5 chars per word
+            const absoluteTargetChars = Math.floor((targetWpm * 5) * elapsedTime); // 5 chars per word
+            
+            // Calculate how many characters were in the removed words
+            let charsInRemovedWords = 0;
+            // We can't calculate exact chars from removed words, so estimate: totalWordsRemoved * average 5 chars
+            // Better: track actual removed character count
+            // For now, we need to adjust the target to account for removed words
+            // The ghost should show position relative to CURRENT visible words only
+            
+            // Simple fix: Ghost word index = (absolute word position) - (words removed)
+            const absoluteWordPosition = Math.floor(absoluteTargetChars / 5); // Approximate word position
+            const relativeWordPosition = absoluteWordPosition - totalWordsRemoved;
+            
+            // If ghost is before current visible words, don't show it
+            if (relativeWordPosition < 0) {
+                clearGhostCursor();
+                return;
+            }
+            
+            // If ghost is beyond visible words, show it at the end
+            if (relativeWordPosition >= words.length) {
+                clearGhostCursor();
+                return;
+            }
 
-            // Find which word and character the ghost should be at
+            // Find the exact character position within the word
             let totalChars = 0;
             let ghostWordIndex = 0;
             let ghostCharIndex = 0;
 
             for (let wordIdx = 0; wordIdx < words.length; wordIdx++) {
                 const wordLength = words[wordIdx].length + 1; // +1 for space
-                if (totalChars + wordLength > targetChars) {
+                if (totalChars + wordLength > absoluteTargetChars - (totalWordsRemoved * 5)) {
                     ghostWordIndex = wordIdx;
-                    ghostCharIndex = targetChars - totalChars;
+                    ghostCharIndex = (absoluteTargetChars - (totalWordsRemoved * 5)) - totalChars;
                     break;
                 }
                 totalChars += wordLength;
@@ -2354,9 +2397,38 @@
         }
 
         function updateWpmTarget() {
-            wpmTargetDisplay.textContent = targetWpm;
+            wpmTargetDisplay.value = targetWpm;
             localStorage.setItem('typeChronTargetWpm', targetWpm);
         }
+        
+        // Allow manual WPM input
+        wpmTargetDisplay.addEventListener('blur', function(e) {
+            e.stopPropagation();
+            let value = parseInt(this.value);
+            
+            // If empty or invalid, reset to current targetWpm
+            if (isNaN(value) || this.value === '') {
+                this.value = targetWpm;
+                return;
+            }
+            
+            // Clamp value between min and max
+            value = Math.max(minWpm, Math.min(maxWpm, value));
+            targetWpm = value;
+            this.value = value;
+            localStorage.setItem('typeChronTargetWpm', targetWpm);
+        });
+        
+        wpmTargetDisplay.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                this.blur(); // Trigger blur to save value
+            }
+        });
+        
+        wpmTargetDisplay.addEventListener('click', function(e) {
+            e.stopPropagation();
+            this.select(); // Select all text when clicked for easy editing
+        });
 
         function updateGhostModeToggle() {
             if (ghostModeEnabled) {
@@ -2395,6 +2467,26 @@
                 timeValue.textContent = testDuration;
                 timeSlider.value = testDuration;
                 document.getElementById('testTimeDisplay').textContent = testDuration;
+            }
+
+            const savedKeyboardLayout = localStorage.getItem('typeChronKeyboardLayout');
+            if (savedKeyboardLayout) {
+                currentLayout = savedKeyboardLayout;
+                keyboardSelect.value = savedKeyboardLayout;
+                generateKeyboard();
+            }
+
+            const savedUseSentences = localStorage.getItem('typeChronUseSentences');
+            if (savedUseSentences) {
+                useSentences = savedUseSentences === 'true';
+                const wordModeToggle = document.getElementById('wordModeToggle');
+                if (useSentences) {
+                    wordModeToggle.classList.add('active');
+                } else {
+                    wordModeToggle.classList.remove('active');
+                }
+                // Regenerate words with saved mode
+                generateWords();
             }
         });
 
@@ -2680,6 +2772,7 @@
             if (currentWordIndex === 20) {  // Trigger slide after 2nd row (20 words)
                 // Remove entire 1st row (first 6 words: 0-5)
                 words.splice(0, 10);  // Remove 10 words (first row)
+                totalWordsRemoved += 10; // Track removed words for ghost calculation
                 
                 // Reset position to 1st word of what is now the 2nd row
                 currentWordIndex = 10;  // Reset to first word of new first row
@@ -3472,6 +3565,8 @@
         function changeKeyboardLayout() {
             currentLayout = keyboardSelect.value;
             generateKeyboard();
+            // Save keyboard layout selection
+            localStorage.setItem('typeChronKeyboardLayout', currentLayout);
         }
 
         // Event listeners
