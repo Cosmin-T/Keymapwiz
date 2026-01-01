@@ -1295,10 +1295,11 @@
             <div class="keyboard-info">
                 <div class="keyboard-selector">
                     <!-- <label for="keyboardSelect">Keyboard Layout:</label> -->
-                    <select id="keyboardSelect">
-                        <option value="keychron">ANSI Alice Layout</option>
-                        <option value="marvo">ANSI 87-key</option>
-                    </select>
+                     <select id="keyboardSelect">
+                         <option value="keychron">ANSI Alice Layout</option>
+                         <option value="marvo">ANSI 87-key</option>
+                         <option value="seventyfive">75% Layout</option>
+                     </select>
                 </div>
             </div>
             <div class="keyboard-background">
@@ -3378,8 +3379,106 @@
                 {row: 5, col: 5, x: 708.5, y: 310, width: 52, height: 54, label: 'Win', code: 'MetaRight', key: 'Meta'},
                 {row: 5, col: 6, x: 768, y: 310, width: 52, height: 54, label: 'Menu', code: 'ContextMenu', key: 'ContextMenu'},
                 {row: 5, col: 7, x: 829.5, y: 310, width: 72, height: 54, label: 'Ctrl', code: 'ControlRight', key: 'Control'}
-            ]
-        };
+             ],
+
+              seventyfive: [
+                   // Function Row - 16 keys with uniform 8px spacing, right column aligned
+                   {row: 0, col: 0, x: 0, y: 10, width: 54, height: 54, label: 'Esc', code: 'Escape', key: 'Escape', isSpecial: true},
+                   {row: 0, col: 1, x: 62, y: 10, width: 54, height: 54, label: 'F1', code: 'F1', key: 'F1'},
+                   {row: 0, col: 2, x: 124, y: 10, width: 54, height: 54, label: 'F2', code: 'F2', key: 'F2'},
+                   {row: 0, col: 3, x: 186, y: 10, width: 54, height: 54, label: 'F3', code: 'F3', key: 'F3'},
+                   {row: 0, col: 4, x: 248, y: 10, width: 54, height: 54, label: 'F4', code: 'F4', key: 'F4'},
+                   {row: 0, col: 5, x: 310, y: 10, width: 54, height: 54, label: 'F5', code: 'F5', key: 'F5'},
+                   {row: 0, col: 6, x: 372, y: 10, width: 54, height: 54, label: 'F6', code: 'F6', key: 'F6'},
+                   {row: 0, col: 7, x: 434, y: 10, width: 54, height: 54, label: 'F7', code: 'F7', key: 'F7'},
+                   {row: 0, col: 8, x: 496, y: 10, width: 54, height: 54, label: 'F8', code: 'F8', key: 'F8'},
+                   {row: 0, col: 9, x: 558, y: 10, width: 54, height: 54, label: 'F9', code: 'F9', key: 'F9'},
+                   {row: 0, col: 10, x: 620, y: 10, width: 54, height: 54, label: 'F10', code: 'F10', key: 'F10'},
+                   {row: 0, col: 11, x: 682, y: 10, width: 54, height: 54, label: 'F11', code: 'F11', key: 'F11'},
+                    {row: 0, col: 12, x: 744, y: 10, width: 54, height: 54, label: 'F12', code: 'F12', key: 'F12'},
+                    {row: 0, col: 13, x: 806, y: 10, width: 54, height: 54, label: 'PrtSc', code: 'PrintScreen', key: 'PrintScreen'},
+                    {row: 0, col: 14, x: 864, y: 10, width: 54, height: 54, label: 'Pause', code: 'Pause', key: 'Pause'},
+                    {row: 0, col: 15, x: 922, y: 10, width: 54, height: 54, label: 'Del', code: 'Delete', key: 'Delete'},
+
+                   // Number Row - 15 keys with proper 75% layout (Backspace 2U, Home aligned with Del)
+                   {row: 1, col: 0, x: 0, y: 72, width: 54, height: 54, label: '~\n`', code: 'Backquote', key: '`'},
+                   {row: 1, col: 1, x: 62, y: 72, width: 54, height: 54, label: '!\n1', code: 'Digit1', key: '1'},
+                   {row: 1, col: 2, x: 124, y: 72, width: 54, height: 54, label: '@\n2', code: 'Digit2', key: '2'},
+                   {row: 1, col: 3, x: 186, y: 72, width: 54, height: 54, label: '#\n3', code: 'Digit3', key: '3'},
+                   {row: 1, col: 4, x: 248, y: 72, width: 54, height: 54, label: '$\n4', code: 'Digit4', key: '4'},
+                   {row: 1, col: 5, x: 310, y: 72, width: 54, height: 54, label: '%\n5', code: 'Digit5', key: '5'},
+                   {row: 1, col: 6, x: 372, y: 72, width: 54, height: 54, label: '^\n6', code: 'Digit6', key: '6'},
+                   {row: 1, col: 7, x: 434, y: 72, width: 54, height: 54, label: '&\n7', code: 'Digit7', key: '7'},
+                   {row: 1, col: 8, x: 496, y: 72, width: 54, height: 54, label: '*\n8', code: 'Digit8', key: '8'},
+                   {row: 1, col: 9, x: 558, y: 72, width: 54, height: 54, label: '(\n9', code: 'Digit9', key: '9'},
+                   {row: 1, col: 10, x: 620, y: 72, width: 54, height: 54, label: ')\n0', code: 'Digit0', key: '0'},
+                   {row: 1, col: 11, x: 682, y: 72, width: 54, height: 54, label: '_\n-', code: 'Minus', key: '-'},
+                   {row: 1, col: 12, x: 744, y: 72, width: 54, height: 54, label: '+\n=', code: 'Equal', key: '='},
+                   {row: 1, col: 13, x: 806, y: 72, width: 108, height: 54, label: 'Backspace', code: 'Backspace', key: 'Backspace'},
+                   {row: 1, col: 14, x: 922, y: 72, width: 54, height: 54, label: 'Home', code: 'Home', key: 'Home'},
+
+                   // QWERTY Row - 15 keys with Tab 1.5U, Backslash 1.5U, PgUp aligned
+                   {row: 2, col: 0, x: 0, y: 134, width: 81, height: 54, label: 'Tab', code: 'Tab', key: 'Tab'},
+                   {row: 2, col: 1, x: 89, y: 134, width: 54, height: 54, label: 'Q', code: 'KeyQ', key: 'q'},
+                   {row: 2, col: 2, x: 151, y: 134, width: 54, height: 54, label: 'W', code: 'KeyW', key: 'w'},
+                   {row: 2, col: 3, x: 213, y: 134, width: 54, height: 54, label: 'E', code: 'KeyE', key: 'e'},
+                   {row: 2, col: 4, x: 275, y: 134, width: 54, height: 54, label: 'R', code: 'KeyR', key: 'r'},
+                   {row: 2, col: 5, x: 337, y: 134, width: 54, height: 54, label: 'T', code: 'KeyT', key: 't'},
+                   {row: 2, col: 6, x: 399, y: 134, width: 54, height: 54, label: 'Y', code: 'KeyY', key: 'y'},
+                   {row: 2, col: 7, x: 461, y: 134, width: 54, height: 54, label: 'U', code: 'KeyU', key: 'u'},
+                   {row: 2, col: 8, x: 523, y: 134, width: 54, height: 54, label: 'I', code: 'KeyI', key: 'i'},
+                   {row: 2, col: 9, x: 585, y: 134, width: 54, height: 54, label: 'O', code: 'KeyO', key: 'o'},
+                   {row: 2, col: 10, x: 647, y: 134, width: 54, height: 54, label: 'P', code: 'KeyP', key: 'p'},
+                   {row: 2, col: 11, x: 709, y: 134, width: 54, height: 54, label: '{\n[', code: 'BracketLeft', key: '['},
+                   {row: 2, col: 12, x: 771, y: 134, width: 54, height: 54, label: '}\n]', code: 'BracketRight', key: ']'},
+                   {row: 2, col: 13, x: 833, y: 134, width: 81, height: 54, label: '|\n\\', code: 'Backslash', key: '\\'},
+                   {row: 2, col: 14, x: 922, y: 134, width: 54, height: 54, label: 'PgUp', code: 'PageUp', key: 'PageUp'},
+
+                   // Home Row - 14 keys with CapsLock 1.75U, Enter 2.25U, PgDn aligned
+                   {row: 3, col: 0, x: 0, y: 196, width: 94.5, height: 54, label: 'Caps Lock', code: 'CapsLock', key: 'CapsLock'},
+                   {row: 3, col: 1, x: 102.5, y: 196, width: 54, height: 54, label: 'A', code: 'KeyA', key: 'a'},
+                   {row: 3, col: 2, x: 164.5, y: 196, width: 54, height: 54, label: 'S', code: 'KeyS', key: 's'},
+                   {row: 3, col: 3, x: 226.5, y: 196, width: 54, height: 54, label: 'D', code: 'KeyD', key: 'd'},
+                   {row: 3, col: 4, x: 288.5, y: 196, width: 54, height: 54, label: 'F', code: 'KeyF', key: 'f'},
+                   {row: 3, col: 5, x: 350.5, y: 196, width: 54, height: 54, label: 'G', code: 'KeyG', key: 'g'},
+                   {row: 3, col: 6, x: 412.5, y: 196, width: 54, height: 54, label: 'H', code: 'KeyH', key: 'h'},
+                   {row: 3, col: 7, x: 474.5, y: 196, width: 54, height: 54, label: 'J', code: 'KeyJ', key: 'j'},
+                   {row: 3, col: 8, x: 536.5, y: 196, width: 54, height: 54, label: 'K', code: 'KeyK', key: 'k'},
+                   {row: 3, col: 9, x: 598.5, y: 196, width: 54, height: 54, label: 'L', code: 'KeyL', key: 'l'},
+                   {row: 3, col: 10, x: 660.5, y: 196, width: 54, height: 54, label: ':\n;', code: 'Semicolon', key: ';'},
+                   {row: 3, col: 11, x: 722.5, y: 196, width: 54, height: 54, label: '"\n\'', code: 'Quote', key: "'"},
+                   {row: 3, col: 12, x: 784.5, y: 196, width: 121.5, height: 54, label: 'Enter', code: 'Enter', key: 'Enter', isSpecial: true},
+                   {row: 3, col: 13, x: 922, y: 196, width: 54, height: 54, label: 'PgDn', code: 'PageDown', key: 'PageDown'},
+
+                    // Bottom Letter Row - 14 keys with LShift 2.25U, RShift 1.875U, End aligned, ↑ positioned for arrow cluster
+                    {row: 4, col: 0, x: 0, y: 258, width: 121.5, height: 54, label: 'Shift', code: 'ShiftLeft', key: 'Shift'},
+                    {row: 4, col: 1, x: 129.5, y: 258, width: 54, height: 54, label: 'Z', code: 'KeyZ', key: 'z'},
+                    {row: 4, col: 2, x: 191.5, y: 258, width: 54, height: 54, label: 'X', code: 'KeyX', key: 'x'},
+                    {row: 4, col: 3, x: 253.5, y: 258, width: 54, height: 54, label: 'C', code: 'KeyC', key: 'c'},
+                    {row: 4, col: 4, x: 315.5, y: 258, width: 54, height: 54, label: 'V', code: 'KeyV', key: 'v'},
+                    {row: 4, col: 5, x: 377.5, y: 258, width: 54, height: 54, label: 'B', code: 'KeyB', key: 'b'},
+                    {row: 4, col: 6, x: 439.5, y: 258, width: 54, height: 54, label: 'N', code: 'KeyN', key: 'n'},
+                    {row: 4, col: 7, x: 501.5, y: 258, width: 54, height: 54, label: 'M', code: 'KeyM', key: 'm'},
+                    {row: 4, col: 8, x: 563.5, y: 258, width: 54, height: 54, label: '<\n,', code: 'Comma', key: ','},
+                    {row: 4, col: 9, x: 625.5, y: 258, width: 54, height: 54, label: '>\n.', code: 'Period', key: '.'},
+                    {row: 4, col: 10, x: 687.5, y: 258, width: 54, height: 54, label: '?\n/', code: 'Slash', key: '/'},
+                    {row: 4, col: 11, x: 749.5, y: 258, width: 101.25, height: 54, label: 'Shift', code: 'ShiftRight', key: 'Shift'},
+                    {row: 4, col: 12, x: 860, y: 258, width: 54, height: 54, label: '↑', code: 'ArrowUp', key: 'ArrowUp'},
+                    {row: 4, col: 13, x: 922, y: 258, width: 54, height: 54, label: 'End', code: 'End', key: 'End'},
+
+                    // Modifier / Navigation Row - 10 keys with Spacebar 6.75U, symmetrical Ctrl keys, arrow cluster aligned under End
+                    {row: 5, col: 0, x: 0, y: 320, width: 81, height: 54, label: 'Ctrl', code: 'ControlLeft', key: 'Control'},
+                    {row: 5, col: 1, x: 89, y: 320, width: 54, height: 54, label: 'Win', code: 'MetaLeft', key: 'Meta'},
+                    {row: 5, col: 2, x: 151, y: 320, width: 54, height: 54, label: 'Alt', code: 'AltLeft', key: 'Alt'},
+                    {row: 5, col: 3, x: 213, y: 320, width: 364.5, height: 54, label: 'Space', code: 'Space', key: ' '},
+                    {row: 5, col: 4, x: 585.5, y: 320, width: 54, height: 54, label: 'Alt', code: 'AltRight', key: 'Alt'},
+                    {row: 5, col: 5, x: 647.5, y: 320, width: 54, height: 54, label: 'Fn', code: 'Fn', key: 'Fn'},
+                    {row: 5, col: 6, x: 709.5, y: 320, width: 81, height: 54, label: 'Ctrl', code: 'ControlRight', key: 'Control'},
+                    {row: 5, col: 7, x: 798, y: 320, width: 54, height: 54, label: '←', code: 'ArrowLeft', key: 'ArrowLeft'},
+                    {row: 5, col: 8, x: 860, y: 320, width: 54, height: 54, label: '↓', code: 'ArrowDown', key: 'ArrowDown'},
+                    {row: 5, col: 9, x: 922, y: 320, width: 54, height: 54, label: '→', code: 'ArrowRight', key: 'ArrowRight'}
+               ]
+         };
 
         // DOM elements
         const modeToggle = document.getElementById('modeToggle');
