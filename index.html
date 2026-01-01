@@ -791,19 +791,7 @@
             margin-bottom: 20px;
         }
 
-        .capture-indicator {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #2ecc71;
-            color: white;
-            padding: 12px 18px;
-            border-radius: 30px;
-            font-size: 14px;
-            display: none;
-            z-index: 1000;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-        }
+
 
         /* Typing Test - Minimalist and Wide */
         #wordsDisplay {
@@ -1276,7 +1264,6 @@
     </style>
 </head>
 <body>
-    <div class="capture-indicator" id="captureIndicator">KEYBOARD ONLY MODE - Toggle to return to typing test</div>
     <div class="focus-overlay" id="focusOverlay"></div>
     
     <div class="container">
@@ -3483,7 +3470,6 @@
         // DOM elements
         const modeToggle = document.getElementById('modeToggle');
         const keyboardLayout = document.getElementById('keyboardLayout');
-        const captureIndicator = document.getElementById('captureIndicator');
         const keyboardSelect = document.getElementById('keyboardSelect');
         let currentLayout = 'keychron';
 
@@ -3572,8 +3558,6 @@
                 // Switch to keyboard-only mode
                 modeToggle.classList.add('active');
                 document.body.classList.add('keyboard-only');
-                captureIndicator.style.display = 'block';
-                captureIndicator.textContent = 'KEYBOARD ONLY MODE - Toggle to return to typing test';
                 
                 // Reset analytics for new session
                 resetAnalytics();
@@ -3589,7 +3573,6 @@
                 // Switch back to typing test mode
                 modeToggle.classList.remove('active');
                 document.body.classList.remove('keyboard-only');
-                captureIndicator.style.display = 'none';
                 
                 // Clear any pressed keys
                 pressedKeys.forEach(keyElement => unhighlightKey(keyElement));
