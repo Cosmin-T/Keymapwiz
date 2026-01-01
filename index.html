@@ -354,6 +354,46 @@
             transform: translateX(30px);
         }
 
+        /* Test Type Selector */
+        .test-type-selector {
+            display: flex;
+            background: rgba(80, 80, 80, 0.3);
+            border-radius: 12px;
+            padding: 4px;
+            border: 1px solid rgba(255, 126, 95, 0.2);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .test-type-btn {
+            flex: 1;
+            padding: 10px 20px;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            color: #ddd;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .test-type-btn:hover {
+            background: rgba(100, 100, 100, 0.4);
+            color: #fff;
+        }
+
+        .test-type-btn.active {
+            background: linear-gradient(135deg, #ff7e5f, #e56a4a);
+            color: white;
+            box-shadow: 0 2px 8px rgba(255, 126, 95, 0.3);
+        }
+
+        .test-type-btn:not(:last-child) {
+            margin-right: 4px;
+        }
+
         /* Keyboard Analytics Panel - NEW */
         .keyboard-analytics {
             display: none;
@@ -1294,22 +1334,22 @@
                     <!-- Keyboard layout will be generated here -->
                 </div>
             </div>
-              <div class="control-row">
-                  <div class="control-group">
-                      <span class="mode-label">Typing Test</span>
-                      <div class="toggle-switch" id="modeToggle">
-                          <div class="toggle-slider"></div>
-                      </div>
-                      <span class="mode-label">Keyboard Only</span>
-                  </div>
-                  <div class="control-group">
-                      <span class="mode-label">Words</span>
-                      <div class="toggle-switch" id="wordModeToggle">
-                          <div class="toggle-slider"></div>
-                      </div>
-                      <span class="mode-label">Sentences</span>
-                  </div>
-              </div>
+               <div class="control-row">
+                   <div class="control-group">
+                       <span class="mode-label">Typing Test</span>
+                       <div class="toggle-switch" id="modeToggle">
+                           <div class="toggle-slider"></div>
+                       </div>
+                       <span class="mode-label">Keyboard Only</span>
+                   </div>
+                   <div class="control-group">
+                       <div class="test-type-selector">
+                           <button class="test-type-btn active" data-type="words">Words</button>
+                           <button class="test-type-btn" data-type="sentences">Sentences</button>
+                           <button class="test-type-btn" data-type="custom">Custom Words</button>
+                       </div>
+                   </div>
+               </div>
               <div class="time-selector">
                   <label for="timeSlider">Test Duration: <span id="timeValue">15</span>s</label>
                   <input type="range" id="timeSlider" min="15" max="60" step="15" value="15">
@@ -1521,6 +1561,7 @@
         <div class="instructions">
             <p>Type on your keyboard to see the visualization. Toggle between keyboard layouts using the dropdown.</p>
             <p>Switch to "Keyboard Only" mode to focus solely on the keyboard visualization.</p>
+            <p>Choose test type: <strong>Words</strong> (random words), <strong>Sentences</strong> (common phrases), or <strong>Custom Words</strong> (type any valid English words).</p>
         </div>
     </div>
 
@@ -1534,7 +1575,7 @@
         let startTime = null;
         let timer = 15; // Default 15 seconds timer
         let testDuration = 15; // Selected test duration
-        let useSentences = false; // Mode: false = words, true = sentences
+        let testMode = 'words'; // Mode: 'words', 'sentences', or 'custom'
         let canStartTest = true;
         let testJustEnded = false;
         let timerInterval = null;
@@ -1565,6 +1606,12 @@
         const minWpm = 10;
         const maxWpm = 200;
         const wpmStep = 1;
+
+        // Custom words validation
+        let wordValidationCache = new Map(); // Cache for validated words
+        let pendingValidations = new Set(); // Words currently being validated
+        let validatedWords = new Map(); // Track which words passed validation (word index -> boolean)
+        let customUsedWords = new Map(); // Track which words have been used in custom mode and their counts
 
         const wordsDisplay = document.getElementById('wordsDisplay');
         const wpmDisplay = document.getElementById('wpm');
@@ -1613,15 +1660,46 @@
         });
 
         // Word/Sentence mode toggle event listener
-        document.getElementById('wordModeToggle').addEventListener('click', function() {
-            this.classList.toggle('active');
-            useSentences = !useSentences;
-            // Save to localStorage
-            localStorage.setItem('typeChronUseSentences', useSentences);
-            // Regenerate words immediately when mode changes
-            if (!testActive) {
-                generateWords();
-            }
+        // Test type selector event listeners
+        document.querySelectorAll('.test-type-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const type = this.getAttribute('data-type');
+                
+                // Update active state
+                document.querySelectorAll('.test-type-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Update test mode
+                testMode = type;
+                
+                // Save to localStorage
+                localStorage.setItem('typeChronTestMode', testMode);
+                
+                // Clear global used words/sentences when switching modes
+                if (type === 'words') {
+                    globalUsedWords.clear();
+                } else if (type === 'sentences') {
+                    globalUsedSentences.clear();
+                } else if (type === 'custom') {
+                    // Clear validation cache when switching to custom mode
+                    wordValidationCache.clear();
+                    validatedWords.clear();
+                }
+                
+                // Regenerate words immediately when mode changes
+                if (!testActive) {
+                    generateWords();
+                } else {
+                    // If test is active, end it and start fresh
+                    if (testActive) {
+                        testActive = false;
+                        clearInterval(timerInterval);
+                        document.body.classList.remove('test-active');
+                        focusOverlay.style.display = 'none';
+                    }
+                    generateWords();
+                }
+            });
         });
 
         // Settings button event listener
@@ -1718,6 +1796,7 @@
             timer = testDuration;
             allowScrolling = false;
             testStartTime = 0;
+            validatedWords.clear();
             
             // Clear the display
             wordsDisplay.innerHTML = '';
@@ -1892,11 +1971,190 @@
             "about", "could", "first", "great", "these", "would", "other", "thing", "think", "where", "right", "three", "years", "place", "after", "house", "never", "water", "while", "every", "found", "going", "under", "again", "being", "large", "often", "those", "which", "until", "since", "world", "today", "small", "state", "child", "group", "money", "music", "night", "party", "still", "story", "study", "table", "there", "times", "trade", "union", "value", "voice", "white", "write", "young", "above", "alone", "apple", "black", "brown", "chair", "clean", "clear", "close", "dance", "dream", "early", "earth", "field", "final", "floor", "force", "fresh", "front", "glass", "grass", "green", "happy", "heart", "heavy", "human", "light", "local", "march", "match", "metal", "model", "month", "north", "paper", "peace", "phone", "piece", "plant", "point", "power", "press", "quick", "quiet", "radio", "reach", "river", "round", "score", "sense", "share", "sheet", "short", "sleep", "smile", "sound", "south", "space", "speak", "spend", "stage", "stand", "start", "steel", "stone", "sweet", "thick", "throw", "touch", "track", "train", "treat", "trust", "truth", "uncle", "under", "visit", "watch", "wheel", "whole", "woman", "women", "worth", "write", "wrong", "youth", "angry", "basic", "beach", "bread", "break", "bring", "build", "catch", "chain", "cheap", "check", "class", "climb", "clock", "cloth", "cloud", "coach", "coast", "count", "court", "cover", "craft", "crash", "crazy", "cream", "crime", "cross", "crowd", "death", "depth", "diary", "doubt", "dozen", "draft", "drama", "dress", "drink", "drive", "drive", "drugs", "empty", "enemy", "enjoy", "equal", "event", "exact", "exist", "extra", "faith", "false", "frame", "fruit", "funny", "ghost", "giant", "given", "grace", "grand", "grant", "grave", "great", "grief", "gross", "guard", "guess", "guest", "guide", "habit", "horse", "hotel", "hurry", "ideal", "image", "index", "inner", "input", "issue", "joint", "judge", "knife", "knock", "label", "labor", "laugh", "layer", "leave", "legal", "level", "limit", "liver", "logic", "loose", "lucky", "lunch", "magic", "major", "maker", "maple", "marry", "maybe", "mayor", "medal", "media", "merit", "minor", "mixed", "modal", "money", "moral", "motor", "mount", "mouse", "mouth", "movie", "nasty", "naval", "noise", "north", "novel", "nurse", "ocean", "offer", "order", "organ", "other", "owner", "panel", "patch", "pause", "phase", "phone", "photo", "piano", "pilot", "pitch", "plain", "plane", "plaza", "plate", "point", "pound", "power", "press", "price", "pride", "prime", "print", "prior", "prize", "proof", "prove", "proud", "queen", "query", "quest", "quick", "quiet", "quite", "quote", "raise", "range", "rapid", "ratio", "reach", "react", "ready", "rebel", "refer", "relax", "reply", "rider", "right", "rival", "river", "robot", "roger", "roman", "rough", "round", "route", "royal", "ruler", "rural", "scale", "scene", "scope", "score", "sense", "serve", "setup", "seven", "shade", "shake", "shall", "shame", "shape", "share", "sharp", "sheep", "sheet", "shelf", "shell", "shift", "shine", "shirt", "shock", "shoot", "short", "shown", "sight", "silly", "since", "sixth", "skill", "sleep", "slide", "small", "smart", "smile", "smoke", "snake", "solid", "solve", "sorry", "sound", "south", "space", "spare", "speak", "speed", "spend", "split", "spoke", "sport", "staff", "stage", "stake", "stamp", "stand", "start", "state", "steam", "steel", "stick", "still", "stock", "stone", "stood", "store", "storm", "story", "strip", "stuck", "study", "stuff", "style", "sugar", "suite", "super", "sweet", "swift", "swing", "table", "taken", "taste", "teach", "thank", "theft", "their", "theme", "there", "these", "thick", "thing", "think", "third", "those", "three", "threw", "throw", "thumb", "tight", "timer", "tired", "title", "today", "token", "total", "touch", "tough", "tower", "track", "trade", "trail", "train", "trash", "treat", "trend", "trial", "tribe", "trick", "tried", "truck", "truly", "trunk", "trust", "truth", "twice", "twist", "ultra", "uncle", "under", "undue", "union", "unity", "until", "upper", "urban", "usage", "usual", "valid", "value", "video", "virus", "visit", "vital", "voice", "waste", "watch", "water", "wheat", "wheel", "where", "which", "while", "white", "whole", "whose", "widow", "width", "woman", "women", "world", "worry", "worse", "worst", "worth", "would", "write", "wrong", "wrote", "youth"
         ];
 
+        // Function to re-render just the current word (for custom mode)
+        function renderCurrentWord() {
+            const wordIndex = currentWordIndex;
+            const word = words[wordIndex];
+            const wordElem = document.getElementById(`word-${wordIndex}`);
+            
+            if (!wordElem) return;
+            
+            // Clear existing content
+            wordElem.innerHTML = '';
+            
+            // Add characters
+            for (let charIndex = 0; charIndex < word.length; charIndex++) {
+                const charSpan = document.createElement('span');
+                charSpan.className = 'char';
+                charSpan.id = `char-${wordIndex}-${charIndex}`;
+                charSpan.textContent = word[charIndex];
+                
+                // Mark past characters as correct
+                if (charIndex < currentCharIndex) {
+                    charSpan.classList.add('correct');
+                }
+                
+                wordElem.appendChild(charSpan);
+            }
+            
+            // Add placeholder if word is empty
+            if (word.length === 0) {
+                const placeholderSpan = document.createElement('span');
+                placeholderSpan.className = 'char placeholder';
+                placeholderSpan.textContent = ' ';
+                placeholderSpan.style.opacity = '0.3';
+                wordElem.appendChild(placeholderSpan);
+            }
+        }
+
+        // Function to validate a word for custom mode
+        async function validateWord(word) {
+            // Clean the word (remove punctuation, lowercase)
+            const cleanWord = word.toLowerCase().replace(/[^a-z]/g, '');
+            
+            if (!cleanWord) {
+                return false;
+            }
+            
+            // DEBUG: Log what word we're validating
+            console.log(`DEBUG: Validating word: "${word}" -> "${cleanWord}"`);
+            
+            // Check for excessive duplicates in custom mode
+            if (testMode === 'custom') {
+                const count = customUsedWords.get(cleanWord) || 0;
+                // Allow a word to appear up to 3 times (for natural language)
+                if (count >= 3) {
+                    console.log(`DEBUG: "${cleanWord}" appears ${count} times (max 3) - REJECTED`);
+                    return false;
+                }
+            }
+            
+            // Always accept these very common words without any checks
+            const alwaysAccept = new Set([
+                'a', 'i', 'am', 'an', 'as', 'at', 'be', 'by', 'do', 'go', 'he', 'hi', 
+                'if', 'in', 'is', 'it', 'me', 'my', 'no', 'of', 'oh', 'on', 'or', 'ox',
+                'so', 'to', 'up', 'us', 'we', 'the', 'and', 'for', 'are', 'but', 'not',
+                'you', 'all', 'can', 'had', 'her', 'was', 'one', 'our', 'out', 'day',
+                'get', 'has', 'him', 'his', 'how', 'man', 'new', 'now', 'old', 'see',
+                'two', 'way', 'who', 'boy', 'did', 'its', 'let', 'put', 'say', 'she',
+                'too', 'use', 'may', 'try', 'own', 'run', 'why'
+            ]);
+            
+            if (alwaysAccept.has(cleanWord)) {
+                console.log(`DEBUG: "${cleanWord}" is in alwaysAccept - ACCEPTED`);
+                // Add to used words if in custom mode
+                if (testMode === 'custom') {
+                    const count = customUsedWords.get(cleanWord) || 0;
+                    customUsedWords.set(cleanWord, count + 1);
+                }
+                return true;
+            }
+            
+            // Check cache first
+            if (wordValidationCache.has(cleanWord)) {
+                const cached = wordValidationCache.get(cleanWord);
+                console.log(`DEBUG: "${cleanWord}" from cache: ${cached}`);
+                // Add to used words if valid and in custom mode
+                if (cached && testMode === 'custom') {
+                    const count = customUsedWords.get(cleanWord) || 0;
+                    customUsedWords.set(cleanWord, count + 1);
+                }
+                return cached;
+            }
+            
+            // Check if already being validated
+            if (pendingValidations.has(cleanWord)) {
+                // Wait for existing validation
+                return new Promise(resolve => {
+                    const checkInterval = setInterval(() => {
+                        if (!pendingValidations.has(cleanWord)) {
+                            clearInterval(checkInterval);
+                            const cached = wordValidationCache.get(cleanWord) || false;
+                            console.log(`DEBUG: "${cleanWord}" from pending cache: ${cached}`);
+                            // Add to used words if valid and in custom mode
+                            if (cached && testMode === 'custom') {
+                                const count = customUsedWords.get(cleanWord) || 0;
+                                customUsedWords.set(cleanWord, count + 1);
+                            }
+                            resolve(cached);
+                        }
+                    }, 50);
+                });
+            }
+            
+            // Add to pending validations
+            pendingValidations.add(cleanWord);
+            
+            try {
+                console.log(`DEBUG: Checking API for "${cleanWord}"`);
+                const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${cleanWord}`);
+                
+                console.log(`DEBUG: API response status for "${cleanWord}": ${response.status}`);
+                
+                // Check if response is OK (status 200-299)
+                if (!response.ok) {
+                    // 404 means word not found
+                    console.log(`DEBUG: "${cleanWord}" not found in API`);
+                    wordValidationCache.set(cleanWord, false);
+                    pendingValidations.delete(cleanWord);
+                    return false;
+                }
+                
+                // Try to parse JSON to make sure it's valid word data
+                const data = await response.json();
+                
+                // Check if we got valid word data
+                // Valid words return an array with at least one entry that has a 'word' field
+                // Invalid words return a dictionary with 'title' field like 'No Definitions Found'
+                let isValid = false;
+                if (Array.isArray(data) && data.length > 0 && data[0].word) {
+                    isValid = true;
+                } else if (data && typeof data === 'object' && data.title === 'No Definitions Found') {
+                    isValid = false;
+                } else {
+                    // Unknown response format, assume invalid
+                    isValid = false;
+                }
+                
+                console.log(`DEBUG: API says "${cleanWord}" is valid: ${isValid}`);
+                
+                // Cache the result
+                wordValidationCache.set(cleanWord, isValid);
+                
+                // Add to used words if valid and in custom mode
+                if (isValid && testMode === 'custom') {
+                    const count = customUsedWords.get(cleanWord) || 0;
+                    customUsedWords.set(cleanWord, count + 1);
+                }
+                
+                // Remove from pending
+                pendingValidations.delete(cleanWord);
+                
+                return isValid;
+            } catch (error) {
+                console.error('Error validating word:', error);
+                // On error, be conservative and assume invalid
+                wordValidationCache.set(cleanWord, false);
+                pendingValidations.delete(cleanWord);
+                return false;
+            }
+        }
+
         function generateWords() {
             words = [];
+            
+            if (testMode === 'custom') {
+                // For custom mode, start with 30 empty words
+                for (let i = 0; i < 30; i++) {
+                    words.push('');
+                }
+                renderWords();
+                return;
+            }
+            
             const usedWords = new Set();
 
-            if (useSentences) {
+            if (testMode === 'sentences') {
                 // Use sentences mode with no repeats
                 let attempts = 0;
                 while (words.length < 30 && attempts < 100) {
@@ -1920,7 +2178,7 @@
                 }
                 words = words.slice(0, 30); // Take first 30 words
             } else {
-                // Use words mode (original logic)
+                // Use words mode (default)
                 for (let i = 0; i < 30; i++) {  // Generate 30 words (3 rows x 10 words)
                     let word;
                     let attempts = 0;
@@ -1998,6 +2256,15 @@
                         wordSpan.appendChild(charSpan);
                     }
                     
+                    // Add placeholder for empty words in custom mode
+                    if (testMode === 'custom' && word.length === 0) {
+                        const placeholderSpan = document.createElement('span');
+                        placeholderSpan.className = 'char placeholder';
+                        placeholderSpan.textContent = ' ';
+                        placeholderSpan.style.opacity = '0.3';
+                        wordSpan.appendChild(placeholderSpan);
+                    }
+                    
                     rowDiv.appendChild(wordSpan);
                 }
                 
@@ -2018,6 +2285,8 @@
             allowScrolling = true; // Enable scrolling when test starts
             totalWordsRemoved = 0; // Reset removed words counter for ghost
 
+            // Reset custom mode tracking
+            customUsedWords.clear();
 
             // Reset advanced stats
             wpmHistory = [];
@@ -2132,15 +2401,99 @@
                     correctChars++;
                 }
                 
+                // Move to next word immediately for responsiveness
                 moveToNextWord();
                 updateStats();
+                updateRealTimeStats();
+                autoScrollToCurrentWord();
+                
+                // In custom mode, validate the word asynchronously
+                if (testMode === 'custom' && wordCorrect) {
+                    const wordToValidate = currentWord; // Save the word text
+                    const wordLength = currentWord.length; // Save word length
+                    
+                    validateWord(currentWord).then(isValid => {
+                        if (!isValid) {
+                            // Find ALL words with this text and mark them as incorrect
+                            const wordElements = document.querySelectorAll('.word');
+                            let totalAdjustedChars = 0;
+                            
+                            for (const wordElem of wordElements) {
+                                const wordText = Array.from(wordElem.querySelectorAll('.char'))
+                                    .map(char => char.textContent)
+                                    .join('');
+                                
+                                if (wordText === wordToValidate) {
+                                    // Mark all characters in this word as incorrect
+                                    const charElements = wordElem.querySelectorAll('.char');
+                                    charElements.forEach(charElem => {
+                                        if (charElem.classList.contains('correct')) {
+                                            charElem.classList.remove('correct');
+                                            charElem.classList.add('incorrect');
+                                            totalAdjustedChars++;
+                                        }
+                                    });
+                                }
+                            }
+                            
+                            // Adjust correct chars count (we counted them as correct initially)
+                            if (totalAdjustedChars > 0) {
+                                correctChars -= totalAdjustedChars;
+                                correctCharsTyped -= totalAdjustedChars;
+                                // Update accuracy stats
+                                updateStats();
+                            }
+                        }
+                    });
+                }
                 return;
             }
             
             // Handle character keys
             if (e.key.length === 1) {
-                // Ignore numbers (including numpad) and symbols - only allow letters
-                if (!/^[a-zA-Z]$/.test(e.key) || e.code.startsWith('Numpad')) {
+                // In custom mode, allow any character (letters, numbers, symbols)
+                // In other modes, only allow letters
+                if (testMode === 'custom') {
+                    // Allow most printable characters except control characters
+                    if (e.key.length === 1 && e.key >= ' ' && e.key <= '~') {
+                        // Allow it
+                    } else {
+                        return;
+                    }
+                } else {
+                    // Ignore numbers (including numpad) and symbols - only allow letters
+                    if (!/^[a-zA-Z]$/.test(e.key) || e.code.startsWith('Numpad')) {
+                        return;
+                    }
+                }
+                
+                // In custom mode, we need to handle empty words differently
+                if (testMode === 'custom' && currentCharIndex >= words[currentWordIndex].length) {
+                    // Add character to the current word in custom mode
+                    words[currentWordIndex] += e.key;
+                    // Re-render the current word to show the new character
+                    renderCurrentWord();
+                    // Get the newly created character element
+                    const newCharElem = document.getElementById(`char-${currentWordIndex}-${currentCharIndex}`);
+                    if (newCharElem) {
+                        // Mark it as correct (since user just typed it)
+                        newCharElem.classList.add('correct');
+                        totalCharsAttempted++;
+                        correctChars++;
+                        correctCharsTyped++;
+                        currentCharIndex++;
+                        updateStats();
+                        updateRealTimeStats();
+                        
+                        // Add current class to next character if it exists
+                        const nextCharElem = document.getElementById(`char-${currentWordIndex}-${currentCharIndex}`);
+                        if (nextCharElem) {
+                            nextCharElem.classList.add('current');
+                        }
+                        
+                        // Auto-scroll in custom mode
+                        autoScrollToCurrentWord();
+                    }
                     return;
                 }
                 
@@ -2198,6 +2551,12 @@
                     // Move back one character
                     currentCharIndex--;
                     
+                    // In custom mode, remove the character from the words array
+                    if (testMode === 'custom' && words[currentWordIndex].length > 0) {
+                        words[currentWordIndex] = words[currentWordIndex].slice(0, -1);
+                        renderCurrentWord();
+                    }
+                    
                     // Reset the character we're going back to
                     const prevCharElem = document.getElementById(`char-${currentWordIndex}-${currentCharIndex}`);
                     if (prevCharElem) {
@@ -2213,6 +2572,7 @@
                     }
                     
                     updateStats();
+                    autoScrollToCurrentWord();
                 }
             }
         }
@@ -2464,17 +2824,35 @@
                 generateKeyboard();
             }
 
+            // Load saved test mode (with backward compatibility for old useSentences)
+            const savedTestMode = localStorage.getItem('typeChronTestMode');
             const savedUseSentences = localStorage.getItem('typeChronUseSentences');
-            if (savedUseSentences) {
-                useSentences = savedUseSentences === 'true';
-                const wordModeToggle = document.getElementById('wordModeToggle');
-                if (useSentences) {
-                    wordModeToggle.classList.add('active');
-                } else {
-                    wordModeToggle.classList.remove('active');
-                }
+            
+            if (savedTestMode) {
+                testMode = savedTestMode;
+                // Update button states
+                document.querySelectorAll('.test-type-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.getAttribute('data-type') === testMode) {
+                        btn.classList.add('active');
+                    }
+                });
                 // Regenerate words with saved mode
                 generateWords();
+            } else if (savedUseSentences) {
+                // Backward compatibility: convert old useSentences to new testMode
+                testMode = savedUseSentences === 'true' ? 'sentences' : 'words';
+                // Update button states
+                document.querySelectorAll('.test-type-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.getAttribute('data-type') === testMode) {
+                        btn.classList.add('active');
+                    }
+                });
+                // Regenerate words with saved mode
+                generateWords();
+                // Save as new format
+                localStorage.setItem('typeChronTestMode', testMode);
             }
         });
 
@@ -2756,47 +3134,73 @@
             currentWordIndex++;
             currentCharIndex = 0;
             
-            // Sliding rows: when finishing LAST word of 2nd row, slide everything up
-            if (currentWordIndex === 20) {  // Trigger slide after 2nd row (20 words)
-                // Remove entire 1st row (first 6 words: 0-5)
-                words.splice(0, 10);  // Remove 10 words (first row)
-                totalWordsRemoved += 10; // Track removed words for ghost calculation
-                
-                // Reset position to 1st word of what is now the 2nd row
-                currentWordIndex = 10;  // Reset to first word of new first row
-                
-                // Add 6 new words to create new 3rd row
-                const usedWords = new Set(words);
-                
-                for (let i = 0; i < 10; i++) {  // Add 10 new words
-                    let word;
-                    let attempts = 0;
-                    
-                    do {
-                        attempts++;
-                        
-                        // Pick random word from our massive list
-                        word = allWords[Math.floor(Math.random() * allWords.length)];
-                        
-                        if (attempts > 200) {
-                            // Reset global used words if we've exhausted the pool
-                            globalUsedWords.clear();
-                            word = allWords[Math.floor(Math.random() * allWords.length)];
-                            break;
-                        }
-                        
-                    } while (usedWords.has(word) || globalUsedWords.has(word) || word === '');
-                    
-                    usedWords.add(word);
-                    globalUsedWords.add(word);
-                    words.push(word);
+            // Handle custom mode differently
+            if (testMode === 'custom') {
+                // In custom mode, add new empty word if we're at the end
+                if (currentWordIndex >= words.length) {
+                    words.push(''); // Add empty word
+                    renderWords();
                 }
                 
-                renderWords();
+                // Sliding rows for custom mode
+                if (currentWordIndex === 20) {  // Trigger slide after 2nd row (20 words)
+                    // Remove entire 1st row (first 10 words: 0-9)
+                    words.splice(0, 10);  // Remove 10 words (first row)
+                    totalWordsRemoved += 10; // Track removed words for ghost calculation
+                    
+                    // Reset position to 1st word of what is now the 2nd row
+                    currentWordIndex = 10;  // Reset to first word of new first row
+                    
+                    // Add 10 new empty words to create new 3rd row
+                    for (let i = 0; i < 10; i++) {
+                        words.push('');
+                    }
+                    
+                    renderWords();
+                }
+            } else {
+                // Original sliding rows logic for words/sentences mode
+                if (currentWordIndex === 20) {  // Trigger slide after 2nd row (20 words)
+                    // Remove entire 1st row (first 10 words: 0-9)
+                    words.splice(0, 10);  // Remove 10 words (first row)
+                    totalWordsRemoved += 10; // Track removed words for ghost calculation
+                    
+                    // Reset position to 1st word of what is now the 2nd row
+                    currentWordIndex = 10;  // Reset to first word of new first row
+                    
+                    // Add 10 new words to create new 3rd row
+                    const usedWords = new Set(words);
+                    
+                    for (let i = 0; i < 10; i++) {  // Add 10 new words
+                        let word;
+                        let attempts = 0;
+                        
+                        do {
+                            attempts++;
+                            
+                            // Pick random word from our massive list
+                            word = allWords[Math.floor(Math.random() * allWords.length)];
+                            
+                            if (attempts > 200) {
+                                // Reset global used words if we've exhausted the pool
+                                globalUsedWords.clear();
+                                word = allWords[Math.floor(Math.random() * allWords.length)];
+                                break;
+                            }
+                            
+                        } while (usedWords.has(word) || globalUsedWords.has(word) || word === '');
+                        
+                        usedWords.add(word);
+                        globalUsedWords.add(word);
+                        words.push(word);
+                    }
+                    
+                    renderWords();
+                }
             }
             
-            // Check if we've reached the end of the test
-            if (currentWordIndex >= words.length) {
+            // Check if we've reached the end of the test (only for non-custom modes)
+            if (testMode !== 'custom' && currentWordIndex >= words.length) {
                 endTest();
                 return;
             }
