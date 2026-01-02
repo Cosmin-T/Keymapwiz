@@ -1676,15 +1676,18 @@
                 }
                 
                 // Only count space as correct if the entire word was correct
-                totalCharsAttempted++;
-                if (wordCorrect) {
-                    correctChars++;
-                    // Count space as a correct "character" in the breakdown
-                    // (spaces are part of the character count in typing tests)
-                    correctCharsTyped++;
-                } else {
-                    // Count space as incorrect
-                    incorrectCharsTyped++;
+                // Only count space if at least one character was in the word
+                if (currentWord.length > 0) {
+                    totalCharsAttempted++;
+                    if (wordCorrect) {
+                        correctChars++;
+                        // Count space as a correct "character" in the breakdown
+                        // (spaces are part of the character count in typing tests)
+                        correctCharsTyped++;
+                    } else {
+                        // Count space as incorrect
+                        incorrectCharsTyped++;
+                    }
                 }
                 
                 moveToNextWord();

@@ -2029,9 +2029,16 @@
                 }
             }
             
+            // Reject single letters (except "a" and "i") - they're not valid English words
+            if (cleanWord.length === 1 && cleanWord !== 'a' && cleanWord !== 'i') {
+                console.log(`DEBUG: "${cleanWord}" is a single letter (not "a" or "i") - REJECTED`);
+                return false;
+            }
+            
             // Always accept these very common words without any checks
             const alwaysAccept = new Set([
-                'a', 'i', 'am', 'an', 'as', 'at', 'be', 'by', 'do', 'go', 'he', 'hi', 
+                'a', 'i', // Only "a" and "i" are valid single-letter words in English
+                'am', 'an', 'as', 'at', 'be', 'by', 'do', 'go', 'he', 'hi', 
                 'if', 'in', 'is', 'it', 'me', 'my', 'no', 'of', 'oh', 'on', 'or', 'ox',
                 'so', 'to', 'up', 'us', 'we', 'the', 'and', 'for', 'are', 'but', 'not',
                 'you', 'all', 'can', 'had', 'her', 'was', 'one', 'our', 'out', 'day',
@@ -2395,10 +2402,13 @@
                     }
                 }
                 
-                // Only count space as correct if the entire word was correct
-                totalCharsAttempted++;
-                if (wordCorrect) {
-                    correctChars++;
+                // Only count space if at least one character was typed in the word
+                // This prevents space spamming on empty words but allows space after typing
+                if (currentWord.length > 0) {
+                    totalCharsAttempted++;
+                    if (wordCorrect) {
+                        correctChars++;
+                    }
                 }
                 
                 // Move to next word immediately for responsiveness
